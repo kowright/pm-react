@@ -20,7 +20,7 @@ function App() {
         <div className="App">
             <header className="App-header">
                 <img src={logo} className="App-logo" alt="logo" />
-                <h1>Task Test Table View</h1>
+                <h1 className="text-3xl font-bold underline text-orange-800	">Task Test Table View</h1>
                 <table>
                     <thead>
                         <tr>
