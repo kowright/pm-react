@@ -17,7 +17,8 @@ function TableView() {
 
     return (
         <div className='mx-8'>
-                <h1 className="text-3xl font-bold underline text-orange-800	">Task Test Table View</h1>
+                <h1>Table View</h1>
+
                 <br />
                 <table className="min-w-full border-collapse border border-gray-200">
                     <thead className="bg-gray-600">
