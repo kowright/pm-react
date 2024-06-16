@@ -14,6 +14,9 @@ function KanbanView() {
     let print = 'Loading...';
     let boardHeaders;
     let taskItems = [];
+    let tasksToRender;
+    let inProgressTasksToRender;
+    let inReviewTasksToRender;
 
     if (data && data.message) {
         // Example of accessing data.message safely
@@ -52,56 +55,60 @@ function KanbanView() {
         console.log(gridRowNum + " x " + gridColumnNum)
 
         boardHeaders = Object.keys(tasksByStatus).map((key, index) => (
-            <div key={index} className='bg-lime-300 rounded-md flex text-xl justify-center'>{key}</div>
+            <div key={index} className='bg-cyan-400 rounded-md flex text-xl justify-center'>{key}</div>
         ))
-
+       
         for (const status in tasksByStatus) {
             tasksByStatus[status].forEach((task, index) => {
                 taskItems.push(
-                    <div className='bg-lime-300 rounded-md flex text-xl justify-center'>{task.name}</div>
+                    <div className='bg-cyan-400 rounded-md flex text-xl justify-center'>{task.name}</div>
                 );
             });
         }
+        tasksToRender = tasksByStatus['Backlog'].map((task, index) => (
+            <div key={index} className='bg-cyan-400 rounded-md flex text-xl justify-center w-80'>
+                {task.name}
+            </div>
+        ));
+
+        inProgressTasksToRender = tasksByStatus['In Progress'].map((task, index) => (
+            <div key={index} className='bg-cyan-400 rounded-md flex text-xl justify-center w-80'>
+                {task.name}
+            </div>
+        ));
+
+        inReviewTasksToRender = tasksByStatus['In Review'].map((task, index) => (
+            <div key={index} className='bg-cyan-400 rounded-md flex text-xl justify-center w-80'>
+                {task.name}
+            </div>
+        ));
     }
 
     return (
         <div>
-            <h1>TIMELINE VIEW</h1>
-            <p>{print}</p>
+            <h1>Kanban View</h1>
 
-            <h1 className="text-3xl font-bold underline text-orange-800	">Task Kanban View</h1>
-            <br />
-            <div className={`grid grid-flow-row gap-4 grid-cols-3 grid-rows-3}`}>
-                {boardHeaders}
+            <div className={`flex gap-4`}>
+                <div className='flex flex-col gap-4'>
+                    <div className='bg-cyan-400 rounded-md flex text-xl justify-center w-80'>
+                        Backlog
+                    </div>
+                    {tasksToRender}
+                </div>
+                <div className='flex flex-col gap-4'>
+                    <div className='bg-cyan-400 rounded-md flex text-xl justify-center w-80'>
+                        In Progress
+                    </div>
+                    {inProgressTasksToRender}
+                </div>
+                <div className='flex flex-col gap-4'>
+                    <div className='bg-cyan-400 rounded-md flex text-xl justify-center w-80'>
+                        In Review
+                    </div>
+                    {inReviewTasksToRender}
+                </div>
 
-                <div className='bg-lime-300 rounded-md flex  justify-center'>01</div>
-                <div className='bg-lime-300 rounded-md flex justify-center'>02</div>
-                <div className='bg-lime-300 rounded-md flex  justify-center'>03</div>
-            </div>
-
-            <br />
-            <hr />
-            <br />
-
-            <div className={`grid grid-flow-col gap-4 grid-cols-3 grid-rows-3`}>
-
-                <div className='bg-lime-300 rounded-md flex justify-center'>01</div>
-                <div className='bg-lime-300 rounded-md flex justify-center'>02</div>
-                <div className='bg-lime-300 rounded-md flex justify-center'>03</div>
-                <div className='bg-lime-300 rounded-md flex justify-center'>04</div>
-                <div className='bg-lime-300 rounded-md flex justify-center' style={{ gridColumn: '3' }}>05</div>
-                <div className='bg-lime-300 rounded-md flex justify-center' style={{ gridColumn: '3' }}>06</div>
-                <div className='bg-lime-300 rounded-md flex justify-center' style={{ gridColumn: '3' }}>07</div>
-
-            </div>
-
-            <br />
-            <hr />
-            <br />
-
-            <div className={`grid grid-flow-row gap-4 grid-cols-3 grid-rows-3`}>
-                {boardHeaders}
-                {taskItems}
+               
 
             </div>
         </div>
