@@ -2,51 +2,18 @@ import logo from './logo.svg';
 import './App.css';
 
 import React from "react";
-
+import TableView from './TableView';
+import KanbanView from './KanbanView';
+import TimelineView from './TimelineView';
 function App() {
-    const [data, setData] = React.useState(null);
-
-    React.useEffect(() => {
-        fetch("/api")
-            .then((res) => res.json())
-            .then((data) => setData(data));
-    }, [])
-
-    if (!data) {
-        return <p>Loading...!</p>; // Render loading until data is fetched
-    }
-
+   
     return (
         <div className="App">
             <header className="App-header">
                 <img src={logo} className="App-logo" alt="logo" />
-                <h1 className="text-3xl font-bold underline text-orange-800	">Task Test Table View</h1>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>Description</th>
-                            <th>Duration</th>
-                            <th>Roadmap</th>
-                            <th>Assignee</th>
-                            <th>Start Date</th>
-                            <th>End Date</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {data.message.map((item, index) => (
-                            <tr key={index}>
-                                <td>{item.name}</td>
-                                <td>{item.description}</td>
-                                <td>{item.duration}</td>
-                                <td>{item.roadmap}</td>
-                                <td>{item.assignee}</td>
-                                <td>{item.startDate}</td>
-                                <td>{item.endDate}</td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
+                <h1 className="font-bold text-white">Project Management Tool</h1>
+                <br />
+                <KanbanView/>
             </header>
         </div>
     );
