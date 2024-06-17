@@ -1,9 +1,12 @@
-import logo from './logo.svg';
-
 import React from "react";
 
 function TableView() {
     const [data, setData] = React.useState(null);
+    const [selectedRoadmap, setSelectedRoadmap] = React.useState('');
+
+    const handleFilterByRoadmap = (roadmap) => {
+        setSelectedRoadmap(roadmap); 
+    };
 
     React.useEffect(() => {
         fetch("/api")
@@ -12,14 +15,23 @@ function TableView() {
     }, [])
 
     if (!data) {
-        return <p>Loading...!</p>; // Render loading until data is fetched
+        return <p>Loading...!</p>; // Render loading until data is fetched   
     }
+
+    const filteredTasks = selectedRoadmap
+        ? data.message.filter(task => task.roadmap === selectedRoadmap)
+        : data.message;
 
     return (
         <div className='mx-8'>
                 <h1>Table View</h1>
-
-                <br />
+  
+            <div className='flex gap-4 justify-center'>
+                <button className='bg-cyan-400 rounded border border-cyan-200 p-2' onClick={() => handleFilterByRoadmap("Engineering Roadmap")}>Engineering Roadmap Tasks</button>
+                <button className='bg-cyan-400 rounded border border-cyan-200 p-2' onClick={() => handleFilterByRoadmap("Design Roadmap")}>Design Roadmap Tasks</button>
+                <button className='bg-cyan-400 rounded border border-cyan-200 p-2' onClick={() => handleFilterByRoadmap("")}>All Roadmaps</button>
+            </div>
+            <br />
                 <table className="min-w-full border-collapse border border-gray-200">
                     <thead className="bg-gray-600">
                         <tr>
@@ -35,7 +47,7 @@ function TableView() {
                         </tr>
                     </thead>
                     <tbody>
-                        {data.message.map((item, index) => (
+                        {filteredTasks.map((item, index) => (
                             <tr key={index}>
                                 <td className="border border-gray-300 px-4 py-2">{item.name}</td>
                                 <td className="border border-gray-300 px-4 py-2">{item.description}</td>
