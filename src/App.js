@@ -5,8 +5,9 @@ import React from "react";
 import TableView from './TableView';
 import KanbanView from './KanbanView';
 import TimelineView from './TimelineView';
+import Timeline from './Timeline/Timeline'
 function App() {
-    const [view, setView] = React.useState('Table');
+    const [view, setView] = React.useState('');
 
     const handleClick = (view) => {
         setView(view)
@@ -25,6 +26,7 @@ function App() {
                 {view === 'Timeline' && <TimelineView />}
                 {view === 'Table' && <TableView />}
                 {view === 'Kanban' && <KanbanView />}
+                <Timeline />
             </header>
         </div>
     );
