@@ -41,9 +41,38 @@ function TimelineView() {
         ))
     }
 
+    const updateTask = (item) => {
+        fetch(`/api/tasks/${item.id-1}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ name: "HELLO" }),
+        })
+            .then(res => res.json())
+            .then(data => {
+                // Handle updated task response if needed
+                console.log('Updated task:', data.task.id);
+                // Optionally update tasks state or handle feedback
+                setData(prev => ({
+                    message: prev.message.map(task => {
+                        if (task.id === (item.id-1)) {
+                            console.log("found updated item; changing " + task.name)
+                            return { ...task, text: data.task.name };
+                        }
+                        return task;
+                    })
+                }));
+            })
+            .catch(error => {
+                console.error('Error updating task:', error);
+            });
+    };
+
     const handleDataUpdated = (entityType, action, item, id) => {
         console.log(`Data updated: ${entityType}, ${action}, ${item}, ${id}`);
         console.log(`It is now duration: ${item.duration}, start date: ${item.start_date} `)
+        updateTask(item)
     };
 
     return (
