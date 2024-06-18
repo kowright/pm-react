@@ -17,11 +17,16 @@ const GanttChart = ({ tasks, onDataUpdated }) => {
         gantt.init(ganttContainer.current);
         gantt.parse(tasks);
 
+        gantt.attachEvent("onAfterTaskUpdate", (id, task) => {
+            onDataUpdated('task', 'update', task, id);
+        });
+
         // Initialize data processor
         const initGanttDataProcessor = () => {
             const processor = gantt.createDataProcessor((entityType, action, item, id) => {
                 return new Promise((resolve, reject) => {
                     if (onDataUpdated) {
+                        console.log("gantt data updated")
                         onDataUpdated(entityType, action, item, id);
                     }
                     return resolve();

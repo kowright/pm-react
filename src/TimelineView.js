@@ -47,22 +47,22 @@ function TimelineView() {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ name: "HELLO" }),
+            body: JSON.stringify({ name: item.name, startDate: item.start_date, duration: item.duration }),
         })
             .then(res => res.json())
             .then(data => {
-                // Handle updated task response if needed
-                console.log('Updated task:', data.task.id);
-                // Optionally update tasks state or handle feedback
-                setData(prev => ({
+                console.log('Updated task:', data.task);
+                // Update state immutably
+          /*      setData(prev => ({
+                    ...prev,
                     message: prev.message.map(task => {
-                        if (task.id === (item.id-1)) {
-                            console.log("found updated item; changing " + task.name)
-                            return { ...task, text: data.task.name };
+                        if (task.id === (item.id - 1)) {
+                            console.log("Found updated item; changing " + data.task.name);
+                            return { ...task };
                         }
                         return task;
                     })
-                }));
+                }));*/
             })
             .catch(error => {
                 console.error('Error updating task:', error);
