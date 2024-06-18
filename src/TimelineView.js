@@ -15,22 +15,7 @@ function TimelineView() {
             .then((res) => res.json())
             .then((data) => setData(data));
     }, [])
-
-
-    /*let tasks = [
-        {
-            start: new Date(2024, 5, 1),
-            end: new Date(2024, 5, 2),
-            name: 'Idea',
-            id: 'Task 0',
-            type: 'task',
-            progress: 45,
-            isDisabled: true,
-            styles: { progressColor: '#ffbb54', progressSelectedColor: '#ff9e0d' },
-        },
-    ];*/
   
-
     let ganttData = {
         data: [
 
@@ -56,6 +41,11 @@ function TimelineView() {
         ))
     }
 
+    const handleDataUpdated = (entityType, action, item, id) => {
+        console.log(`Data updated: ${entityType}, ${action}, ${item}, ${id}`);
+        console.log(`It is now duration: ${item.duration}, start date: ${item.start_date} `)
+    };
+
     return (
         <div>
             <h1>TIMELINE VIEW</h1>
@@ -63,7 +53,7 @@ function TimelineView() {
             <br />
 
             <div className="h-full w-full">
-                <Gantt tasks={ganttData} />
+                <Gantt tasks={ganttData} onDataUpdated={handleDataUpdated} />
             </div>
         </div>
     );

@@ -5,8 +5,9 @@ import { gantt } from 'dhtmlx-gantt';
 
 import 'dhtmlx-gantt'; // Import Gantt library
 
-const GanttChart = ({ tasks }) => {
+const GanttChart = ({ tasks, onDataUpdated }) => {
     const ganttContainer = React.useRef(null);
+    const [dataProcessor, setDataProcessor] = React.useState(null);
 
     React.useEffect(() => {
         if (!ganttContainer.current) return;
@@ -16,10 +17,29 @@ const GanttChart = ({ tasks }) => {
         gantt.init(ganttContainer.current);
         gantt.parse(tasks);
 
+        // Initialize data processor
+        const initGanttDataProcessor = () => {
+            const processor = gantt.createDataProcessor((entityType, action, item, id) => {
+                return new Promise((resolve, reject) => {
+                    if (onDataUpdated) {
+                        onDataUpdated(entityType, action, item, id);
+                    }
+                    return resolve();
+                });
+            });
+            setDataProcessor(processor);
+        };
+
+        initGanttDataProcessor();
+
         return () => {
             gantt.clearAll();
+            if (dataProcessor) {
+                dataProcessor.destructor();
+                setDataProcessor(null);
+            }
         };
-    }, [tasks]);
+    }, [tasks, onDataUpdated]);
 
     const containerStyle = {
         width: '2000px',
@@ -27,7 +47,7 @@ const GanttChart = ({ tasks }) => {
     };
 
     return (
-        <div ref={ganttContainer} style={containerStyle} className="w-full h-full"></div>
+        <div ref={ganttContainer} style={containerStyle} className="w-full h-full overflow-x-auto"></div>
     );
 };
 
