@@ -4,10 +4,15 @@ function KanbanView() {
     const [data, setData] = useState(null);
 
     const [selectedRoadmap, setSelectedRoadmap] = React.useState('');
+    const [selectedTaskStatus, setSelectedTaskStatus] = React.useState('');
 
     const handleFilterByRoadmap = (roadmap) => {
         setSelectedRoadmap(roadmap);
     };
+    const handleFilterByTaskStatus = (status) => {
+        setSelectedTaskStatus(status);
+    };
+
 
     useEffect(() => {
         fetch("/api")
@@ -33,6 +38,10 @@ function KanbanView() {
         filteredTasks = selectedRoadmap
             ? data.message.filter(task => task.roadmap === selectedRoadmap)
             : data.message;
+
+        filteredTasks = selectedTaskStatus
+            ? filteredTasks.filter(task => task.taskStatus === selectedTaskStatus)
+            : filteredTasks;
 
         console.log("filtered tasks " + filteredTasks)
         const tasksByStatus = filteredTasks.reduce((acc, task) => {
@@ -113,10 +122,18 @@ function KanbanView() {
     return (
         <div>
             <h1>Kanban View</h1>
+
             <div className='flex gap-4 justify-center'>
-                <button className='bg-cyan-400 rounded border border-cyan-200 p-2' onClick={() => handleFilterByRoadmap("Engineering Roadmap")}>Engineering Roadmap Tasks</button>
-                <button className='bg-cyan-400 rounded border border-cyan-200 p-2' onClick={() => handleFilterByRoadmap("Design Roadmap")}>Design Roadmap Tasks</button>
-                <button className='bg-cyan-400 rounded border border-cyan-200 p-2' onClick={() => handleFilterByRoadmap("")}>All Roadmaps</button>
+                <button className={`rounded border border-cyan-200 p-2 ${selectedRoadmap === "Engineering Roadmap" ? "bg-cyan-800" : "bg-cyan-400"}`} onClick={() => handleFilterByRoadmap("Engineering Roadmap")}>Engineering Roadmap Tasks</button>
+                <button className={`rounded border border-cyan-200 p-2 ${selectedRoadmap === "Design Roadmap" ? "bg-cyan-800" : "bg-cyan-400"}`} onClick={() => handleFilterByRoadmap("Design Roadmap")} >Design Roadmap Tasks</button>
+                <button className={`rounded border border-cyan-200 p-2 ${selectedRoadmap === "" ? "bg-cyan-800" : "bg-cyan-400"}`} onClick={() => handleFilterByRoadmap("")}>All Roadmaps</button>
+            </div>
+            <br />
+            <div className='flex gap-4 justify-center'>
+                <button className={`rounded border border-cyan-200 p-2 ${selectedTaskStatus === "In Progress" ? "bg-cyan-800" : "bg-cyan-400"}`} onClick={() => handleFilterByTaskStatus("In Progress")}>In Progress</button>
+                <button className={`rounded border border-cyan-200 p-2 ${selectedTaskStatus === "In Review" ? "bg-cyan-800" : "bg-cyan-400"}`} onClick={() => handleFilterByTaskStatus("In Review")}>In Review</button>
+                <button className={`rounded border border-cyan-200 p-2 ${selectedTaskStatus === "Backlog" ? "bg-cyan-800" : "bg-cyan-400"}`} onClick={() => handleFilterByTaskStatus("Backlog")}>Backlog</button>
+                <button className={`rounded border border-cyan-200 p-2 ${selectedTaskStatus === "" ? "bg-cyan-800" : "bg-cyan-400"}`} onClick={() => handleFilterByTaskStatus("")}>All Statuses</button>
             </div>
             <br/>
             <div className={`flex gap-4`}>
@@ -147,3 +164,8 @@ function KanbanView() {
 }
 
 export default KanbanView;
+
+//todo
+//make it look nicer & bigger
+//make items clickable for sidebar
+//show tags on items 

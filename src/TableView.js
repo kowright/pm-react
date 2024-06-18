@@ -3,9 +3,13 @@ import React from "react";
 function TableView() {
     const [data, setData] = React.useState(null);
     const [selectedRoadmap, setSelectedRoadmap] = React.useState('');
+    const [selectedTaskStatus, setSelectedTaskStatus] = React.useState('');
 
     const handleFilterByRoadmap = (roadmap) => {
         setSelectedRoadmap(roadmap); 
+    };
+    const handleFilterByTaskStatus = (status) => {
+        setSelectedTaskStatus(status);
     };
 
     React.useEffect(() => {
@@ -18,18 +22,33 @@ function TableView() {
         return <p>Loading...!</p>; // Render loading until data is fetched   
     }
 
-    const filteredTasks = selectedRoadmap
+    let filteredTasks = selectedRoadmap
         ? data.message.filter(task => task.roadmap === selectedRoadmap)
         : data.message;
+/*
+    let filteredTasks = selectedTaskStatus
+        ? data.message.filter(task => task.taskStatus === selectedTaskStatus)
+        : data.message;*/
+
+    filteredTasks = selectedTaskStatus
+        ? filteredTasks.filter(task => task.taskStatus === selectedTaskStatus)
+        : filteredTasks;
 
     return (
         <div className='mx-8'>
                 <h1>Table View</h1>
   
             <div className='flex gap-4 justify-center'>
-                <button className='bg-cyan-400 rounded border border-cyan-200 p-2' onClick={() => handleFilterByRoadmap("Engineering Roadmap")}>Engineering Roadmap Tasks</button>
-                <button className='bg-cyan-400 rounded border border-cyan-200 p-2' onClick={() => handleFilterByRoadmap("Design Roadmap")}>Design Roadmap Tasks</button>
-                <button className='bg-cyan-400 rounded border border-cyan-200 p-2' onClick={() => handleFilterByRoadmap("")}>All Roadmaps</button>
+                <button className={`rounded border border-cyan-200 p-2 ${selectedRoadmap === "Engineering Roadmap" ? "bg-cyan-800" : "bg-cyan-400" }`} onClick={() => handleFilterByRoadmap("Engineering Roadmap")}>Engineering Roadmap Tasks</button>
+                <button className={`rounded border border-cyan-200 p-2 ${selectedRoadmap === "Design Roadmap" ? "bg-cyan-800" : "bg-cyan-400"}`} onClick={() => handleFilterByRoadmap("Design Roadmap")} >Design Roadmap Tasks</button>
+                <button className={`rounded border border-cyan-200 p-2 ${selectedRoadmap === "" ? "bg-cyan-800" : "bg-cyan-400"}`} onClick={() => handleFilterByRoadmap("")}>All Roadmaps</button>
+            </div>
+            <br />
+            <div className='flex gap-4 justify-center'>
+                <button className={`rounded border border-cyan-200 p-2 ${selectedTaskStatus === "In Progress" ? "bg-cyan-800" : "bg-cyan-400"}`} onClick={() => handleFilterByTaskStatus("In Progress")}>In Progress</button>
+                <button className={`rounded border border-cyan-200 p-2 ${selectedTaskStatus === "In Review" ? "bg-cyan-800" : "bg-cyan-400"}`} onClick={() => handleFilterByTaskStatus("In Review")}>In Review</button>
+                <button className={`rounded border border-cyan-200 p-2 ${selectedTaskStatus === "Backlog" ? "bg-cyan-800" : "bg-cyan-400"}`} onClick={() => handleFilterByTaskStatus("Backlog")}>Backlog</button>
+                <button className={`rounded border border-cyan-200 p-2 ${selectedTaskStatus === "" ? "bg-cyan-800" : "bg-cyan-400"}`} onClick={() => handleFilterByTaskStatus("")}>All Statuses</button>
             </div>
             <br />
                 <table className="min-w-full border-collapse border border-gray-200">
@@ -67,3 +86,9 @@ function TableView() {
 
 
 export default TableView;
+
+//todo 
+//make table move with size of window 
+//standardize columns and rows of table 
+//make row clickable 
+                               

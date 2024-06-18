@@ -9,6 +9,15 @@ import 'dhtmlx-gantt'; // Import Gantt library
 
 function TimelineView() {
     const [data, setData] = React.useState(null);
+    const [selectedRoadmap, setSelectedRoadmap] = React.useState('');
+    const [selectedTaskStatus, setSelectedTaskStatus] = React.useState('');
+
+    const handleFilterByRoadmap = (roadmap) => {
+        setSelectedRoadmap(roadmap);
+    };
+    const handleFilterByTaskStatus = (status) => {
+        setSelectedTaskStatus(status);
+    };
 
     React.useEffect(() => {
         fetch("/api")
@@ -25,7 +34,16 @@ function TimelineView() {
         ]
     };
     if (data && data.message) {
-        data.message.map((item, index) => (
+
+        let filteredTasks = selectedRoadmap
+            ? data.message.filter(task => task.roadmap === selectedRoadmap)
+            : data.message;
+
+        filteredTasks = selectedTaskStatus
+            ? filteredTasks.filter(task => task.taskStatus === selectedTaskStatus)
+            : filteredTasks;
+
+        filteredTasks.map((item, index) => (
             ganttData.data.push(
                 {
                     
@@ -80,7 +98,18 @@ function TimelineView() {
             <h1>TIMELINE VIEW</h1>
             
             <br />
-
+            <div className='flex gap-4 justify-center'>
+                <button className={`rounded border border-cyan-200 p-2 ${selectedRoadmap === "Engineering Roadmap" ? "bg-cyan-800" : "bg-cyan-400"}`} onClick={() => handleFilterByRoadmap("Engineering Roadmap")}>Engineering Roadmap Tasks</button>
+                <button className={`rounded border border-cyan-200 p-2 ${selectedRoadmap === "Design Roadmap" ? "bg-cyan-800" : "bg-cyan-400"}`} onClick={() => handleFilterByRoadmap("Design Roadmap")} >Design Roadmap Tasks</button>
+                <button className={`rounded border border-cyan-200 p-2 ${selectedRoadmap === "" ? "bg-cyan-800" : "bg-cyan-400"}`} onClick={() => handleFilterByRoadmap("")}>All Roadmaps</button>
+            </div>
+            <br />
+            <div className='flex gap-4 justify-center'>
+                <button className={`rounded border border-cyan-200 p-2 ${selectedTaskStatus === "In Progress" ? "bg-cyan-800" : "bg-cyan-400"}`} onClick={() => handleFilterByTaskStatus("In Progress")}>In Progress</button>
+                <button className={`rounded border border-cyan-200 p-2 ${selectedTaskStatus === "In Review" ? "bg-cyan-800" : "bg-cyan-400"}`} onClick={() => handleFilterByTaskStatus("In Review")}>In Review</button>
+                <button className={`rounded border border-cyan-200 p-2 ${selectedTaskStatus === "Backlog" ? "bg-cyan-800" : "bg-cyan-400"}`} onClick={() => handleFilterByTaskStatus("Backlog")}>Backlog</button>
+                <button className={`rounded border border-cyan-200 p-2 ${selectedTaskStatus === "" ? "bg-cyan-800" : "bg-cyan-400"}`} onClick={() => handleFilterByTaskStatus("")}>All Statuses</button>
+            </div>
             <div className="h-full w-full">
                 <Gantt tasks={ganttData} onDataUpdated={handleDataUpdated} />
             </div>

@@ -32,3 +32,9 @@ function App() {
 
 
 export default App;
+
+//things to do
+//put view/filter changing things in a component and do api call on parent to pass to children data and filters
+//make roadmaps and tags be held in database and populate into header component 
+//put sidebar component in here 
+                   
