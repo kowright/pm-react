@@ -49,7 +49,7 @@ const Timeline = () => {
     let numberedDateElements = [];
     let dayOfWeekDateElements = [];
     const startDate = new Date('2024-06-01'); //will be user input
-    const endDate = new Date('2024-07-10'); //will be user input
+    const endDate = new Date('2024-08-31'); //will be user input
 
     const adjustedStartDate = new Date(startDate);
     adjustedStartDate.setDate(startDate.getDate() + 1);
@@ -107,9 +107,15 @@ const Timeline = () => {
             let width = `${day * task.duration * 4}px`;
             let top = `${day * (index + 1) * 4}px`;
 
+            let dateRange =
+                Math.round
+                    ((new Date(task.startDate) - startDate) / (1000 * 3600 * 24));
+    
+            let left = `${day * 4 * dateRange}px`;
+            console.log(new Date(task.startDate))
             const containerStyles = {
                 position: 'absolute',
-                left: 0,
+                left: left,
                 top: top,
                 width: width,
                 height: `${day*4}px`, 
