@@ -16,47 +16,8 @@ const Timeline = () => {
     const handleFilterByTaskStatus = (status) => {
         setSelectedTaskStatus(status);
     };
-    let tableRows = [];
-    function createRows(num){
-        for (let i = 0; i < num; i++) {
 
-            tableRows.push(
-                <tr>
-                    <td className="w-40 h-40 border border-gray-400 text-center">Cell 1</td>
-                    <td className="w-40 h-40 border border-gray-400 text-center">Cell 2</td>
-                    <td className="w-40 h-40 border border-gray-400 text-center">Cell 3</td>
-                    <td className="w-40 h-40 border border-gray-400 text-center">Cell 4</td>
-                    <td className="w-40 h-40 border border-gray-400 text-center">Cell 5</td>
-                    <td className="w-40 h-40 border border-gray-400 text-center">Cell 6</td>
-                    <td className="w-40 h-40 border border-gray-400 text-center">Cell 7</td>
-                    <td className="w-40 h-40 border border-gray-400 text-center">Cell 8</td>
-                    <td className="w-40 h-40 border border-gray-400 text-center">Cell 1</td>
-                    <td className="w-40 h-40 border border-gray-400 text-center">Cell 2</td>
-                    <td className="w-40 h-40 border border-gray-400 text-center">Cell 3</td>
-                    <td className="w-40 h-40 border border-gray-400 text-center">Cell 4</td>
-                    <td className="w-40 h-40 border border-gray-400 text-center">Cell 5</td>
-                    <td className="w-40 h-40 border border-gray-400 text-center">Cell 6</td>
-                    <td className="w-40 h-40 border border-gray-400 text-center">Cell 7</td>
-                    <td className="w-40 h-40 border border-gray-400 text-center">Cell 8</td>
-                    <td className="w-40 h-40 border border-gray-400 text-center">Cell 1</td>
-                    <td className="w-40 h-40 border border-gray-400 text-center">Cell 2</td>
-                    <td className="w-40 h-40 border border-gray-400 text-center">Cell 3</td>
-                    <td className="w-40 h-40 border border-gray-400 text-center">Cell 4</td>
-                    <td className="w-40 h-40 border border-gray-400 text-center">Cell 5</td>
-                    <td className="w-40 h-40 border border-gray-400 text-center">Cell 6</td>
-                    <td className="w-40 h-40 border border-gray-400 text-center">Cell 7</td>
-                    <td className="w-40 h-40 border border-gray-400 text-center">Cell 8</td>
-                    <td className="w-40 h-40 border border-gray-400 text-center">Cell 1</td>
-                    <td className="w-40 h-40 border border-gray-400 text-center">Cell 2</td>
-                    <td className="w-40 h-40 border border-gray-400 text-center">Cell 3</td>
-                    <td className="w-40 h-40 border border-gray-400 text-center">Cell 4</td>
-                    <td className="w-40 h-40 border border-gray-400 text-center">Cell 5</td>
-                    <td className="w-40 h-40 border border-gray-400 text-center">Cell 6</td>
-                </tr>
-            )
-        }
-        return tableRows;
-    }
+   
 
     React.useEffect(() => {
         fetch("/api")
@@ -157,6 +118,69 @@ const Timeline = () => {
     });
 
 
+
+    const tableHeaderStyle = {
+        width: `${day * 4}px`,
+        height: `${(day / 2) * 4}px`,
+        border: '1px solid #ccc',
+        textAlign: 'center'
+    }
+
+    function formatDateNumerical(date) {
+        const options = { month: '2-digit', day: '2-digit' };
+        const formattedDate = date.toLocaleDateString('en-US', options).replace(/\//g, '-');
+        return formattedDate;
+    }
+    function formatDayOfWeek(date) {
+        const options = { weekday: 'short' };
+        return date.toLocaleDateString('en-US', options);
+    }
+
+
+    let numberedDateElements = [];
+    let dayOfWeekDateElements = [];
+    const startDate = new Date('2024-06-01');
+    const endDate = new Date('2024-07-10');
+
+    for (let currentDate = startDate; currentDate <= endDate; currentDate.setDate(currentDate.getDate() + 1)) {
+
+
+        const numberedDateElement = <th style={tableHeaderStyle}>{formatDateNumerical(currentDate)}</th>
+        const dayOfWeekDateElement = <th style={tableHeaderStyle}>{formatDayOfWeek(currentDate)}</th>
+
+        numberedDateElements.push(numberedDateElement);
+        dayOfWeekDateElements.push(dayOfWeekDateElement);
+    }
+    console.log(numberedDateElements.length)
+    const tableRowStyle = {
+        width: `${day * 4}px`,
+        height: `${day * 4}px`,
+        border: '1px solid #ccc',
+        textAlign: 'center'
+    }
+
+    let tableRows = [];
+    function createRows(numRows, numColumns = numberedDateElements.length) {
+        for (let i = 0; i < numRows; i++) {
+            let tableCells = [];
+
+            for (let j = 0; j < numColumns; j++) {
+                tableCells.push(
+                    <td key={`row-${i}-col-${j}`} style={tableRowStyle}>
+                        Cell {j + 1}
+                    </td>
+                );
+            }
+
+            tableRows.push(
+                <tr key={`row-${i}`}>
+                    {tableCells}
+                </tr>
+            )
+        }
+        return tableRows;
+    }
+
     return (
         <div>
             <div className='flex gap-4 justify-center'>
@@ -171,91 +195,32 @@ const Timeline = () => {
                 <button className={`rounded border border-cyan-200 p-2 ${selectedTaskStatus === "Backlog" ? "bg-cyan-800" : "bg-cyan-400"}`} onClick={() => handleFilterByTaskStatus("Backlog")}>Backlog</button>
                 <button className={`rounded border border-cyan-200 p-2 ${selectedTaskStatus === "" ? "bg-cyan-800" : "bg-cyan-400"}`} onClick={() => handleFilterByTaskStatus("")}>All Statuses</button>
             </div>
-            <div className='w-full h-full bg-purple-100 flex overflow-x-auto relative'>
+  
+            <div className='w-full h-full bg-purple-100 overflow-x-auto relative shrink-0 flex' style={{ width: '2000px' }} >
              
                 {milestones}
 
                 {tasks}
 
 
-                    <table className="border-collapse border border-gray-800 shrink-0 z-0">
-                        <thead>
-                            <tr>
-                                <th className="w-40 h-20 border border-gray-400 text-center">6/1</th>
-                                <th className="w-40 h-20 border border-gray-400 text-center">6/2</th>
-                                <th className="w-40 h-20 border border-gray-400 text-center">6/3</th>
-                                <th className="w-40 h-20 border border-gray-400 text-center">6/4</th>
-                                <th className="w-40 h-20 border border-gray-400 text-center">6/5</th>
-                                <th className="w-40 h-20 border border-gray-400 text-center">6/6</th>
-                                <th className="w-40 h-20 border border-gray-400 text-center">6/7</th>
-                                <th className="w-40 h-20 border border-gray-400 text-center">6/8</th>
-                                <th className="w-40 h-20 border border-gray-400 text-center">6/9</th>
-                                <th className="w-40 h-20 border border-gray-400 text-center">6/10</th>
-                                <th className="w-40 h-20 border border-gray-400 text-center">6/11</th>
-                                <th className="w-40 h-20 border border-gray-400 text-center">6/12</th>
-                                <th className="w-40 h-20 border border-gray-400 text-center">6/13</th>
-                                <th className="w-40 h-20 border border-gray-400 text-center">6/14</th>
-                                <th className="w-40 h-20 border border-gray-400 text-center">6/15</th>
-                                <th className="w-40 h-20 border border-gray-400 text-center">6/16</th>
-                                <th className="w-40 h-20 border border-gray-400 text-center">6/17</th>
-                                <th className="w-40 h-20 border border-gray-400 text-center">6/18</th>
-                                <th className="w-40 h-20 border border-gray-400 text-center">6/19</th>
-                                <th className="w-40 h-20 border border-gray-400 text-center">6/20</th>
-                                <th className="w-40 h-20 border border-gray-400 text-center">6/21</th>
-                                <th className="w-40 h-20 border border-gray-400 text-center">6/22</th>
-                                <th className="w-40 h-20 border border-gray-400 text-center">6/23</th>
-                                <th className="w-40 h-20 border border-gray-400 text-center">6/24</th>
-                                <th className="w-40 h-20 border border-gray-400 text-center">6/25</th>
-                                <th className="w-40 h-20 border border-gray-400 text-center">6/26</th>
-                                <th className="w-40 h-20 border border-gray-400 text-center">6/27</th>
-                                <th className="w-40 h-20 border border-gray-400 text-center">6/28</th>
-                                <th className="w-40 h-20 border border-gray-400 text-center">6/29</th>
-                                <th className="w-40 h-20 border border-gray-400 text-center">6/30</th>
-                            </tr>
+                <table className="border-collapse border border-gray-800 shrink-0 z-0">
+                    <thead>
+                        <tr>
+                            {numberedDateElements }
+                        </tr>
                     </thead>
                     <thead>
                         <tr>
-                            <th className="w-40 h-20 border border-gray-400 text-center">Sat</th>
-                            <th className="w-40 h-20 border border-gray-400 text-center">Sun</th>
-                            <th className="w-40 h-20 border border-gray-400 text-center">Mon</th>
-                            <th className="w-40 h-20 border border-gray-400 text-center">Tues</th>
-                            <th className="w-40 h-20 border border-gray-400 text-center">Wed</th>
-                            <th className="w-40 h-20 border border-gray-400 text-center">Thurs</th>
-                            <th className="w-40 h-20 border border-gray-400 text-center">Fri</th>
-                            <th className="w-40 h-20 border border-gray-400 text-center">Sat</th>
-                            <th className="w-40 h-20 border border-gray-400 text-center">Sun</th>
-                            <th className="w-40 h-20 border border-gray-400 text-center">Mon</th>
-                            <th className="w-40 h-20 border border-gray-400 text-center">Tues</th>
-                            <th className="w-40 h-20 border border-gray-400 text-center">Wed</th>
-                            <th className="w-40 h-20 border border-gray-400 text-center">Thurs</th>
-                            <th className="w-40 h-20 border border-gray-400 text-center">Fri</th>
-                            <th className="w-40 h-20 border border-gray-400 text-center">Sat</th>
-                            <th className="w-40 h-20 border border-gray-400 text-center">Sun</th>
-                            <th className="w-40 h-20 border border-gray-400 text-center">Mon</th>
-                            <th className="w-40 h-20 border border-gray-400 text-center">Tues</th>
-                            <th className="w-40 h-20 border border-gray-400 text-center">Wed</th>
-                            <th className="w-40 h-20 border border-gray-400 text-center">Thurs</th>
-                            <th className="w-40 h-20 border border-gray-400 text-center">Fri</th>
-                            <th className="w-40 h-20 border border-gray-400 text-center">Sat</th>
-                            <th className="w-40 h-20 border border-gray-400 text-center">Sun</th>
-                            <th className="w-40 h-20 border border-gray-400 text-center">Mon</th>
-                            <th className="w-40 h-20 border border-gray-400 text-center">Tues</th>
-                            <th className="w-40 h-20 border border-gray-400 text-center">Wed</th>
-                            <th className="w-40 h-20 border border-gray-400 text-center">Thurs</th>
-                            <th className="w-40 h-20 border border-gray-400 text-center">Fri</th>
-                            <th className="w-40 h-20 border border-gray-400 text-center">Sat</th>
-                            <th className="w-40 h-20 border border-gray-400 text-center">Sun</th>
-                            
+                            {dayOfWeekDateElements}
                         </tr>
                     </thead>
+
                         <tbody>
-                            
-                            {createRows(filteredTasks.length) }
+                            {createRows(filteredTasks.length, ) }
                         </tbody>
                     </table>
-            
-            </div>
           
+            </div>
         </div>
     );
 
