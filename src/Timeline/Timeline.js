@@ -29,96 +29,6 @@ const Timeline = () => {
         return <p>Loading...!</p>; // Render loading until data is fetched
     }
 
-    let filteredTasks = selectedRoadmap
-        ? data.message.filter(task => task.roadmap === selectedRoadmap)
-        : data.message;
-
-    filteredTasks = selectedTaskStatus
-        ? filteredTasks.filter(task => task.taskStatus === selectedTaskStatus)
-        : filteredTasks;
-
-
-    let tasks = filteredTasks.map((task, index) => {
-            let width = `${day * task.duration * 4}px`;
-            let top = `${day * (index + 1) * 4}px`;
-
-            const containerStyles = {
-                position: 'absolute',
-                left: 0,
-                top: top,
-                width: width,
-                height: `${day*4}px`, 
-                backgroundColor: 'gray',
-                borderRadius: '0.5rem', // Example border radius
-                boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)', // Example shadow
-                zIndex: 20
-            };
-
-            return (
-                 <div style={containerStyles}>
-                    <p className="text-white text-center">{task.name}</p>
-                </div>
-            );
-    });
-
-    let tempMilestones = [
-        {
-            name: "Specifications Done",
-            date: new Date('2024-06-07'),
-            roadmaps: ['Engineering Roadmap'],
-            taskStatus: 'In Progress'
-        },
-      /*  {
-            name: "Design Done",
-            date: new Date('2024-06-10'),
-            roadmaps: ['Design Roadmap'],
-            taskStatus: 'In Review'
-        },
-        {
-            name: "Prototype Completed",
-            date: new Date('2024-06-15'),
-            roadmaps: ['Engineering Roadmap', 'Design Roadmap'],
-            taskStatus: 'Backlog'
-        },*/
-    ];
-
-    let filteredMilestones = selectedRoadmap
-        ? tempMilestones.filter(milestone => milestone.roadmaps.includes(selectedRoadmap))
-        : tempMilestones;
-
-    filteredMilestones= selectedTaskStatus
-        ? filteredMilestones.filter(milestones => milestones.taskStatus === selectedTaskStatus)
-        : filteredMilestones;
-
-
-    let milestones = filteredMilestones.map((milestone, index) => {
-
-        let width = `${day * 4}px`;
-        let top = `${day * 4}px`;
-        let height = `${day * 4 * filteredTasks.length}px`;
-
-        const containerStyles = {
-            position: 'absolute',
-            left: '960px',
-            top: top,
-            overflow: 'hidden',
-            width: width,
-            height: height,
-            backgroundColor: '#F59E0B',
-            borderRadius: '0.375rem', // Assuming you want the rounded corners to be 6px (0.375rem)
-            boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)', // Mimicking the shadow effect
-            zIndex: 30
-        }
-
-        return (
-             <div style={containerStyles} >
-                    <p className="text-white text-center">{milestone.name}</p>
-                </div>
-        );
-    });
-
-
-
     const tableHeaderStyle = {
         width: `${day * 4}px`,
         height: `${(day / 2) * 4}px`,
@@ -135,7 +45,6 @@ const Timeline = () => {
         const options = { weekday: 'short' };
         return date.toLocaleDateString('en-US', options);
     }
-
 
     let numberedDateElements = [];
     let dayOfWeekDateElements = [];
@@ -185,6 +94,103 @@ const Timeline = () => {
         return tableRows;
     }
 
+    let filteredTasks = selectedRoadmap
+        ? data.message.filter(task => task.roadmap === selectedRoadmap)
+        : data.message;
+
+    filteredTasks = selectedTaskStatus
+        ? filteredTasks.filter(task => task.taskStatus === selectedTaskStatus)
+        : filteredTasks;
+
+
+    let tasks = filteredTasks.map((task, index) => {
+            let width = `${day * task.duration * 4}px`;
+            let top = `${day * (index + 1) * 4}px`;
+
+            const containerStyles = {
+                position: 'absolute',
+                left: 0,
+                top: top,
+                width: width,
+                height: `${day*4}px`, 
+                backgroundColor: 'gray',
+                borderRadius: '0.5rem', // Example border radius
+                boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)', // Example shadow
+                zIndex: 20
+            };
+
+            return (
+                 <div style={containerStyles}>
+                    <p className="text-white text-center">{task.name}</p>
+                </div>
+            );
+    });
+
+    let tempMilestones = [
+        {
+            name: "Specifications Done",
+            date: new Date('2024-06-07'),
+            roadmaps: ['Engineering Roadmap'],
+            taskStatus: 'In Progress'
+        },
+        {
+            name: "Design Done",
+            date: new Date('2024-06-10'),
+            roadmaps: ['Design Roadmap'],
+            taskStatus: 'In Review'
+        },
+        {
+            name: "Prototype Completed",
+            date: new Date('2024-06-15'),
+            roadmaps: ['Engineering Roadmap', 'Design Roadmap'],
+            taskStatus: 'Backlog'
+        },
+    ];
+
+    let filteredMilestones = selectedRoadmap
+        ? tempMilestones.filter(milestone => milestone.roadmaps.includes(selectedRoadmap))
+        : tempMilestones;
+
+    filteredMilestones= selectedTaskStatus
+        ? filteredMilestones.filter(milestones => milestones.taskStatus === selectedTaskStatus)
+        : filteredMilestones;
+
+
+    let milestones = filteredMilestones.map((milestone, index) => {
+
+        let width = `${day * 4}px`;
+        let top = `${day * 4}px`;
+        let height = `${day * 4 * filteredTasks.length}px`;
+
+        let dateRange =
+            Math.round
+                ((milestone.date - startDate) / (1000 * 3600 * 24));
+
+        let left = `${day * 4 * dateRange}px`;
+
+        const containerStyles = {
+            position: 'absolute',
+            left: left,
+            top: top,
+            overflow: 'hidden',
+            width: width,
+            height: height,
+            backgroundColor: '#F59E0B',
+            borderRadius: '0.375rem', // Assuming you want the rounded corners to be 6px (0.375rem)
+            boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)', // Mimicking the shadow effect
+            zIndex: 30
+        }
+
+        return (
+             <div style={containerStyles} >
+                    <p className="text-white text-center">{milestone.name}</p>
+                </div>
+        );
+    });
+
+
+
+    
     return (
         <div>
             <div className='flex gap-4 justify-center'>
