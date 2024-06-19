@@ -16,6 +16,47 @@ const Timeline = () => {
     const handleFilterByTaskStatus = (status) => {
         setSelectedTaskStatus(status);
     };
+    let tableRows = [];
+    function createRows(num){
+        for (let i = 0; i < num; i++) {
+
+            tableRows.push(
+                <tr>
+                    <td className="w-40 h-40 border border-gray-400 text-center">Cell 1</td>
+                    <td className="w-40 h-40 border border-gray-400 text-center">Cell 2</td>
+                    <td className="w-40 h-40 border border-gray-400 text-center">Cell 3</td>
+                    <td className="w-40 h-40 border border-gray-400 text-center">Cell 4</td>
+                    <td className="w-40 h-40 border border-gray-400 text-center">Cell 5</td>
+                    <td className="w-40 h-40 border border-gray-400 text-center">Cell 6</td>
+                    <td className="w-40 h-40 border border-gray-400 text-center">Cell 7</td>
+                    <td className="w-40 h-40 border border-gray-400 text-center">Cell 8</td>
+                    <td className="w-40 h-40 border border-gray-400 text-center">Cell 1</td>
+                    <td className="w-40 h-40 border border-gray-400 text-center">Cell 2</td>
+                    <td className="w-40 h-40 border border-gray-400 text-center">Cell 3</td>
+                    <td className="w-40 h-40 border border-gray-400 text-center">Cell 4</td>
+                    <td className="w-40 h-40 border border-gray-400 text-center">Cell 5</td>
+                    <td className="w-40 h-40 border border-gray-400 text-center">Cell 6</td>
+                    <td className="w-40 h-40 border border-gray-400 text-center">Cell 7</td>
+                    <td className="w-40 h-40 border border-gray-400 text-center">Cell 8</td>
+                    <td className="w-40 h-40 border border-gray-400 text-center">Cell 1</td>
+                    <td className="w-40 h-40 border border-gray-400 text-center">Cell 2</td>
+                    <td className="w-40 h-40 border border-gray-400 text-center">Cell 3</td>
+                    <td className="w-40 h-40 border border-gray-400 text-center">Cell 4</td>
+                    <td className="w-40 h-40 border border-gray-400 text-center">Cell 5</td>
+                    <td className="w-40 h-40 border border-gray-400 text-center">Cell 6</td>
+                    <td className="w-40 h-40 border border-gray-400 text-center">Cell 7</td>
+                    <td className="w-40 h-40 border border-gray-400 text-center">Cell 8</td>
+                    <td className="w-40 h-40 border border-gray-400 text-center">Cell 1</td>
+                    <td className="w-40 h-40 border border-gray-400 text-center">Cell 2</td>
+                    <td className="w-40 h-40 border border-gray-400 text-center">Cell 3</td>
+                    <td className="w-40 h-40 border border-gray-400 text-center">Cell 4</td>
+                    <td className="w-40 h-40 border border-gray-400 text-center">Cell 5</td>
+                    <td className="w-40 h-40 border border-gray-400 text-center">Cell 6</td>
+                </tr>
+            )
+        }
+        return tableRows;
+    }
 
     React.useEffect(() => {
         fetch("/api")
@@ -45,7 +86,7 @@ const Timeline = () => {
                 left: 0,
                 top: top,
                 width: width,
-                height: `${day*4}px`, // Assuming day is a variable in your scope
+                height: `${day*4}px`, 
                 backgroundColor: 'gray',
                 borderRadius: '0.5rem', // Example border radius
                 boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)', // Example shadow
@@ -53,12 +94,68 @@ const Timeline = () => {
             };
 
             return (
-                <div style={containerStyles}>
+                 <div style={containerStyles}>
                     <p className="text-white text-center">{task.name}</p>
                 </div>
             );
-        
     });
+
+    let tempMilestones = [
+        {
+            name: "Specifications Done",
+            date: new Date('2024-06-07'),
+            roadmaps: ['Engineering Roadmap'],
+            taskStatus: 'In Progress'
+        },
+      /*  {
+            name: "Design Done",
+            date: new Date('2024-06-10'),
+            roadmaps: ['Design Roadmap'],
+            taskStatus: 'In Review'
+        },
+        {
+            name: "Prototype Completed",
+            date: new Date('2024-06-15'),
+            roadmaps: ['Engineering Roadmap', 'Design Roadmap'],
+            taskStatus: 'Backlog'
+        },*/
+    ];
+
+    let filteredMilestones = selectedRoadmap
+        ? tempMilestones.filter(milestone => milestone.roadmaps.includes(selectedRoadmap))
+        : tempMilestones;
+
+    filteredMilestones= selectedTaskStatus
+        ? filteredMilestones.filter(milestones => milestones.taskStatus === selectedTaskStatus)
+        : filteredMilestones;
+
+
+    let milestones = filteredMilestones.map((milestone, index) => {
+
+        let width = `${day * 4}px`;
+        let top = `${day * 4}px`;
+        let height = `${day * 4 * filteredTasks.length}px`;
+
+        const containerStyles = {
+            position: 'absolute',
+            left: '960px',
+            top: top,
+            overflow: 'hidden',
+            width: width,
+            height: height,
+            backgroundColor: '#F59E0B',
+            borderRadius: '0.375rem', // Assuming you want the rounded corners to be 6px (0.375rem)
+            boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)', // Mimicking the shadow effect
+            zIndex: 30
+        }
+
+        return (
+             <div style={containerStyles} >
+                    <p className="text-white text-center">{milestone.name}</p>
+                </div>
+        );
+    });
+
 
     return (
         <div>
@@ -75,10 +172,8 @@ const Timeline = () => {
                 <button className={`rounded border border-cyan-200 p-2 ${selectedTaskStatus === "" ? "bg-cyan-800" : "bg-cyan-400"}`} onClick={() => handleFilterByTaskStatus("")}>All Statuses</button>
             </div>
             <div className='w-full h-full bg-purple-100 flex overflow-x-auto relative'>
-              
-                <div className="absolute left-[960px] top-40 shrink-0 w-40 h-[800px] bg-yellow-500 rounded-md shadow-md z-30">
-                    <p className="text-white text-center">Milestone</p>
-                </div>
+             
+                {milestones}
 
                 {tasks}
 
@@ -154,166 +249,8 @@ const Timeline = () => {
                         </tr>
                     </thead>
                         <tbody>
-                            <tr>
-                                <td className="w-40 h-40 border border-gray-400 text-center">Cell 1</td>
-                                <td className="w-40 h-40 border border-gray-400 text-center">Cell 2</td>
-                                <td className="w-40 h-40 border border-gray-400 text-center">Cell 3</td>
-                                <td className="w-40 h-40 border border-gray-400 text-center">Cell 4</td>
-                                <td className="w-40 h-40 border border-gray-400 text-center">Cell 5</td>
-                                <td className="w-40 h-40 border border-gray-400 text-center">Cell 6</td>
-                                <td className="w-40 h-40 border border-gray-400 text-center">Cell 7</td>
-                                <td className="w-40 h-40 border border-gray-400 text-center">Cell 8</td>
-                                <td className="w-40 h-40 border border-gray-400 text-center">Cell 1</td>
-                                <td className="w-40 h-40 border border-gray-400 text-center">Cell 2</td>
-                                <td className="w-40 h-40 border border-gray-400 text-center">Cell 3</td>
-                                <td className="w-40 h-40 border border-gray-400 text-center">Cell 4</td>
-                                <td className="w-40 h-40 border border-gray-400 text-center">Cell 5</td>
-                                <td className="w-40 h-40 border border-gray-400 text-center">Cell 6</td>
-                                <td className="w-40 h-40 border border-gray-400 text-center">Cell 7</td>
-                                <td className="w-40 h-40 border border-gray-400 text-center">Cell 8</td>
-                                <td className="w-40 h-40 border border-gray-400 text-center">Cell 1</td>
-                                <td className="w-40 h-40 border border-gray-400 text-center">Cell 2</td>
-                                <td className="w-40 h-40 border border-gray-400 text-center">Cell 3</td>
-                                <td className="w-40 h-40 border border-gray-400 text-center">Cell 4</td>
-                                <td className="w-40 h-40 border border-gray-400 text-center">Cell 5</td>
-                                <td className="w-40 h-40 border border-gray-400 text-center">Cell 6</td>
-                                <td className="w-40 h-40 border border-gray-400 text-center">Cell 7</td>
-                                <td className="w-40 h-40 border border-gray-400 text-center">Cell 8</td>
-                                <td className="w-40 h-40 border border-gray-400 text-center">Cell 1</td>
-                                <td className="w-40 h-40 border border-gray-400 text-center">Cell 2</td>
-                                <td className="w-40 h-40 border border-gray-400 text-center">Cell 3</td>
-                                <td className="w-40 h-40 border border-gray-400 text-center">Cell 4</td>
-                                <td className="w-40 h-40 border border-gray-400 text-center">Cell 5</td>
-                                <td className="w-40 h-40 border border-gray-400 text-center">Cell 6</td>
-                            </tr>
-                        <tr>
-                            <td className="w-40 h-40 border border-gray-400 text-center">Cell 1</td>
-                            <td className="w-40 h-40 border border-gray-400 text-center">Cell 2</td>
-                            <td className="w-40 h-40 border border-gray-400 text-center">Cell 3</td>
-                            <td className="w-40 h-40 border border-gray-400 text-center">Cell 4</td>
-                            <td className="w-40 h-40 border border-gray-400 text-center">Cell 5</td>
-                            <td className="w-40 h-40 border border-gray-400 text-center">Cell 6</td>
-                            <td className="w-40 h-40 border border-gray-400 text-center">Cell 7</td>
-                            <td className="w-40 h-40 border border-gray-400 text-center">Cell 8</td>
-                            <td className="w-40 h-40 border border-gray-400 text-center">Cell 1</td>
-                            <td className="w-40 h-40 border border-gray-400 text-center">Cell 2</td>
-                            <td className="w-40 h-40 border border-gray-400 text-center">Cell 3</td>
-                            <td className="w-40 h-40 border border-gray-400 text-center">Cell 4</td>
-                            <td className="w-40 h-40 border border-gray-400 text-center">Cell 5</td>
-                            <td className="w-40 h-40 border border-gray-400 text-center">Cell 6</td>
-                            <td className="w-40 h-40 border border-gray-400 text-center">Cell 7</td>
-                            <td className="w-40 h-40 border border-gray-400 text-center">Cell 8</td>
-                            <td className="w-40 h-40 border border-gray-400 text-center">Cell 1</td>
-                            <td className="w-40 h-40 border border-gray-400 text-center">Cell 2</td>
-                            <td className="w-40 h-40 border border-gray-400 text-center">Cell 3</td>
-                            <td className="w-40 h-40 border border-gray-400 text-center">Cell 4</td>
-                            <td className="w-40 h-40 border border-gray-400 text-center">Cell 5</td>
-                            <td className="w-40 h-40 border border-gray-400 text-center">Cell 6</td>
-                            <td className="w-40 h-40 border border-gray-400 text-center">Cell 7</td>
-                            <td className="w-40 h-40 border border-gray-400 text-center">Cell 8</td>
-                            <td className="w-40 h-40 border border-gray-400 text-center">Cell 1</td>
-                            <td className="w-40 h-40 border border-gray-400 text-center">Cell 2</td>
-                            <td className="w-40 h-40 border border-gray-400 text-center">Cell 3</td>
-                            <td className="w-40 h-40 border border-gray-400 text-center">Cell 4</td>
-                            <td className="w-40 h-40 border border-gray-400 text-center">Cell 5</td>
-                            <td className="w-40 h-40 border border-gray-400 text-center">Cell 6</td>
-                        </tr>
-                        <tr>
-                            <td className="w-40 h-40 border border-gray-400 text-center">Cell 1</td>
-                            <td className="w-40 h-40 border border-gray-400 text-center">Cell 2</td>
-                            <td className="w-40 h-40 border border-gray-400 text-center">Cell 3</td>
-                            <td className="w-40 h-40 border border-gray-400 text-center">Cell 4</td>
-                            <td className="w-40 h-40 border border-gray-400 text-center">Cell 5</td>
-                            <td className="w-40 h-40 border border-gray-400 text-center">Cell 6</td>
-                            <td className="w-40 h-40 border border-gray-400 text-center">Cell 7</td>
-                            <td className="w-40 h-40 border border-gray-400 text-center">Cell 8</td>
-                            <td className="w-40 h-40 border border-gray-400 text-center">Cell 1</td>
-                            <td className="w-40 h-40 border border-gray-400 text-center">Cell 2</td>
-                            <td className="w-40 h-40 border border-gray-400 text-center">Cell 3</td>
-                            <td className="w-40 h-40 border border-gray-400 text-center">Cell 4</td>
-                            <td className="w-40 h-40 border border-gray-400 text-center">Cell 5</td>
-                            <td className="w-40 h-40 border border-gray-400 text-center">Cell 6</td>
-                            <td className="w-40 h-40 border border-gray-400 text-center">Cell 7</td>
-                            <td className="w-40 h-40 border border-gray-400 text-center">Cell 8</td>
-                            <td className="w-40 h-40 border border-gray-400 text-center">Cell 1</td>
-                            <td className="w-40 h-40 border border-gray-400 text-center">Cell 2</td>
-                            <td className="w-40 h-40 border border-gray-400 text-center">Cell 3</td>
-                            <td className="w-40 h-40 border border-gray-400 text-center">Cell 4</td>
-                            <td className="w-40 h-40 border border-gray-400 text-center">Cell 5</td>
-                            <td className="w-40 h-40 border border-gray-400 text-center">Cell 6</td>
-                            <td className="w-40 h-40 border border-gray-400 text-center">Cell 7</td>
-                            <td className="w-40 h-40 border border-gray-400 text-center">Cell 8</td>
-                            <td className="w-40 h-40 border border-gray-400 text-center">Cell 1</td>
-                            <td className="w-40 h-40 border border-gray-400 text-center">Cell 2</td>
-                            <td className="w-40 h-40 border border-gray-400 text-center">Cell 3</td>
-                            <td className="w-40 h-40 border border-gray-400 text-center">Cell 4</td>
-                            <td className="w-40 h-40 border border-gray-400 text-center">Cell 5</td>
-                            <td className="w-40 h-40 border border-gray-400 text-center">Cell 6</td>
-                        </tr>
-                        <tr>
-                            <td className="w-40 h-40 border border-gray-400 text-center">Cell 1</td>
-                            <td className="w-40 h-40 border border-gray-400 text-center">Cell 2</td>
-                            <td className="w-40 h-40 border border-gray-400 text-center">Cell 3</td>
-                            <td className="w-40 h-40 border border-gray-400 text-center">Cell 4</td>
-                            <td className="w-40 h-40 border border-gray-400 text-center">Cell 5</td>
-                            <td className="w-40 h-40 border border-gray-400 text-center">Cell 6</td>
-                            <td className="w-40 h-40 border border-gray-400 text-center">Cell 7</td>
-                            <td className="w-40 h-40 border border-gray-400 text-center">Cell 8</td>
-                            <td className="w-40 h-40 border border-gray-400 text-center">Cell 1</td>
-                            <td className="w-40 h-40 border border-gray-400 text-center">Cell 2</td>
-                            <td className="w-40 h-40 border border-gray-400 text-center">Cell 3</td>
-                            <td className="w-40 h-40 border border-gray-400 text-center">Cell 4</td>
-                            <td className="w-40 h-40 border border-gray-400 text-center">Cell 5</td>
-                            <td className="w-40 h-40 border border-gray-400 text-center">Cell 6</td>
-                            <td className="w-40 h-40 border border-gray-400 text-center">Cell 7</td>
-                            <td className="w-40 h-40 border border-gray-400 text-center">Cell 8</td>
-                            <td className="w-40 h-40 border border-gray-400 text-center">Cell 1</td>
-                            <td className="w-40 h-40 border border-gray-400 text-center">Cell 2</td>
-                            <td className="w-40 h-40 border border-gray-400 text-center">Cell 3</td>
-                            <td className="w-40 h-40 border border-gray-400 text-center">Cell 4</td>
-                            <td className="w-40 h-40 border border-gray-400 text-center">Cell 5</td>
-                            <td className="w-40 h-40 border border-gray-400 text-center">Cell 6</td>
-                            <td className="w-40 h-40 border border-gray-400 text-center">Cell 7</td>
-                            <td className="w-40 h-40 border border-gray-400 text-center">Cell 8</td>
-                            <td className="w-40 h-40 border border-gray-400 text-center">Cell 1</td>
-                            <td className="w-40 h-40 border border-gray-400 text-center">Cell 2</td>
-                            <td className="w-40 h-40 border border-gray-400 text-center">Cell 3</td>
-                            <td className="w-40 h-40 border border-gray-400 text-center">Cell 4</td>
-                            <td className="w-40 h-40 border border-gray-400 text-center">Cell 5</td>
-                            <td className="w-40 h-40 border border-gray-400 text-center">Cell 6</td>
-                        </tr>
-                        <tr>
-                            <td className="w-40 h-40 border border-gray-400 text-center">Cell 1</td>
-                            <td className="w-40 h-40 border border-gray-400 text-center">Cell 2</td>
-                            <td className="w-40 h-40 border border-gray-400 text-center">Cell 3</td>
-                            <td className="w-40 h-40 border border-gray-400 text-center">Cell 4</td>
-                            <td className="w-40 h-40 border border-gray-400 text-center">Cell 5</td>
-                            <td className="w-40 h-40 border border-gray-400 text-center">Cell 6</td>
-                            <td className="w-40 h-40 border border-gray-400 text-center">Cell 7</td>
-                            <td className="w-40 h-40 border border-gray-400 text-center">Cell 8</td>
-                            <td className="w-40 h-40 border border-gray-400 text-center">Cell 1</td>
-                            <td className="w-40 h-40 border border-gray-400 text-center">Cell 2</td>
-                            <td className="w-40 h-40 border border-gray-400 text-center">Cell 3</td>
-                            <td className="w-40 h-40 border border-gray-400 text-center">Cell 4</td>
-                            <td className="w-40 h-40 border border-gray-400 text-center">Cell 5</td>
-                            <td className="w-40 h-40 border border-gray-400 text-center">Cell 6</td>
-                            <td className="w-40 h-40 border border-gray-400 text-center">Cell 7</td>
-                            <td className="w-40 h-40 border border-gray-400 text-center">Cell 8</td>
-                            <td className="w-40 h-40 border border-gray-400 text-center">Cell 1</td>
-                            <td className="w-40 h-40 border border-gray-400 text-center">Cell 2</td>
-                            <td className="w-40 h-40 border border-gray-400 text-center">Cell 3</td>
-                            <td className="w-40 h-40 border border-gray-400 text-center">Cell 4</td>
-                            <td className="w-40 h-40 border border-gray-400 text-center">Cell 5</td>
-                            <td className="w-40 h-40 border border-gray-400 text-center">Cell 6</td>
-                            <td className="w-40 h-40 border border-gray-400 text-center">Cell 7</td>
-                            <td className="w-40 h-40 border border-gray-400 text-center">Cell 8</td>
-                            <td className="w-40 h-40 border border-gray-400 text-center">Cell 1</td>
-                            <td className="w-40 h-40 border border-gray-400 text-center">Cell 2</td>
-                            <td className="w-40 h-40 border border-gray-400 text-center">Cell 3</td>
-                            <td className="w-40 h-40 border border-gray-400 text-center">Cell 4</td>
-                            <td className="w-40 h-40 border border-gray-400 text-center">Cell 5</td>
-                            <td className="w-40 h-40 border border-gray-400 text-center">Cell 6</td>
-                        </tr>
+                            
+                            {createRows(filteredTasks.length) }
                         </tbody>
                     </table>
             
