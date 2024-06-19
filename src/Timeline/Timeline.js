@@ -139,19 +139,23 @@ const Timeline = () => {
 
     let numberedDateElements = [];
     let dayOfWeekDateElements = [];
-    const startDate = new Date('2024-06-01');
-    const endDate = new Date('2024-07-10');
+    const startDate = new Date('2024-06-01'); //will be user input
+    const endDate = new Date('2024-07-10'); //will be user input
 
-    for (let currentDate = startDate; currentDate <= endDate; currentDate.setDate(currentDate.getDate() + 1)) {
+    const adjustedStartDate = new Date(startDate);
+    adjustedStartDate.setDate(startDate.getDate() + 1);
 
+    const adjustedEndDate = new Date(endDate);
+    adjustedEndDate.setDate(endDate.getDate() + 1);
 
-        const numberedDateElement = <th style={tableHeaderStyle}>{formatDateNumerical(currentDate)}</th>
-        const dayOfWeekDateElement = <th style={tableHeaderStyle}>{formatDayOfWeek(currentDate)}</th>
+    for (let currentDate = adjustedStartDate; currentDate <= adjustedEndDate; currentDate.setDate(currentDate.getDate() + 1)) {
+        const numberedDateElement = <th style={tableHeaderStyle}>{formatDateNumerical(currentDate)}</th>;
+        const dayOfWeekDateElement = <th style={tableHeaderStyle}>{formatDayOfWeek(currentDate)}</th>;
 
         numberedDateElements.push(numberedDateElement);
         dayOfWeekDateElements.push(dayOfWeekDateElement);
     }
-    console.log(numberedDateElements.length)
+
     const tableRowStyle = {
         width: `${day * 4}px`,
         height: `${day * 4}px`,
@@ -196,7 +200,7 @@ const Timeline = () => {
                 <button className={`rounded border border-cyan-200 p-2 ${selectedTaskStatus === "" ? "bg-cyan-800" : "bg-cyan-400"}`} onClick={() => handleFilterByTaskStatus("")}>All Statuses</button>
             </div>
   
-            <div className='w-full h-full bg-purple-100 overflow-x-auto relative shrink-0 flex' style={{ width: '2000px' }} >
+            <div className='7h-full bg-purple-100 overflow-x-auto relative shrink-0 flex' style={{ width: '2000px' }} >
              
                 {milestones}
 
