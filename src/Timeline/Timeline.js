@@ -211,7 +211,7 @@ const Timeline = () => {
                 <button className={`rounded border border-cyan-200 p-2 ${selectedTaskStatus === "Backlog" ? "bg-cyan-800" : "bg-cyan-400"}`} onClick={() => handleFilterByTaskStatus("Backlog")}>Backlog</button>
                 <button className={`rounded border border-cyan-200 p-2 ${selectedTaskStatus === "" ? "bg-cyan-800" : "bg-cyan-400"}`} onClick={() => handleFilterByTaskStatus("")}>All Statuses</button>
             </div>
-  
+            <h1>Date Range: {formatDateNumerical(startDate)} - {formatDateNumerical(endDate)}</h1>
             <div className='7h-full bg-purple-100 overflow-x-auto relative shrink-0 flex' style={{ width: '2000px' }} >
              
                 {milestones}
