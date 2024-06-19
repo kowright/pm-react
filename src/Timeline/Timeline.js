@@ -49,7 +49,7 @@ const Timeline = () => {
     let numberedDateElements = [];
     let dayOfWeekDateElements = [];
     const startDate = new Date('2024-06-01'); //will be user input
-    const endDate = new Date('2024-08-31'); //will be user input
+    const endDate = new Date('2024-07-22'); //will be user input
 
     const adjustedStartDate = new Date(startDate);
     adjustedStartDate.setDate(startDate.getDate() + 1);
@@ -101,35 +101,39 @@ const Timeline = () => {
     filteredTasks = selectedTaskStatus
         ? filteredTasks.filter(task => task.taskStatus === selectedTaskStatus)
         : filteredTasks;
-
+        
+    filteredTasks = filteredTasks.filter(task => new Date(task.startDate) <= endDate);
 
     let tasks = filteredTasks.map((task, index) => {
-            let width = `${day * task.duration * 4}px`;
-            let top = `${day * (index + 1) * 4}px`;
-
-            let dateRange =
-                Math.round
-                    ((new Date(task.startDate) - startDate) / (1000 * 3600 * 24));
     
-            let left = `${day * 4 * dateRange}px`;
-            console.log(new Date(task.startDate))
-            const containerStyles = {
-                position: 'absolute',
-                left: left,
-                top: top,
-                width: width,
-                height: `${day*4}px`, 
-                backgroundColor: 'gray',
-                borderRadius: '0.5rem', // Example border radius
-                boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)', // Example shadow
-                zIndex: 20
-            };
+        let top = `${day * (index + 1) * 4}px`;
+        //shorten task length to fit timeline range
+        let lengthRange = Math.round((endDate - new Date(task.endDate)) / (1000 * 3600 * 24));
+        let width = lengthRange < 0 ? `${day * (task.duration + lengthRange + 1) * 4}px` : `${day * task.duration * 4}px`;
 
-            return (
-                 <div style={containerStyles}>
-                    <p className="text-white text-center">{task.name}</p>
-                </div>
-            );
+        let startOffset =
+            Math.round
+                ((new Date(task.startDate) - startDate) / (1000 * 3600 * 24));
+    
+        let left = `${day * 4 * startOffset}px`;
+        console.log(new Date(task.startDate))
+        const containerStyles = {
+            position: 'absolute',
+            left: left,
+            top: top,
+            width: width,
+            height: `${day*4}px`, 
+            backgroundColor: 'gray',
+            borderRadius: '0.5rem', // Example border radius
+            boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)', // Example shadow
+            zIndex: 20
+        };
+
+        return (
+                <div style={containerStyles}>
+                <p className="text-white text-center">{task.name}</p>
+            </div>
+        );
     });
 
     let tempMilestones = [
@@ -161,6 +165,11 @@ const Timeline = () => {
         ? filteredMilestones.filter(milestones => milestones.taskStatus === selectedTaskStatus)
         : filteredMilestones;
 
+    filteredMilestones = selectedTaskStatus
+        ? filteredMilestones.filter(milestones => milestones.taskStatus === selectedTaskStatus)
+        : filteredMilestones;
+
+    filteredMilestones = filteredMilestones.filter(milestone => milestone.date <= endDate);
 
     let milestones = filteredMilestones.map((milestone, index) => {
 
