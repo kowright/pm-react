@@ -8,11 +8,22 @@ import TimelineView from './TimelineView';
 import Timeline from './Timeline/Timeline'; //bring this back
 import { Sidebar } from './Sidebar/Sidebar';
 function App() {
-    const [view, setView] = React.useState('Table');
+    const [view, setView] = React.useState('');
+    const [selectedTask, setTask] = React.useState(null);
 
     const handleClick = (view) => {
         setView(view)
     };
+
+    function handleTaskClick(task){
+
+        console.log("HELLOOO " + task.name)
+        setTask(task);
+        if (selectedTask != null) {
+            console.log("BYEE ")
+        }
+     
+    }
     return (
         <div>
             <header className="App-header">
@@ -31,11 +42,12 @@ function App() {
                         {view === 'Timeline' && <TimelineView />}
                         {view === 'Table' && <TableView />}
                         {view === 'Kanban' && <KanbanView />}
+                        <Timeline taskClick={handleTaskClick} />
                     </div>
                     <div>
-                        <Sidebar taskId={2} isTask={true} />
+                        {selectedTask != null ? <Sidebar taskId={selectedTask.id} isTask={true} /> : <div></div>}
                     </div>
-                 
+                
                     
                 </div>
 

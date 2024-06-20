@@ -1,10 +1,14 @@
 import React from 'react';
 
 
-const Timeline = () => {
+const Timeline = ({ taskClick }) => {
+    const day = 40; // Size of cell in pixels
 
-    const timeLength = 365; 
-    const day = 40;
+    // Example of using the taskClick function
+    const handleClick = (task) => {
+        console.log("Inside Timeline component - before invoking taskClick function " + task.name);
+        taskClick(task); // Invoke the function with some example task data
+    };
 
     const [data, setData] = React.useState(null);
     const [selectedRoadmap, setSelectedRoadmap] = React.useState('');
@@ -17,8 +21,6 @@ const Timeline = () => {
         setSelectedTaskStatus(status);
     };
 
-   
-
     React.useEffect(() => {
         fetch("/api")
             .then((res) => res.json())
@@ -29,6 +31,7 @@ const Timeline = () => {
         return <p>Loading...!</p>; // Render loading until data is fetched
     }
 
+    // #region Table
     const tableHeaderStyle = {
         width: `${day * 4}px`,
         height: `${(day / 2) * 4}px`,
@@ -93,6 +96,9 @@ const Timeline = () => {
         }
         return tableRows;
     }
+    // #endregion
+
+    // #region Tasks
 
     let filteredTasks = selectedRoadmap
         ? data.message.filter(task => task.roadmap === selectedRoadmap)
@@ -130,12 +136,16 @@ const Timeline = () => {
         };
 
         return (
-                <div style={containerStyles}>
+            <div style={containerStyles} onClick={() => handleClick(task)}>
                 <p className="text-white text-center">{task.name}</p>
             </div>
         );
     });
+  
+ 
+    // #endregion
 
+    // #region Milestones
     let tempMilestones = [
         {
             name: "Specifications Done",
@@ -203,9 +213,8 @@ const Timeline = () => {
         );
     });
 
+    // #endregion
 
-
-    
     return (
         <div>
             <div className='flex gap-4 justify-center'>
