@@ -1,29 +1,26 @@
 import logo from './logo.svg';
 import './App.css';
 
-import React from "react";
+import React, { useState } from 'react';
 import TableView from './TableView';
 import KanbanView from './KanbanView';
 import TimelineView from './TimelineView';
-import Timeline from './Timeline/Timeline'; //bring this back
 import { Sidebar } from './Sidebar/Sidebar';
-function App() {
-    const [view, setView] = React.useState('');
-    const [selectedTask, setTask] = React.useState(null);
+import { Task } from './Interfaces'
 
-    const handleClick = (view) => {
-        setView(view)
+function App() {
+    const [view, setView] = useState<string>(''); 
+    const [selectedTask, setSelectedTask] = useState<Task|null>(null); 
+
+    const handleClick = (viewName: string) => {
+        setView(viewName);
     };
 
-    function handleTaskClick(task){
+    const handleTaskClick = (task: Task) => {
+        console.log("Selected Task: ", task.name);
+        setSelectedTask(task);
+    };
 
-        console.log("HELLOOO " + task.name)
-        setTask(task);
-        if (selectedTask != null) {
-            console.log("BYEE ")
-        }
-     
-    }
     return (
         <div>
             <header className="App-header">
@@ -39,31 +36,25 @@ function App() {
             <div className="flex flex-col bg-[#282c34] justify-between">
                 <div className="flex justify-center">
                     <div>
-                        {view === 'Timeline' && <TimelineView />}
+                        {view === 'Timeline' && <TimelineView taskClick={handleTaskClick} />}
                         {view === 'Table' && <TableView />}
                         {view === 'Kanban' && <KanbanView />}
-                        <Timeline taskClick={handleTaskClick} />
                     </div>
                     <div>
-                        {selectedTask != null ? <Sidebar taskId={selectedTask.id} isTask={true} /> : <div></div>}
+                        <Sidebar sidebarData={selectedTask} />
                     </div>
-                
-                    
                 </div>
 
                 <div>
                     <p className='text-white flex justify-center my-4'>Kortney Wright</p>
                 </div>
-               
-
             </div>
-           
         </div>
     );
 }
 
-
 export default App;
+
 
 //things to do
 //put view/filter changing things in a component and do api call on parent to pass to children data and filters

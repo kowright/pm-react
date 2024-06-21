@@ -1,91 +1,72 @@
 import React from 'react';
+import { Milestone, Task, formatDateNumericalMMDDYYYY } from '../Interfaces';
 
 interface SidebarProps {
-    isTask: boolean;
-    isMilestone: boolean;
-    taskId: number;
+    sidebarData: (Milestone | Task | null); //what can show in the sidebar
 }
 
-/**
- * Primary UI component for user interaction
- */
-export const Sidebar: React.FC<SidebarProps> = ({
-    isTask = false,
-    isMilestone = false,
+export const Sidebar = ({
+    sidebarData = null,
     ...props
 }: SidebarProps) => {
-    const [data, setData] = React.useState<any>(null); // Use 'any' or specify the expected shape of data
 
-    const hideContent = !isTask && !isMilestone;
+    let hideContent: boolean = true;
 
-    const fetchURL = `/api/tasks/${props.taskId}`; 
+    let sidebarContent: JSX.Element;
 
-    React.useEffect(() => {
-        fetch(fetchURL)
-            .then((res) => res.json())
-            .then((data) => setData(data))
-            .catch((error) => console.error('Error fetching data:', error));
-    }, [fetchURL, props.taskId]); // Ensure taskId is included in dependencies array
-
-    if (!data) {
-        return <div>Loading...</div>; // Handle loading state
+    switch (true) {
+        case sidebarData === null:
+            sidebarContent = <div>No content to show.</div>;
+            hideContent = true;
+            break;
+        case isMilestone(sidebarData):
+            sidebarContent = <div>Milestone data: {sidebarData.name}</div>;
+            hideContent = false;
+            break;
+        case isTask(sidebarData):
+            sidebarContent =
+            <div>
+                  <h1>TASK DETAILS</h1>
+                    <p>NAME: {sidebarData.name} </p>
+                    <hr />
+                    <p>DESCRIPTION: {sidebarData.description} </p>
+                    <hr />
+                    <p>ROADMAP(S): {sidebarData.roadmap} </p>
+                    <hr />
+                    <p>ASSIGNEE: {sidebarData.assignee} </p>
+                    <hr />
+                    <p>START DATE: {formatDateNumericalMMDDYYYY(new Date(sidebarData.startDate))} </p>
+                    <hr />
+                    <p>END DATE: {formatDateNumericalMMDDYYYY(new Date(sidebarData.endDate))} </p>
+                    <hr />
+                    <p>DURATION: {sidebarData.duration} </p>
+                    <hr />
+                    <p>TASK STATUS: {sidebarData.taskStatus} </p>
+                    <hr />
+                    <p>ID: {sidebarData.id} </p>
+                </div>;
+            hideContent = false;
+            break;
+        default:
+            sidebarContent = <div>Unknown data type.</div>;
+            hideContent = false;
+            break;
+    }
+    function isMilestone(data: Milestone | Task | null): data is Milestone {
+        return (data as Milestone).date !== undefined;
     }
 
-    function formatDateNumerical(date: Date | string): string {
-        const formattedDate = typeof date === 'string' ? new Date(date) : date;
-
-        // Check if formattedDate is a valid Date object
-        if (!(formattedDate instanceof Date && !isNaN(formattedDate.getTime()))) {
-            throw new Error('Invalid date provided');
-        }
-
-        // Extract year, month, and day
-        const year = formattedDate.getFullYear();
-        const month = String(formattedDate.getMonth() + 1).padStart(2, '0'); // Months are zero-indexed
-        const day = String(formattedDate.getDate()).padStart(2, '0');
-
-        // Return formatted date string
-        return `${month}-${day}-${year}`;
+    function isTask(data: Milestone | Task | null): data is Task {
+        return (data as Task).duration !== undefined;
     }
-
-
 
     return (
         <div>
-            {hideContent ? (
-                <div>No content to show</div> ) : (
-                    <div className='w-full h-full bg-rose-700'>
-
-                        {isTask &&
-                            <div>
-                                <h1>TASK DETAILS</h1>
-                                <p>NAME: {data.task.name} </p>
-                                <hr />
-                                <p>DESCRIPTION: {data.task.description} </p>
-                                <hr />
-                                <p>ROADMAP(S): {data.task.roadmap} </p>
-                                <hr />
-                                <p>ASSIGNEE: {data.task.assignee} </p>
-                                <hr />
-                                <p>START DATE: {formatDateNumerical(data.task.startDate)} </p>
-                                <hr />
-                                <p>END DATE: {formatDateNumerical(data.task.endDate)} </p>
-                                <hr />
-                                <p>DURATION: {data.task.duration} </p>
-                                <hr />
-                                <p>TASK STATUS: {data.task.taskStatus} </p>
-                                <hr />
-                                <p>ID: {data.task.id} </p>
-                            </div>
-                        }
-
-
-
-                        {isMilestone && <div>MILESTONING </div> }
-                       
-
-                    </div>
-            )}
+            {!hideContent &&
+                 <div className='w-full h-full bg-rose-700'>
+                    {sidebarContent }
+                </div> 
+            }
         </div>
     );
 };
