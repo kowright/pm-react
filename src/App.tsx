@@ -55,7 +55,7 @@ function App() {
                     <div>
                         {view === 'Timeline' && <TimelineView taskClick={handleTaskClick} />}
                         {view === 'Table' && <TableView roadmap={selectedRoadmap} taskStatus={ selectedTaskStatus} />}
-                        {view === 'Kanban' && <KanbanView />}
+                        {view === 'Kanban' && <KanbanView roadmap={selectedRoadmap} taskStatus={selectedTaskStatus} />}
 
                     </div>
                     <br />
