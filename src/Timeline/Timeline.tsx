@@ -1,5 +1,5 @@
 import React from 'react';
-import { Milestone, Task, formatDateNumericalMMDD } from '../Interfaces';
+import { Milestone, Task, TaskStatus, Roadmap, formatDateNumericalMMDD, addDaysToDate } from '../Interfaces';
 
 interface TimelineProps {
     taskClick: (task: Task) => void;
@@ -15,24 +15,31 @@ export const Timeline: React.FC<TimelineProps> = ({ taskClick }) => {
     };
 
     const [data, setData] = React.useState<{ message: Task[] } | null>(null);
-    const [selectedRoadmap, setSelectedRoadmap] = React.useState<string>('');
-    const [selectedTaskStatus, setSelectedTaskStatus] = React.useState<string>('');
+    const [milestoneData, setMilestoneData] = React.useState<{ message: Milestone[]  } | null>(null);
+    const [selectedRoadmap, setSelectedRoadmap] = React.useState<Roadmap | null>(null);
+    const [selectedTaskStatus, setSelectedTaskStatus] = React.useState<TaskStatus | null>(null);
 
-    const handleFilterByRoadmap = (roadmap: string) => {
+    const handleFilterByRoadmap = (roadmap: Roadmap) => {
         setSelectedRoadmap(roadmap);
     };
 
-    const handleFilterByTaskStatus = (status: string) => {
+    const handleFilterByTaskStatus = (status: TaskStatus) => {
         setSelectedTaskStatus(status);
     };
 
     React.useEffect(() => {
-        fetch("/api")
+        fetch("/api/tasks")
             .then((res) => res.json())
             .then((data) => setData(data));
     }, []);
 
-    if (!data) {
+    React.useEffect(() => {
+        fetch("/api/milestones")
+            .then((res) => res.json())
+            .then((milestoneData) => setMilestoneData(milestoneData));
+    }, []);
+
+    if (!data || !milestoneData) {
         return <p>Loading...!</p>; // Render loading until data is fetched
     }
 
@@ -99,7 +106,7 @@ export const Timeline: React.FC<TimelineProps> = ({ taskClick }) => {
 
     // #region Tasks
     let filteredTasks = selectedRoadmap
-        ? data.message.filter((task) => task.roadmap === selectedRoadmap)
+        ? data.message.filter((task) => task.roadmaps.includes(selectedRoadmap))
         : data.message;
 
     filteredTasks = selectedTaskStatus
@@ -137,34 +144,15 @@ export const Timeline: React.FC<TimelineProps> = ({ taskClick }) => {
     // #endregion
 
     // #region Milestones
-    let tempMilestones: Milestone[] = [
-        {
-            name: "Specifications Done",
-            date: new Date('2024-06-07'),
-            roadmaps: ['Engineering Roadmap'],
-            taskStatus: 'In Progress'
-        },
-        {
-            name: "Design Done",
-            date: new Date('2024-06-10'),
-            roadmaps: ['Design Roadmap'],
-            taskStatus: 'In Review'
-        },
-        {
-            name: "Prototype Completed",
-            date: new Date('2024-06-15'),
-            roadmaps: ['Engineering Roadmap', 'Design Roadmap'],
-            taskStatus: 'Backlog'
-        },
-    ];
+   
+    //REDO HOW THIS WORKS
+    /*let filteredMilestones = selectedRoadmap
+        ? milestoneData?.message.filter(milestone => milestone.roadmaps.includes(selectedRoadmap))
+        : milestoneData?.message;*/
 
-    let filteredMilestones = selectedRoadmap
-        ? tempMilestones.filter(milestone => milestone.roadmaps.includes(selectedRoadmap))
-        : tempMilestones;
-
-    filteredMilestones = selectedTaskStatus
-        ? filteredMilestones.filter(milestone => milestone.taskStatus === selectedTaskStatus)
-        : filteredMilestones;
+     let filteredMilestones = selectedTaskStatus
+        ? milestoneData?.message.filter(milestone => milestone.taskStatus === selectedTaskStatus)
+        : milestoneData?.message;
 
     filteredMilestones = filteredMilestones.filter(milestone => milestone.date <= endDate);
 
@@ -199,18 +187,7 @@ export const Timeline: React.FC<TimelineProps> = ({ taskClick }) => {
 
     return (
         <div>
-            <div className='flex gap-4 justify-center'>
-                <button className={`rounded border border-cyan-200 p-2 ${selectedRoadmap === "Engineering Roadmap" ? "bg-cyan-800" : "bg-cyan-400"}`} onClick={() => handleFilterByRoadmap("Engineering Roadmap")}>Engineering Roadmap Tasks</button>
-                <button className={`rounded border border-cyan-200 p-2 ${selectedRoadmap === "Design Roadmap" ? "bg-cyan-800" : "bg-cyan-400"}`} onClick={() => handleFilterByRoadmap("Design Roadmap")}>Design Roadmap Tasks</button>
-                <button className={`rounded border border-cyan-200 p-2 ${selectedRoadmap === "" ? "bg-cyan-800" : "bg-cyan-400"}`} onClick={() => handleFilterByRoadmap("")}>All Roadmaps</button>
-            </div>
-            <br />
-            <div className='flex gap-4 justify-center'>
-                <button className={`rounded border border-cyan-200 p-2 ${selectedTaskStatus === "In Progress" ? "bg-cyan-800" : "bg-cyan-400"}`} onClick={() => handleFilterByTaskStatus("In Progress")}>In Progress</button>
-                <button className={`rounded border border-cyan-200 p-2 ${selectedTaskStatus === "In Review" ? "bg-cyan-800" : "bg-cyan-400"}`} onClick={() => handleFilterByTaskStatus("In Review")}>In Review</button>
-                <button className={`rounded border border-cyan-200 p-2 ${selectedTaskStatus === "Backlog" ? "bg-cyan-800" : "bg-cyan-400"}`} onClick={() => handleFilterByTaskStatus("Backlog")}>Backlog</button>
-                <button className={`rounded border border-cyan-200 p-2 ${selectedTaskStatus === "" ? "bg-cyan-800" : "bg-cyan-400"}`} onClick={() => handleFilterByTaskStatus("")}>All Statuses</button>
-            </div>
+            {/* ADD BACK FILTER BUTTONS */}
             <h1>Date Range: {formatDateNumericalMMDD(startDate)} - {formatDateNumericalMMDD(endDate)}</h1>
             <div className='7h-full bg-purple-100 overflow-x-auto relative shrink-0 flex' style={{ width: '2000px' }}>
                 {milestones}

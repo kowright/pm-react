@@ -1,21 +1,44 @@
 export interface Milestone {
     name: string;
+    description: string;
     date: Date;
-    roadmaps: string[];
-    taskStatus: string;
+    taskStatus: TaskStatus;
+    id: number;
 }
 
 export interface Task {
-    id: number;
+    name: string,
+    description: string,
+    duration: number;
+    roadmaps: Roadmap[],
+    assignee: Assignee,
+    startDate: Date,
+    endDate: Date,
+    taskStatus: TaskStatus,
+    id: number,
+}
+export interface TaskStatus {
     name: string;
     description: string;
-    duration: number;
-    roadmap: string;
-    assignee: string;
-    startDate: string;
-    endDate: string;
-    taskStatus: string;
 }
+
+export interface Roadmap {
+    name: string;
+    description: string;
+    milestones: Milestone[];
+    tags: Tag[];
+    id: number;
+}
+
+export interface Assignee {
+    name: string;
+    //role
+}
+export interface Tag {
+    name: string;
+    description: string;
+}
+
 
 export const formatDateNumericalMMDD = (date: Date): string => {
     const month = (date.getMonth() + 1).toString().padStart(2, '0'); // Month is zero-indexed, so we add 1
@@ -35,3 +58,16 @@ export const formatDateNumericalMMDDYYYY = (date: Date): string => {
 
     return formattedDate;
 };
+
+export function addDaysToDate(date: Date, daysToAdd: number): Date {
+    // Create a new Date object to avoid mutating the original date
+    const newDate = new Date(date);
+
+    // Get the current day of the month
+    const currentDay = newDate.getDate();
+
+    // Set the date to the new day of the month
+    newDate.setDate(currentDay + daysToAdd);
+
+    return newDate;
+}

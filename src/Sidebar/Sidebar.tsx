@@ -2,7 +2,7 @@ import React from 'react';
 import { Milestone, Task, formatDateNumericalMMDDYYYY } from '../Interfaces';
 
 interface SidebarProps {
-    sidebarData: (Milestone | Task | null); //what can show in the sidebar
+    sidebarData: Milestone | Task | null; //what can show in the sidebar
 }
 
 export const Sidebar = ({
@@ -11,10 +11,30 @@ export const Sidebar = ({
 }: SidebarProps) => {
 
     let hideContent: boolean = true;
-
     let sidebarContent: JSX.Element;
 
-    switch (true) {
+
+    sidebarContent = <div>NAH</div>
+
+    /*if (sidebarData != null) {
+        sidebarContent = <div>null</div>
+    }
+     else if(sidebarData instanceof Milestone) {
+        // Handle Milestone case
+    } else if (sidebarData instanceof Task) {
+        let data: Task = sidebarData as Task;
+        sidebarContent =
+            <div>
+                <NAME: {data.name} </p>
+
+            </div>;
+        hideContent = false;
+    } else {
+        // Handle other cases
+    }*/
+
+
+    /*switch (true) {
         case sidebarData === null:
             sidebarContent = <div>No content to show.</div>;
             hideContent = true;
@@ -31,7 +51,7 @@ export const Sidebar = ({
                     <hr />
                     <p>DESCRIPTION: {sidebarData.description} </p>
                     <hr />
-                    <p>ROADMAP(S): {sidebarData.roadmap} </p>
+                    <p>ROADMAP(S): {sidebarData.} </p>
                     <hr />
                     <p>ASSIGNEE: {sidebarData.assignee} </p>
                     <hr />
@@ -51,20 +71,20 @@ export const Sidebar = ({
             sidebarContent = <div>Unknown data type.</div>;
             hideContent = false;
             break;
-    }
-    function isMilestone(data: Milestone | Task | null): data is Milestone {
+    }*/
+  /*  function isMilestone(data: Milestone | Task | null): data is Milestone {
         return (data as Milestone).date !== undefined;
     }
 
     function isTask(data: Milestone | Task | null): data is Task {
         return (data as Task).duration !== undefined;
     }
-
+*/
     return (
         <div>
             {!hideContent &&
                  <div className='w-full h-full bg-rose-700'>
-                    {sidebarContent }
+                    { sidebarContent }
                 </div> 
             }
         </div>

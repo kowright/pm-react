@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {Task} from './Interfaces';
+import { Task, TaskStatus, Roadmap } from './Interfaces';
 
 interface KanbanViewProps {
 
@@ -10,34 +10,43 @@ interface KanbanViewProps {
     }: KanbanViewProps) => {
 
 
-    const [data, setData] = useState < { message: Task[] } | null > (null);
-    const [selectedRoadmap, setSelectedRoadmap] = useState < string > ('');
-    const [selectedTaskStatus, setSelectedTaskStatus] = useState < string > ('');
+    const [data, setData] = useState <{ message: Task[] } | null> (null);
+    const [selectedRoadmap, setSelectedRoadmap] = useState<Roadmap | null> (null); //keep
+    const [selectedTaskStatus, setSelectedTaskStatus] = useState<TaskStatus | null>(null); //keep
+    const [roadmapData, setRoadmapData] = useState<{ message: Roadmap[] } | null>(null);
+    const [taskStatusData, setTaskStatusData] = useState<{ message: TaskStatus[] } | null>(null);
 
-    const handleFilterByRoadmap = (roadmap: string) => {
-        setSelectedRoadmap(roadmap);
-    };
 
-    const handleFilterByTaskStatus = (status: string) => {
+     const handleFilterByRoadmap = (roadmap: Roadmap | null) => { //keep
+         setSelectedRoadmap(roadmap);
+     };
+
+    const handleFilterByTaskStatus = (status: TaskStatus | null) => { //keep
         setSelectedTaskStatus(status);
     };
 
-    useEffect(() => {
-        fetch("/api")
+    useEffect(() => { //keep for now until App gives it to you
+        fetch("/api/tasks")
             .then((res) => res.json())
             .then((data) => setData(data))
             .catch((error) => console.error('Error fetching data:', error));
     }, []);
 
+     useEffect(() => {
+         fetch("/api/roadmaps")
+             .then((res) => res.json())
+             .then((data) => setRoadmapData(data))
+             .catch((error) => console.error('Error fetching data:', error));
+     }, []);
 
-    if (!data) {
+    if (!data || !roadmapData) {
         return <div> oh no</div>
     }
 
         let filteredTasks = data.message;
 
         if (selectedRoadmap) {
-            filteredTasks = filteredTasks.filter(task => task.roadmap === selectedRoadmap);
+            filteredTasks = filteredTasks.filter(task => task.roadmaps.includes(selectedRoadmap));
         }
 
         if (selectedTaskStatus) {
@@ -45,7 +54,7 @@ interface KanbanViewProps {
         }
 
         const tasksByStatus = filteredTasks.reduce((acc: Record<string, Task[]>, task: Task) => {
-            const status = task.taskStatus;
+            const status = task.taskStatus.name;
             if (!acc[status]) {
                 acc[status] = [];
             }
@@ -71,26 +80,21 @@ interface KanbanViewProps {
                 {task.name}
             </div>
         ));
-    
+
+    //ADD ALL ROADMAPS BUTTON 
+     let roadmapButtons = roadmapData.message.map(roadmap =>
+             <button className={`rounded border border-cyan-200 p-2 ${selectedRoadmap?.name === roadmap.name ? "bg-cyan-800" : "bg-cyan-400"}`} onClick={() => selectedRoadmap && handleFilterByRoadmap(roadmap)}>{roadmap.name} Roadmap Tasks</button>
+        )
+
+     let taskStatusButtons = taskStatusData?.message.map(status =>
+         <button className={`rounded border border-cyan-200 p-2 ${selectedTaskStatus?.name === status.name ? "bg-cyan-800" : "bg-cyan-400"}`} onClick={() => selectedTaskStatus && handleFilterByTaskStatus(status)}>{status.name}</button>
+
+     )
 
     return (
         <div>
             <br/>
             <p className='flex justify-center text-3xl text-white'>KANBAN VIEW</p>
-
-            <div className='flex gap-4 justify-center'>
-                <button className={`rounded border border-cyan-200 p-2 ${selectedRoadmap === "Engineering Roadmap" ? "bg-cyan-800" : "bg-cyan-400"}`} onClick={() => handleFilterByRoadmap("Engineering Roadmap")}>Engineering Roadmap Tasks</button>
-                <button className={`rounded border border-cyan-200 p-2 ${selectedRoadmap === "Design Roadmap" ? "bg-cyan-800" : "bg-cyan-400"}`} onClick={() => handleFilterByRoadmap("Design Roadmap")} >Design Roadmap Tasks</button>
-                <button className={`rounded border border-cyan-200 p-2 ${selectedRoadmap === "" ? "bg-cyan-800" : "bg-cyan-400"}`} onClick={() => handleFilterByRoadmap("")}>All Roadmaps</button>
-            </div>
-            <br />
-            <div className='flex gap-4 justify-center'>
-                <button className={`rounded border border-cyan-200 p-2 ${selectedTaskStatus === "In Progress" ? "bg-cyan-800" : "bg-cyan-400"}`} onClick={() => handleFilterByTaskStatus("In Progress")}>In Progress</button>
-                <button className={`rounded border border-cyan-200 p-2 ${selectedTaskStatus === "In Review" ? "bg-cyan-800" : "bg-cyan-400"}`} onClick={() => handleFilterByTaskStatus("In Review")}>In Review</button>
-                <button className={`rounded border border-cyan-200 p-2 ${selectedTaskStatus === "Backlog" ? "bg-cyan-800" : "bg-cyan-400"}`} onClick={() => handleFilterByTaskStatus("Backlog")}>Backlog</button>
-                <button className={`rounded border border-cyan-200 p-2 ${selectedTaskStatus === "" ? "bg-cyan-800" : "bg-cyan-400"}`} onClick={() => handleFilterByTaskStatus("")}>All Statuses</button>
-            </div>
-            <br />
             <div className='flex gap-4'>
                 <div className='flex flex-col gap-4'>
                     <div className='bg-cyan-400 rounded-md flex text-xl justify-center w-80'>
