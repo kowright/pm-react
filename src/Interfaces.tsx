@@ -1,4 +1,4 @@
-export interface Milestone {
+export interface Milestone { //MIGHT NEED TO CHANGE THESE TO DISCRIMINANT UNIONS
     name: string;
     description: string;
     date: Date;
@@ -63,10 +63,8 @@ export function addDaysToDate(date: Date, daysToAdd: number): Date {
     // Create a new Date object to avoid mutating the original date
     const newDate = new Date(date);
 
-    // Get the current day of the month
     const currentDay = newDate.getDate();
 
-    // Set the date to the new day of the month
     newDate.setDate(currentDay + daysToAdd);
 
     return newDate;

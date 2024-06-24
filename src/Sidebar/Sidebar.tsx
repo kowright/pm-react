@@ -2,7 +2,7 @@ import React from 'react';
 import { Milestone, Task, formatDateNumericalMMDDYYYY } from '../Interfaces';
 
 interface SidebarProps {
-    sidebarData: Milestone | Task | null; //what can show in the sidebar
+    sidebarData: Task | null; //what can show in the sidebar; ADD EVERYTHING ELSE
 }
 
 export const Sidebar = ({
@@ -13,28 +13,19 @@ export const Sidebar = ({
     let hideContent: boolean = true;
     let sidebarContent: JSX.Element;
 
-
-    sidebarContent = <div>NAH</div>
-
-    /*if (sidebarData != null) {
-        sidebarContent = <div>null</div>
+    console.log("sidebar data " + sidebarData)
+    sidebarContent = <div>NAHHHHHHHHHHHHHHHHH</div>
+        
+    if (sidebarData == null) {
+        return <div>No details to display</div>
+  
     }
-     else if(sidebarData instanceof Milestone) {
-        // Handle Milestone case
-    } else if (sidebarData instanceof Task) {
-        let data: Task = sidebarData as Task;
-        sidebarContent =
-            <div>
-                <NAME: {data.name} </p>
 
-            </div>;
-        hideContent = false;
-    } else {
-        // Handle other cases
-    }*/
+    hideContent = false;
 
-
-    /*switch (true) {
+    
+    /*
+    switch (true) {
         case sidebarData === null:
             sidebarContent = <div>No content to show.</div>;
             hideContent = true;
@@ -50,8 +41,6 @@ export const Sidebar = ({
                     <p>NAME: {sidebarData.name} </p>
                     <hr />
                     <p>DESCRIPTION: {sidebarData.description} </p>
-                    <hr />
-                    <p>ROADMAP(S): {sidebarData.} </p>
                     <hr />
                     <p>ASSIGNEE: {sidebarData.assignee} </p>
                     <hr />
@@ -71,20 +60,37 @@ export const Sidebar = ({
             sidebarContent = <div>Unknown data type.</div>;
             hideContent = false;
             break;
-    }*/
-  /*  function isMilestone(data: Milestone | Task | null): data is Milestone {
+    }
+    function isMilestone(data: Milestone | Task | null): data is Milestone {
         return (data as Milestone).date !== undefined;
     }
 
     function isTask(data: Milestone | Task | null): data is Task {
         return (data as Task).duration !== undefined;
-    }
-*/
+    }*/
+
     return (
         <div>
             {!hideContent &&
                  <div className='w-full h-full bg-rose-700'>
-                    { sidebarContent }
+                    <div>
+                        <h1>TASK DETAILS</h1>
+                        <p>NAME: {sidebarData?.name} </p>
+                        <hr />
+                        <p>DESCRIPTION: {sidebarData?.description} </p>
+                        <hr />
+                        <p>ASSIGNEE: {sidebarData?.assignee.name} </p>
+                        <hr />
+                        <p>START DATE: {formatDateNumericalMMDDYYYY(new Date(sidebarData.startDate))} </p>
+                        <hr />
+                        <p>END DATE: {formatDateNumericalMMDDYYYY(new Date(sidebarData.endDate))} </p>
+                        <hr />
+                        <p>DURATION: {sidebarData?.duration} </p>
+                        <hr />
+                        <p>TASK STATUS: {sidebarData?.taskStatus.name} </p>
+                        <hr />
+                        <p>ID: {sidebarData?.id} </p>
+                    </div> 
                 </div> 
             }
         </div>

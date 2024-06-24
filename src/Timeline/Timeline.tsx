@@ -62,7 +62,7 @@ export const Timeline: React.FC<TimelineProps> = ({ taskClick }) => {
     let numberedDateElements: JSX.Element[] = [];
     let dayOfWeekDateElements: JSX.Element[] = [];
     const startDate = new Date('2024-06-01'); // will be user input
-    const endDate = new Date('2024-07-22'); // will be user input
+    const endDate = new Date('2024-09-01'); // will be user input
 
     const adjustedStartDate = new Date(startDate);
     adjustedStartDate.setDate(startDate.getDate() + 1);
@@ -153,15 +153,16 @@ export const Timeline: React.FC<TimelineProps> = ({ taskClick }) => {
      let filteredMilestones = selectedTaskStatus
         ? milestoneData?.message.filter(milestone => milestone.taskStatus === selectedTaskStatus)
         : milestoneData?.message;
+    console.log("milestones c " + filteredMilestones.length)
 
-    filteredMilestones = filteredMilestones.filter(milestone => milestone.date <= endDate);
+    filteredMilestones = filteredMilestones.filter(milestone => new Date(milestone.date) <= endDate);
 
     let milestones = filteredMilestones.map((milestone, index) => {
         let width = `${day * 4}px`;
         let top = `${day * 4}px`;
         let height = `${day * 4 * filteredTasks.length}px`;
 
-        let dateRange = Math.round((milestone.date.getTime() - startDate.getTime()) / (1000 * 3600 * 24));
+        let dateRange = Math.round((new Date(milestone.date).getTime() - startDate.getTime()) / (1000 * 3600 * 24));
         let left = `${day * 4 * dateRange}px`;
 
         const containerStyles: React.CSSProperties = {
@@ -188,7 +189,8 @@ export const Timeline: React.FC<TimelineProps> = ({ taskClick }) => {
     return (
         <div>
             {/* ADD BACK FILTER BUTTONS */}
-            <h1>Date Range: {formatDateNumericalMMDD(startDate)} - {formatDateNumericalMMDD(endDate)}</h1>
+            <p className='flex justify-center text-3xl text-white'>DATE RANGE:  {formatDateNumericalMMDD(startDate)} - {formatDateNumericalMMDD(endDate)}</p>
+
             <div className='7h-full bg-purple-100 overflow-x-auto relative shrink-0 flex' style={{ width: '2000px' }}>
                 {milestones}
                 {tasks}
