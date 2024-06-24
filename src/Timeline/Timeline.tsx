@@ -22,6 +22,9 @@ export const Timeline = ({
     const [milestoneData, setMilestoneData] = React.useState<{ message: Milestone[]  } | null>(null);
     const [selectedRoadmap, setSelectedRoadmap] = React.useState<Roadmap | null>(null);
     const [selectedTaskStatus, setSelectedTaskStatus] = React.useState<TaskStatus | null>(null);
+    const [selectedStartDate, setSelectedStartDate] = React.useState('2024-06-01');
+    const [selectedEndDate, setSelectedEndDate] = React.useState('2024-09-01');
+
 
     const handleFilterByRoadmap = (roadmap: Roadmap) => {
         setSelectedRoadmap(roadmap);
@@ -65,8 +68,8 @@ export const Timeline = ({
     // Generating numbered date elements and day of week date elements
     let numberedDateElements: JSX.Element[] = [];
     let dayOfWeekDateElements: JSX.Element[] = [];
-    const startDate = new Date('2024-06-01'); // will be user input
-    const endDate = new Date('2024-09-01'); // will be user input
+    const startDate = new Date(selectedStartDate); // will be user input
+    const endDate = new Date(selectedEndDate); // will be user input
 
     const adjustedStartDate = new Date(startDate);
     adjustedStartDate.setDate(startDate.getDate() + 1);
@@ -151,16 +154,10 @@ export const Timeline = ({
     // #endregion
 
     // #region Milestones
-   
-    //REDO HOW THIS WORKS
-    /*let filteredMilestones = selectedRoadmap
-        ? milestoneData?.message.filter(milestone => milestone.roadmaps.includes(selectedRoadmap))
-        : milestoneData?.message;*/
 
      let filteredMilestones = selectedTaskStatus
         ? milestoneData?.message.filter(milestone => milestone.taskStatus === selectedTaskStatus)
         : milestoneData?.message;
-    console.log("milestones c " + filteredMilestones.length)
 
     filteredMilestones = filteredMilestones.filter(milestone => new Date(milestone.date) <= endDate);
 
@@ -193,10 +190,43 @@ export const Timeline = ({
     });
     // #endregion
 
+    // #region Date Range
+    // Function to handle date change
+    const handleStartDateChange = (event: any) => {
+        setSelectedStartDate(event.target.value);
+    };
+    const handleEndDateChange = (event: any) => {
+        setSelectedEndDate(event.target.value);
+    };
+
+    // #endregion
+
     return (
         <div>
-            {/* ADD BACK FILTER BUTTONS */}
-            <p className='flex justify-center text-3xl text-white'>DATE RANGE:  {formatDateNumericalMMDD(startDate)} - {formatDateNumericalMMDD(endDate)}</p>
+            <div className='flex justify-content gap-4'>
+                <div className='flex'>
+                    <p className='text-white'>START DATE == </p> 
+                    <input
+                        id="datePicker"
+                        type="date"
+                        value={selectedStartDate} // Bind the selectedDate state to input value
+                        onChange={handleStartDateChange} // Handle date change
+                        aria-label="Start Date"
+                    />
+                </div>
+
+                <div className='flex justify-content gap-4'>
+                    <p className='text-white'>END DATE == </p> 
+                    <input
+                        id="datePicker"
+                        type="date"
+                        value={selectedEndDate} // Bind the selectedDate state to input value
+                        onChange={handleEndDateChange} // Handle date change
+                        aria-label="End Date"
+                    />
+                </div>
+              
+            </div>
 
             <div className='7h-full bg-purple-100 overflow-x-auto relative shrink-0 flex' style={{ width: '2000px' }}>
                 {milestones}
@@ -216,7 +246,7 @@ export const Timeline = ({
                         {createRows(filteredTasks.length)}
                     </tbody>
                 </table>
-            </div>
+            p</div>
         </div>
     );
 };
