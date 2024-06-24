@@ -133,7 +133,7 @@ export const TableView = ({
 
                     <td className="border border-gray-300 px-4 py-2">{item.taskStatus.name}</td>
                     <td className="border border-gray-300 px-4 py-2">{item.id}</td>
-
+                    <td className="border border-gray-300 px-4 py-2">{item.type}</td>
                 </tr >
             ));
             break;
@@ -159,6 +159,7 @@ export const TableView = ({
                         <td className="border border-gray-300 px-4 py-2">{formatDateNumericalMMDDYYYY(new Date(item.date))}</td>
                         <td className="border border-gray-300 px-4 py-2">{item.taskStatus.name}</td>
                         <td className="border border-gray-300 px-4 py-2">{item.id}</td>
+                        <td className="border border-gray-300 px-4 py-2">{item.type}</td>
                     </tr >
                 ));
             break;
@@ -180,6 +181,8 @@ export const TableView = ({
                     <tr key={index}>
                         <td className="border border-gray-300 px-4 py-2">{item.name}</td>
                         <td className="border border-gray-300 px-4 py-2">{item.description}</td>
+                        <td className="border border-gray-300 px-4 py-2">{item.id}</td>
+                        <td className="border border-gray-300 px-4 py-2">{item.type}</td>
                     </tr >
                 ));
             break;
@@ -200,6 +203,9 @@ export const TableView = ({
                 assigneeData?.message.map((item, index) => (
                     <tr key={index}>
                         <td className="border border-gray-300 px-4 py-2">{item.name}</td>
+                        <td className="border border-gray-300 px-4 py-2">{item.description}</td>
+                        <td className="border border-gray-300 px-4 py-2">{item.id}</td>
+                        <td className="border border-gray-300 px-4 py-2">{item.type}</td>
                     </tr >
                 ));
             break;
