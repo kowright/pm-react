@@ -6,12 +6,12 @@ import TableView from './TableView';
 import KanbanView from './KanbanView';
 import TimelineView from './TimelineView';
 import { Sidebar } from './Sidebar/Sidebar';
-import { Task, Roadmap, TaskStatus, Milestone } from './Interfaces';
+import { Task, Roadmap, TaskStatus, Milestone, Tag, Assignee } from './Interfaces';
 import { FilterArea } from './FilterArea/FilterArea';
 
 function App() {
     const [view, setView] = useState<string>(''); 
-    const [selectedTask, setSelectedTask] = useState<Task | Milestone |null>(null); 
+    const [selectedItem, setSelectedItem] = useState<Task | Milestone | Tag | Assignee | null>(null); 
 
     //Filter Area Necessities
     const [selectedRoadmap, setSelectedRoadmap] = useState<Roadmap | null>(null); //keep
@@ -28,9 +28,9 @@ function App() {
         setView(viewName);
     };
 
-    const handleTaskClick = (task: Task | Milestone) => {
-        console.log("Selected Task: ", task.name);
-        setSelectedTask(task);
+    const handleTaskClick = (item: Task | Milestone | Tag | Assignee) => {
+        console.log("Selected Task: ", item.name);
+        setSelectedItem(item);
     };
 
 
@@ -54,13 +54,13 @@ function App() {
 
                     <div>
                         {view === 'Timeline' && <TimelineView taskClick={handleTaskClick} roadmap={selectedRoadmap} taskStatus={selectedTaskStatus} />}
-                        {view === 'Table' && <TableView roadmap={selectedRoadmap} taskStatus={ selectedTaskStatus} />}
-                        {view === 'Kanban' && <KanbanView roadmap={selectedRoadmap} taskStatus={selectedTaskStatus} />}
+                        {view === 'Table' && <TableView rowClick={handleTaskClick} roadmap={selectedRoadmap} taskStatus={ selectedTaskStatus} />}
+                        {view === 'Kanban' && <KanbanView rowClick={handleTaskClick} roadmap={selectedRoadmap} taskStatus={selectedTaskStatus} />}
 
                     </div>
                     <br />
                     <div>
-                        <Sidebar sidebarData={selectedTask} />
+                        <Sidebar sidebarData={selectedItem} />
                     </div>
                 </div>
 

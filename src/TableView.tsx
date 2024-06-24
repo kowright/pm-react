@@ -4,6 +4,8 @@ import { Task, TaskStatus, Roadmap, Milestone, Assignee, Tag, formatDateNumerica
 interface TableViewProps {
     roadmap: Roadmap | null; //group filter properties together
     taskStatus: TaskStatus | null;
+    rowClick: (task: Task | Milestone | Tag | Assignee) => void;
+
 }
 
 type DataType = {
@@ -26,6 +28,11 @@ export const TableView = ({
 
     let fetchURL = "/api/" + tableDataType + "/";
     let content: any = <div>hi</div>;
+
+    const handleClick = (item: Task | Milestone | Tag | Assignee ) => {
+        console.log("Inside Timeline component - before invoking taskClick function " + item.name);
+        props.rowClick(item); // Invoke the function with some example task data
+    };
 
     useEffect(() => {
         switch (tableDataType) {
@@ -100,6 +107,7 @@ export const TableView = ({
             if (props.roadmap) {
                 console.log("task " + props.roadmap.name)
             }
+
             let filteredTasks = props.taskStatus
                 ? taskData.message.filter(task => task.taskStatus.name === props.taskStatus!.name)
                 : taskData.message;
@@ -111,7 +119,6 @@ export const TableView = ({
                 })
                 : filteredTasks;
 
-
             headers = taskData.message.length > 0 ? Object.keys(taskData.message[0]) : [];
 
             tableFormat =
@@ -121,7 +128,7 @@ export const TableView = ({
             
             content = 
             filteredTasks.map((item, index) => (
-                <tr key={index}>
+                <tr key={index} onClick={() => handleClick(item)} className="cursor-pointer hover:bg-lime-500">
                     <td className="border border-gray-300 px-4 py-2">{item.name}</td>
                     <td className="border border-gray-300 px-4 py-2">{item.description}</td>
                     <td className="border border-gray-300 px-4 py-2">{item.roadmaps.map(map => map.name + " ")}</td>
@@ -150,10 +157,13 @@ export const TableView = ({
                     <th key={index} className="border border-gray-300 px-4 py-2">{formatHeaderLabel(header)}</th>
                 ));
 
+            let filteredMilestones = props.taskStatus
+                ? milestoneData.message.filter(milestone => milestone.taskStatus.name === props.taskStatus!.name)
+                : milestoneData.message;
 
             content =
-                milestoneData?.message.map((item, index) => (
-                    <tr key={index}>
+                filteredMilestones.map((item, index) => (
+                    <tr key={index} onClick={() => handleClick(item)} className="cursor-pointer hover:bg-lime-500">
                         <td className="border border-gray-300 px-4 py-2">{item.name}</td>
                         <td className="border border-gray-300 px-4 py-2">{item.description}</td>
                         <td className="border border-gray-300 px-4 py-2">{formatDateNumericalMMDDYYYY(new Date(item.date))}</td>
@@ -178,7 +188,7 @@ export const TableView = ({
 
             content =
                 tagData?.message.map((item, index) => (
-                    <tr key={index}>
+                    <tr key={index} onClick={() => handleClick(item)} className="cursor-pointer hover:bg-lime-500">
                         <td className="border border-gray-300 px-4 py-2">{item.name}</td>
                         <td className="border border-gray-300 px-4 py-2">{item.description}</td>
                         <td className="border border-gray-300 px-4 py-2">{item.id}</td>
@@ -201,7 +211,7 @@ export const TableView = ({
 
             content =
                 assigneeData?.message.map((item, index) => (
-                    <tr key={index}>
+                    <tr key={index} onClick={() => handleClick(item as Assignee)} className="cursor-pointer hover:bg-lime-500">
                         <td className="border border-gray-300 px-4 py-2">{item.name}</td>
                         <td className="border border-gray-300 px-4 py-2">{item.description}</td>
                         <td className="border border-gray-300 px-4 py-2">{item.id}</td>

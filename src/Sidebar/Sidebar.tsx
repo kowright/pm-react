@@ -1,8 +1,8 @@
 import React from 'react';
-import { Milestone, Task, formatDateNumericalMMDDYYYY } from '../Interfaces';
+import { Milestone, Task, Tag, Assignee, formatDateNumericalMMDDYYYY } from '../Interfaces';
 
 interface SidebarProps {
-    sidebarData: Task | Milestone | null; //what can show in the sidebar; ADD EVERYTHING ELSE
+    sidebarData: Task | Milestone | Tag | Assignee | null; //what can show in the sidebar; ADD EVERYTHING ELSE
 }
 
 export const Sidebar = ({
@@ -49,10 +49,10 @@ export const Sidebar = ({
             );
             break;
         case "Milestone":
-            const milestoneData = sidebarData as Milestone; // Type assertion
+            const milestoneData = sidebarData as Milestone; 
             sidebarContent = (
                 <div>
-                    <h1>milestone DETAILS</h1>
+                    <h1>MILESTONE DETAILS</h1>
                     <p>NAME: {milestoneData.name} </p>
                     <hr />
                     <p>DESCRIPTION: {milestoneData.description} </p>
@@ -64,52 +64,35 @@ export const Sidebar = ({
             );
 
             break;
-    }
-    
-    /*
-    switch (true) {
-        case sidebarData === null:
-            sidebarContent = <div>No content to show.</div>;
-            hideContent = true;
-            break;
-        case isMilestone(sidebarData):
-            sidebarContent = <div>Milestone data: {sidebarData.name}</div>;
-            hideContent = false;
-            break;
-        case isTask(sidebarData):
-            sidebarContent =
-            <div>
-                  <h1>TASK DETAILS</h1>
-                    <p>NAME: {sidebarData.name} </p>
+        case "Tag":
+            const tagData = sidebarData as Tag; 
+            sidebarContent = (
+                <div>
+                    <h1>TAG DETAILS</h1>
+                    <p>NAME: {tagData.name} </p>
                     <hr />
-                    <p>DESCRIPTION: {sidebarData.description} </p>
+                    <p>DESCRIPTION: {tagData.description} </p>
                     <hr />
-                    <p>ASSIGNEE: {sidebarData.assignee} </p>
-                    <hr />
-                    <p>START DATE: {formatDateNumericalMMDDYYYY(new Date(sidebarData.startDate))} </p>
-                    <hr />
-                    <p>END DATE: {formatDateNumericalMMDDYYYY(new Date(sidebarData.endDate))} </p>
-                    <hr />
-                    <p>DURATION: {sidebarData.duration} </p>
-                    <hr />
-                    <p>TASK STATUS: {sidebarData.taskStatus} </p>
-                    <hr />
-                    <p>ID: {sidebarData.id} </p>
-                </div>;
-            hideContent = false;
-            break;
-        default:
-            sidebarContent = <div>Unknown data type.</div>;
-            hideContent = false;
-            break;
-    }
-    function isMilestone(data: Milestone | Task | null): data is Milestone {
-        return (data as Milestone).date !== undefined;
-    }
+                    <p>ID: {tagData.id} </p>
+                </div>
+            );
 
-    function isTask(data: Milestone | Task | null): data is Task {
-        return (data as Task).duration !== undefined;
-    }*/
+            break;
+        case "Assignee":
+            const assigneeData = sidebarData as Assignee;
+            sidebarContent = (
+                <div>
+                    <h1>ASSIGNEE DETAILS</h1>
+                    <p>NAME: {assigneeData.name} </p>
+                    <hr />
+                    <p>DESCRIPTION: {assigneeData.description} </p>
+                    <hr />
+                    <p>ID: {assigneeData.id} </p>
+                </div>
+            );
+
+            break;
+    }
 
     return (
         <div className='bg-white'>

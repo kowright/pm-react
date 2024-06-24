@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { Task, TaskStatus, Roadmap } from './Interfaces';
+import { Task, TaskStatus, Roadmap, Milestone, Assignee, Tag } from './Interfaces';
 
 interface KanbanViewProps {
     roadmap: Roadmap | null; //group filter properties together
     taskStatus: TaskStatus | null;
+    rowClick: (task: Task | Milestone | Tag | Assignee) => void;
 }
 
  export const KanbanView = ({
@@ -17,6 +18,10 @@ interface KanbanViewProps {
     const [roadmapData, setRoadmapData] = useState<{ message: Roadmap[] } | null>(null);
     const [taskStatusData, setTaskStatusData] = useState<{ message: TaskStatus[] } | null>(null);
 
+     const handleClick = (task: Task | Milestone | Tag | Assignee) => {
+         console.log("Inside Timeline component - before invoking taskClick function " + task.name);
+         props.rowClick(task); // Invoke the function with some example task data
+     };
 
     useEffect(() => { //keep for now until App gives it to you
         fetch("/api/tasks")
@@ -43,7 +48,7 @@ interface KanbanViewProps {
         return <div> oh no</div>
     }
 
-        let filteredTasks = taskData.message;
+       let filteredTasks = taskData.message;
 
     
       filteredTasks = props.taskStatus
@@ -69,7 +74,7 @@ interface KanbanViewProps {
 
      let statusColumns = Object.keys(tasksByStatus).map(key =>
          tasksByStatus[key]?.map((task, index) => (
-             <div key={task.id} className='bg-cyan-400 rounded-md flex text-xl justify-center w-80'>
+             <div key={task.id} onClick={() => handleClick(task)} className="cursor-pointer hover:bg-lime-500 bg-cyan-400 rounded-md flex text-xl justify-center w-80">
                  {task.name}
              </div>
          )));
