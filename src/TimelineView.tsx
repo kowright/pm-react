@@ -1,9 +1,11 @@
 import React from "react";
 import { Timeline } from './Timeline/Timeline';
-import { Task, Milestone } from './Interfaces';
+import { Task, Milestone, Roadmap, TaskStatus } from './Interfaces';
 
 export interface TimelineViewProps {
     taskClick: (task: Task | Milestone) => void;
+    roadmap: Roadmap | null; //group filter properties together
+    taskStatus: TaskStatus | null;
 }
 
 export const TimelineView = ({
@@ -46,12 +48,14 @@ export const TimelineView = ({
         updateTask(item)
     };*/
 
+
+
     return (
         <div>
             <br />
             <p className='flex justify-center text-3xl text-white'>TIMELINE VIEW</p>
             <br />
-            <Timeline taskClick={props.taskClick} />
+            <Timeline taskClick={props.taskClick} roadmap={props.roadmap} taskStatus={props.taskStatus} />
         </div>
     );
 };

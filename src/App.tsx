@@ -53,7 +53,7 @@ function App() {
                 <div className="flex justify-center">
 
                     <div>
-                        {view === 'Timeline' && <TimelineView taskClick={handleTaskClick} />}
+                        {view === 'Timeline' && <TimelineView taskClick={handleTaskClick} roadmap={selectedRoadmap} taskStatus={selectedTaskStatus} />}
                         {view === 'Table' && <TableView roadmap={selectedRoadmap} taskStatus={ selectedTaskStatus} />}
                         {view === 'Kanban' && <KanbanView roadmap={selectedRoadmap} taskStatus={selectedTaskStatus} />}
 

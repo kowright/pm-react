@@ -3,15 +3,19 @@ import { Milestone, Task, TaskStatus, Roadmap, formatDateNumericalMMDD, addDaysT
 
 interface TimelineProps {
     taskClick: (task: Task | Milestone) => void;
+    roadmap: Roadmap | null; //group filter properties together
+    taskStatus: TaskStatus | null;
 }
 
-export const Timeline: React.FC<TimelineProps> = ({ taskClick }) => {
+export const Timeline = ({
+    ...props
+}: TimelineProps) => {
     const day = 40; // Size of cell in pixels
 
     // Example of using the taskClick function
     const handleClick = (task: Task | Milestone) => {
         console.log("Inside Timeline component - before invoking taskClick function " + task.name);
-        taskClick(task); // Invoke the function with some example task data
+        props.taskClick(task); // Invoke the function with some example task data
     };
 
     const [data, setData] = React.useState<{ message: Task[] } | null>(null);
@@ -105,12 +109,15 @@ export const Timeline: React.FC<TimelineProps> = ({ taskClick }) => {
     // #endregion
 
     // #region Tasks
-    let filteredTasks = selectedRoadmap
-        ? data.message.filter((task) => task.roadmaps.includes(selectedRoadmap))
+    let filteredTasks = props.roadmap
+        ? data.message.filter((task) => {
+            const roadmaps = task.roadmaps.map(map => map.name);
+            return roadmaps.includes(props.roadmap!.name);
+        })
         : data.message;
 
-    filteredTasks = selectedTaskStatus
-        ? filteredTasks.filter((task) => task.taskStatus === selectedTaskStatus)
+    filteredTasks = props.taskStatus
+        ? filteredTasks.filter(task => task.taskStatus.name === props.taskStatus!.name)
         : filteredTasks;
 
     filteredTasks = filteredTasks.filter((task) => new Date(task.startDate) <= endDate);
