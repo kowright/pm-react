@@ -2,7 +2,7 @@ import React from 'react';
 import { Milestone, Task, formatDateNumericalMMDDYYYY } from '../Interfaces';
 
 interface SidebarProps {
-    sidebarData: Task | null; //what can show in the sidebar; ADD EVERYTHING ELSE
+    sidebarData: Task | Milestone | null; //what can show in the sidebar; ADD EVERYTHING ELSE
 }
 
 export const Sidebar = ({
@@ -23,6 +23,16 @@ export const Sidebar = ({
 
     hideContent = false;
 
+    switch (sidebarData.type) {
+        case "Task":
+            sidebarContent = <div>TASKING</div>
+
+            break;
+        case "Milestone":
+            sidebarContent = <div>MILESTONING</div>
+
+            break;
+    }
     
     /*
     switch (true) {
@@ -72,26 +82,7 @@ export const Sidebar = ({
     return (
         <div>
             {!hideContent &&
-                 <div className='w-full h-full bg-rose-700'>
-                    <div>
-                        <h1>TASK DETAILS</h1>
-                        <p>NAME: {sidebarData?.name} </p>
-                        <hr />
-                        <p>DESCRIPTION: {sidebarData?.description} </p>
-                        <hr />
-                        <p>ASSIGNEE: {sidebarData?.assignee.name} </p>
-                        <hr />
-                        <p>START DATE: {formatDateNumericalMMDDYYYY(new Date(sidebarData.startDate))} </p>
-                        <hr />
-                        <p>END DATE: {formatDateNumericalMMDDYYYY(new Date(sidebarData.endDate))} </p>
-                        <hr />
-                        <p>DURATION: {sidebarData?.duration} </p>
-                        <hr />
-                        <p>TASK STATUS: {sidebarData?.taskStatus.name} </p>
-                        <hr />
-                        <p>ID: {sidebarData?.id} </p>
-                    </div> 
-                </div> 
+                sidebarContent
             }
         </div>
     );

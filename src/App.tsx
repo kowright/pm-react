@@ -6,12 +6,12 @@ import TableView from './TableView';
 import KanbanView from './KanbanView';
 import TimelineView from './TimelineView';
 import { Sidebar } from './Sidebar/Sidebar';
-import { Task, Roadmap, TaskStatus } from './Interfaces';
+import { Task, Roadmap, TaskStatus, Milestone } from './Interfaces';
 import { FilterArea } from './FilterArea/FilterArea';
 
 function App() {
     const [view, setView] = useState<string>(''); 
-    const [selectedTask, setSelectedTask] = useState<Task|null>(null); 
+    const [selectedTask, setSelectedTask] = useState<Task | Milestone |null>(null); 
 
     //Filter Area Necessities
     const [selectedRoadmap, setSelectedRoadmap] = useState<Roadmap | null>(null); //keep

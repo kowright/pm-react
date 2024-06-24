@@ -96,14 +96,13 @@ export const TableView = ({
             if (!taskData || !taskData.message || taskData.message.length === 0) {
                 return <p>No tasks found.</p>;
             }
-
+            
             if (props.roadmap) {
                 console.log("task " + props.roadmap.name)
             }
             let filteredTasks = props.taskStatus
                 ? taskData.message.filter(task => task.taskStatus.name === props.taskStatus!.name)
                 : taskData.message;
-
 
             filteredTasks = props.roadmap
                 ? filteredTasks.filter(task => {

@@ -1,14 +1,16 @@
-export interface Milestone { //MIGHT NEED TO CHANGE THESE TO DISCRIMINANT UNIONS
+interface Unit {
     name: string;
     description: string;
-    date: Date;
-    taskStatus: TaskStatus;
+    type: string;
     id: number;
 }
 
-export interface Task {
-    name: string,
-    description: string,
+export interface Milestone extends Unit { //MIGHT NEED TO CHANGE THESE TO DISCRIMINANT UNIONS
+    date: Date;
+    taskStatus: TaskStatus;
+}
+
+export interface Task extends Unit {
     duration: number;
     roadmaps: Roadmap[],
     assignee: Assignee,
@@ -17,12 +19,12 @@ export interface Task {
     taskStatus: TaskStatus,
     id: number,
 }
-export interface TaskStatus {
+export interface TaskStatus extends Unit {
     name: string;
     description: string;
 }
 
-export interface Roadmap {
+export interface Roadmap extends Unit {
     name: string;
     description: string;
     milestones: Milestone[];
@@ -30,11 +32,11 @@ export interface Roadmap {
     id: number;
 }
 
-export interface Assignee {
+export interface Assignee extends Unit {
     name: string;
     //role
 }
-export interface Tag {
+export interface Tag extends Unit {
     name: string;
     description: string;
 }
