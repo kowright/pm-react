@@ -46,11 +46,11 @@ export const FilterArea = ({
         <div className='flex flex-col gap-4 '>
             <div className='flex gap-4 justify-center'>
                 {roadmapButtons}
-                <button className={`rounded border border-cyan-200 p-2 ${props.selectedRoadmap?.name === "" ? "bg-cyan-800" : "bg-cyan-400"}`} onClick={() => props.selectedRoadmap && props.handleFilterByRoadmap(null)}>All Roadmaps</button>
+                <button className={`rounded border border-cyan-200 p-2 ${props.selectedRoadmap?.name == null ? "bg-cyan-800" : "bg-cyan-400"}`} onClick={() => props.selectedRoadmap && props.handleFilterByRoadmap(null)}>All Roadmaps</button>
             </div>
             <div className='flex gap-4 justify-center'>
                 {taskStatusButtons}
-                <button className={`rounded border border-cyan-200 p-2 ${props.selectedTaskStatus?.name === "" ? "bg-cyan-800" : "bg-cyan-400"}`} onClick={() => props.selectedTaskStatus && props.handleFilterByTaskStatus(null)}>All Statuses</button>
+                <button className={`rounded border border-cyan-200 p-2 ${props.selectedTaskStatus?.name == null ? "bg-cyan-800" : "bg-cyan-400"}`} onClick={() => props.selectedTaskStatus && props.handleFilterByTaskStatus(null)}>All Statuses</button>
             </div>
         </div>
     );

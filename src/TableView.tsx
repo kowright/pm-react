@@ -283,11 +283,10 @@ export const TableView = ({
                 <button className={`rounded border border-cyan-200 p-2 ${tableDataType === "milestones" ? "bg-cyan-800" : "bg-cyan-400"}`} onClick={() => setTableDataType("milestones")}>Milestone</button>
                 <button className={`rounded border border-cyan-200 p-2 ${tableDataType === "tags" ? "bg-cyan-800" : "bg-cyan-400"}`} onClick={() => setTableDataType("tags")}>Tag</button>
                 <button className={`rounded border border-cyan-200 p-2 ${tableDataType === "assignees" ? "bg-cyan-800" : "bg-cyan-400"}`} onClick={() => setTableDataType("assignees")}>Assignee</button>
-                <button className={`rounded border border-cyan-200 p-2 ${tableDataType === "" ? "bg-cyan-800" : "bg-cyan-400"}`} onClick={() => setTableDataType("")}>All Types</button>
-            </div>
+           </div>
   
             <br />
-            <table className="min-w-full border-collapse border border-gray-200">
+            <table className="min-w-full text-white border-collapse border border-gray-200">
                 <thead className="bg-gray-600">
                     <tr>
                         {tableFormat }
