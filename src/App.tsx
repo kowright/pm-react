@@ -28,7 +28,7 @@ function App() {
         setView(viewName);
     };
 
-    const handleTaskClick = (task: Task) => {
+    const handleTaskClick = (task: Task | Milestone) => {
         console.log("Selected Task: ", task.name);
         setSelectedTask(task);
     };

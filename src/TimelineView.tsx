@@ -1,9 +1,9 @@
 import React from "react";
 import { Timeline } from './Timeline/Timeline';
-import { Task } from './Interfaces';
+import { Task, Milestone } from './Interfaces';
 
 export interface TimelineViewProps {
-    taskClick: (task: Task) => void;
+    taskClick: (task: Task | Milestone) => void;
 }
 
 export const TimelineView = ({

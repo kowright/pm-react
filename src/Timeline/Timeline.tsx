@@ -2,14 +2,14 @@ import React from 'react';
 import { Milestone, Task, TaskStatus, Roadmap, formatDateNumericalMMDD, addDaysToDate } from '../Interfaces';
 
 interface TimelineProps {
-    taskClick: (task: Task) => void;
+    taskClick: (task: Task | Milestone) => void;
 }
 
 export const Timeline: React.FC<TimelineProps> = ({ taskClick }) => {
     const day = 40; // Size of cell in pixels
 
     // Example of using the taskClick function
-    const handleClick = (task: Task) => {
+    const handleClick = (task: Task | Milestone) => {
         console.log("Inside Timeline component - before invoking taskClick function " + task.name);
         taskClick(task); // Invoke the function with some example task data
     };
@@ -179,7 +179,7 @@ export const Timeline: React.FC<TimelineProps> = ({ taskClick }) => {
         };
 
         return (
-            <div key={index} style={containerStyles}>
+            <div key={index} style={containerStyles} onClick={() => handleClick(milestone)}>
                 <p className="text-white text-center">{milestone.name}</p>
             </div>
         );
