@@ -42,83 +42,123 @@ export const Sidebar = ({
 
     hideContent = false;
 
+    const handleInputBlur = (event: any) => {
+        //change it to call api and change backend 
+        const editedValue = event.target.value;
+        const propertyName = event.target.id; // Assuming id is the property name to update
+        if (sidebarData.type === 'Task') {
+            let updatedItem = { ...sidebarData as Task };
+
+            if (propertyName === 'name') {
+                updatedItem.name = event.target.value
+            }
+            if (propertyName === 'description') {
+                updatedItem.description = event.target.value
+            }
+            //start date and end date for some reason gets set to the day before without this
+            if (propertyName === 'startDate') {
+                const originalDate = new Date(editedValue); // Parse editedValue into a Date object
+                const nextDay = new Date(originalDate); // Create a new Date object based on originalDate
+                nextDay.setDate(originalDate.getDate() + 1); // Set next day
+
+                updatedItem.startDate = nextDay;
+            }
+            if (propertyName === 'endDate') {
+                const originalDate = new Date(editedValue); // Parse editedValue into a Date object
+                const nextDay = new Date(originalDate); // Create a new Date object based on originalDate
+                nextDay.setDate(originalDate.getDate() + 1); // Set next day
+
+                updatedItem.endDate = nextDay;
+            }
+            if (propertyName === 'assignee') {
+                updatedItem.assignee.name = editedValue
+            }
+            if (propertyName === 'taskStatus') {
+                updatedItem.taskStatus.name = editedValue
+            }
+
+
+            updateTask(updatedItem as Task)
+        }
+
+        if (sidebarData.type === 'Milestone') {
+            let updatedItem = { ...sidebarData as Milestone };
+
+            if (propertyName === 'name') {
+                updatedItem.name = event.target.value
+            }
+            if (propertyName === 'description') {
+                updatedItem.description = event.target.value
+            }
+            //start date and end date for some reason gets set to the day before without this
+            if (propertyName === 'date') {
+                const originalDate = new Date(editedValue); // Parse editedValue into a Date object
+                const nextDay = new Date(originalDate); // Create a new Date object based on originalDate
+                nextDay.setDate(originalDate.getDate() + 1); // Set next day
+
+                updatedItem.date = nextDay;
+            }
+
+            if (propertyName === 'taskStatus') {
+                updatedItem.taskStatus.name = editedValue
+            }
+
+
+            updateMilestone(updatedItem as Milestone)
+        }
+
+
+    };
+
+    const updateTask = (item: Task) => {
+        fetch(`/api/tasks/${item.id}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                name: item.name, description: item.description, startDate: item.startDate,
+                endDate: item.endDate, assignee: item.assignee, taskStatus: item.taskStatus,
+                type: item.type
+            }),
+        })
+            .then(res => res.json())
+            .then(data => {
+                console.log(data.message)
+                console.log('Updated task:', data.task);
+                // Update state immutably
+                console.log("new date " + data.task.startDate)
+                setTask(data.task);
+            })
+            .catch(error => {
+                console.error('Error updating task:', error);
+            });
+    }
+
+    const updateMilestone = (item: Milestone) => {
+        fetch(`/api/milestones/${item.id}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                name: item.name, description: item.description, type: item.type,
+                date: item.date, taskStatus: item.taskStatus
+            }),
+        })
+            .then(res => res.json())
+            .then(data => {
+                console.log(data)
+                setTask(data);
+            })
+            .catch(error => {
+                console.error('Error updating milestone:', error);
+            });
+    }
+
     switch (sidebarData.type) {
         case "Task":
-          
-            // Function to handle name change
-            const handleNameChange = (event: any) => {
-                setName(event.target.value);
-            };
 
-            // Function to handle description change
-            const handleDescriptionChange = (event: any) => {
-                setDescription(event.target.value);
-            };
-
-            const handleInputBlur = (event: any) => {
-                //change it to call api and change backend 
-                const editedValue = event.target.value;
-                const propertyName = event.target.id; // Assuming id is the property name to update
-
-                let updatedItem = { ...sidebarData as Task };
-
-                if (propertyName === 'name') {
-                    updatedItem.name = event.target.value
-                }
-                if (propertyName === 'description') {
-                    updatedItem.description = event.target.value
-                }
-                //start date and end date for some reason gets set to the day before without this
-                if (propertyName === 'startDate') {
-                    const originalDate = new Date(editedValue); // Parse editedValue into a Date object
-                    const nextDay = new Date(originalDate); // Create a new Date object based on originalDate
-                    nextDay.setDate(originalDate.getDate() + 1); // Set next day
-
-                    updatedItem.startDate = nextDay; 
-                }
-                if (propertyName === 'endDate') {
-                    const originalDate = new Date(editedValue); // Parse editedValue into a Date object
-                    const nextDay = new Date(originalDate); // Create a new Date object based on originalDate
-                    nextDay.setDate(originalDate.getDate() + 1); // Set next day
-
-                    updatedItem.endDate = nextDay;
-}
-                if (propertyName === 'assignee') {
-                    updatedItem.assignee.name = editedValue
-                }
-                if (propertyName === 'taskStatus') {
-                    updatedItem.taskStatus.name = editedValue
-                }
-
-              updateTask(updatedItem as Task)
-
-                console.log('User finished editing. Edited value:', editedValue);
-            };
-
-            const updateTask = (item: Task) => {
-                fetch(`/api/tasks/${item.id}`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        name: item.name, description: item.description, startDate: item.startDate,
-                        endDate: item.endDate, assignee: item.assignee, taskStatus: item.taskStatus
-                    }),
-                })
-                    .then(res => res.json())
-                    .then(data => {
-                        console.log(data.message)
-                        console.log('Updated task:', data.task);
-                        // Update state immutably
-                        console.log("new date " + data.task.startDate)
-                        setTask(data.task);
-                    })
-                    .catch(error => {
-                        console.error('Error updating task:', error);
-                    });
-            }
-           
             const taskData = sidebarData as Task;
 
             sidebarContent = (
@@ -130,7 +170,6 @@ export const Sidebar = ({
                         id="name"
                         type="text"
                         value={name}
-                        onChange={handleNameChange}
                         onBlur={handleInputBlur}
                         defaultValue={taskData.name}
                     />
@@ -140,7 +179,6 @@ export const Sidebar = ({
                     <textarea
                         id="description"
                         value={description}
-                        onChange={handleDescriptionChange}
                         onBlur={(event) => { //can put on other things after API push check 
                             if (event.target.value !== taskData.description) {
                                 console.log(event.target.value)
@@ -237,17 +275,77 @@ export const Sidebar = ({
             );
             break;
         case "Milestone":
+
+
+
+
             const milestoneData = sidebarData as Milestone; 
             sidebarContent = (
                 <div>
                     <div className='font-bold text-center'>MILESTONE DETAILS</div>
-                    <p>NAME: {milestoneData.name} </p>
+                    <label htmlFor="name">Name:</label>
+                    <input
+                        id="name"
+                        type="text"
+                        value={name}
+                        onBlur={handleInputBlur}
+                        defaultValue={milestoneData.name}
+                    />
+          
+
                     <hr />
-                    <p>DESCRIPTION: {milestoneData.description} </p>
+
+                    <label htmlFor="description">Description:</label>
+                    <textarea
+                        id="description"
+                        value={description}
+                        onBlur={(event) => { //can put on other things after API push check 
+                            if (event.target.value !== milestoneData.description) {
+                                handleInputBlur(event)
+                            }
+                        }
+                        }
+                        defaultValue={milestoneData.description}
+                    />
                     <hr />
-                    <p>DATE: {formatDateNumericalMMDDYYYY(new Date(milestoneData.date))} </p>
+                    <label htmlFor="date">Start Date: </label>
+                    <input
+                        id="date"
+                        type="date"
+                        value={formatDateNumericalYYYYMMDDWithDashes(new Date(milestoneData.date))} // Bind the selectedDate state to input value
+                        aria-label="Start Date"
+                        onChange={(event) => { //can put on other things after API push check 
+                            let startDateString = formatDateNumericalYYYYMMDDWithDashes(new Date(milestoneData.date));
+                            if (event.target.value !== startDateString) {
+                                handleInputBlur(event)
+                            }
+                        }
+                        }
+                    />
                     <hr />
-                    <p>ID: {milestoneData.id} </p>
+
+
+                        <label htmlFor="task status">Task Status:</label>
+                        <select
+                            id="taskStatus"
+                            value={milestoneData.taskStatus.name}
+                            onChange={(event) => { //can put on other things after API push check 
+
+                                if (event.target.value !== taskData.taskStatus.name) {
+                                    handleInputBlur(event)
+                                }
+                            }
+                            }
+                        >
+                            {taskStatuses?.message.map((option, index) => (
+                                <option key={index} value={option.name}>
+                                    {option.name}
+                                </option>
+                            ))}
+                        </select>
+                        <hr/>
+                          <p>ID: {milestoneData.id} </p>
+                        <hr />
                 </div>
             );
 
