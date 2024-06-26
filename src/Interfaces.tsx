@@ -61,6 +61,15 @@ export const formatDateNumericalMMDDYYYY = (date: Date): string => {
     return formattedDate;
 };
 
+export const formatDateNumericalYYYYMMDDWithDashes = (date: Date): string => {
+    const month = (date.getMonth() + 1).toString().padStart(2, '0'); // Month is zero-indexed, so we add 1
+    const day = date.getDate().toString().padStart(2, '0');
+    const year = date.getFullYear().toString(); // Get full year YYYY
+
+    const formattedDate = `${year}-${month}-${day}`;
+    return formattedDate;
+};
+
 export function addDaysToDate(date: Date, daysToAdd: number): Date {
     // Create a new Date object to avoid mutating the original date
     const newDate = new Date(date);

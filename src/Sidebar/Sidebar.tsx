@@ -1,5 +1,5 @@
 import React from 'react';
-import { Milestone, Task, Tag, Assignee, formatDateNumericalMMDDYYYY } from '../Interfaces';
+import { Milestone, Task, Tag, Assignee, TaskStatus, formatDateNumericalMMDDYYYY, formatDateNumericalYYYYMMDDWithDashes } from '../Interfaces';
 
 interface SidebarProps {
     sidebarData: Task | Milestone | Tag | Assignee | null; //what can show in the sidebar; ADD EVERYTHING ELSE
@@ -13,38 +13,226 @@ export const Sidebar = ({
     let hideContent: boolean = true;
     let sidebarContent: JSX.Element;
 
-    console.log("sidebar data ", sidebarData)
     sidebarContent = <div>NAHHHHHHHHHHHHHHHHH</div>
-        
+
+    //TASKS
+    const [name, setName] = React.useState(sidebarData?.name);
+    const [description, setDescription] = React.useState(sidebarData?.description);
+    const [task, setTask] = React.useState(sidebarData)
+    const [assignees, setAssignees] = React.useState<{ message: Assignee[] } | null>(null);
+    const [taskStatuses, setTaskStatuses] = React.useState<{ message: TaskStatus[] } | null>(null);
+
+    React.useEffect(() => {
+        fetch("/api/taskstatus")
+            .then((res) => res.json())
+            .then((data) => setTaskStatuses(data))
+            .catch((error) => console.error('Error fetching data:', error));
+    }, []);
+
+    React.useEffect(() => {
+        fetch("/api/assignees")
+            .then((res) => res.json())
+            .then((data) => setAssignees(data))
+            .catch((error) => console.error('Error fetching data:', error));
+    }, []);
+
     if (sidebarData == null) {
         return <div>No details to display</div>
-  
     }
 
     hideContent = false;
 
     switch (sidebarData.type) {
         case "Task":
+          
+            // Function to handle name change
+            const handleNameChange = (event: any) => {
+                setName(event.target.value);
+            };
 
-            const taskData = sidebarData as Task; // Type assertion
+            // Function to handle description change
+            const handleDescriptionChange = (event: any) => {
+                setDescription(event.target.value);
+            };
+
+            const handleInputBlur = (event: any) => {
+                //change it to call api and change backend 
+                const editedValue = event.target.value;
+                const propertyName = event.target.id; // Assuming id is the property name to update
+
+                let updatedItem = { ...sidebarData as Task };
+
+                if (propertyName === 'name') {
+                    updatedItem.name = event.target.value
+                }
+                if (propertyName === 'description') {
+                    updatedItem.description = event.target.value
+                }
+                //start date and end date for some reason gets set to the day before without this
+                if (propertyName === 'startDate') {
+                    const originalDate = new Date(editedValue); // Parse editedValue into a Date object
+                    const nextDay = new Date(originalDate); // Create a new Date object based on originalDate
+                    nextDay.setDate(originalDate.getDate() + 1); // Set next day
+
+                    updatedItem.startDate = nextDay; 
+                }
+                if (propertyName === 'endDate') {
+                    const originalDate = new Date(editedValue); // Parse editedValue into a Date object
+                    const nextDay = new Date(originalDate); // Create a new Date object based on originalDate
+                    nextDay.setDate(originalDate.getDate() + 1); // Set next day
+
+                    updatedItem.endDate = nextDay;
+}
+                if (propertyName === 'assignee') {
+                    updatedItem.assignee.name = editedValue
+                }
+                if (propertyName === 'taskStatus') {
+                    updatedItem.taskStatus.name = editedValue
+                }
+
+              updateTask(updatedItem as Task)
+
+                console.log('User finished editing. Edited value:', editedValue);
+            };
+
+            const updateTask = (item: Task) => {
+                fetch(`/api/tasks/${item.id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        name: item.name, description: item.description, startDate: item.startDate,
+                        endDate: item.endDate, assignee: item.assignee, taskStatus: item.taskStatus
+                    }),
+                })
+                    .then(res => res.json())
+                    .then(data => {
+                        console.log(data.message)
+                        console.log('Updated task:', data.task);
+                        // Update state immutably
+                        console.log("new date " + data.task.startDate)
+                        setTask(data.task);
+                    })
+                    .catch(error => {
+                        console.error('Error updating task:', error);
+                    });
+            }
+           
+            const taskData = sidebarData as Task;
+
             sidebarContent = (
                 <div>
-                    <h1>TASK DETAILS</h1>
-                    <p>NAME: {taskData.name} </p>
+                    <div className='font-bold text-center'>TASK DETAILS</div>
+                    <br/>
+                    <label htmlFor="name">Name:</label>
+                    <input
+                        id="name"
+                        type="text"
+                        value={name}
+                        onChange={handleNameChange}
+                        onBlur={handleInputBlur}
+                        defaultValue={taskData.name}
+                    />
                     <hr />
-                    <p>DESCRIPTION: {taskData.description} </p>
+
+                    <label htmlFor="description">Description:</label>
+                    <textarea
+                        id="description"
+                        value={description}
+                        onChange={handleDescriptionChange}
+                        onBlur={(event) => { //can put on other things after API push check 
+                            if (event.target.value !== taskData.description) {
+                                console.log(event.target.value)
+                                handleInputBlur(event)
+                            }
+                        }
+                        } 
+                        defaultValue={taskData.description}
+                    />
                     <hr />
-                    <p>ASSIGNEE: {taskData.assignee.name} </p> {/* Accessing taskData.assignee.name */}
+                    <label htmlFor="assignees">Assignee:</label>
+                    <select
+                        id="assignee"
+                        value={taskData.assignee.name}
+                        onChange={(event) => { //can put on other things after API push check 
+                                if (event.target.value !== taskData.assignee.name) {
+                                    console.log(event.target.value)
+                                    handleInputBlur(event)
+                                }
+                            }
+                        }
+                    >
+                        {assignees?.message.map((option, index) => (
+                            <option key={index} value={option.name}>
+                                {option.name} 
+                            </option>
+                        ))}
+                    </select>
+
+                 
                     <hr />
-                    <p>START DATE: {formatDateNumericalMMDDYYYY(new Date(taskData.startDate))} </p>
+                    <label htmlFor="start date">Start Date: </label>
+                     <input
+                        id="startDate"
+                        type="date"
+                        value={formatDateNumericalYYYYMMDDWithDashes(new Date(taskData.startDate))} // Bind the selectedDate state to input value
+                        //onChange={handleStartDateChange} // Handle date change
+                        aria-label="Start Date"
+                        onChange={(event) => { //can put on other things after API push check 
+                            let startDateString = formatDateNumericalYYYYMMDDWithDashes(new Date(taskData.startDate));
+                            if (event.target.value !== startDateString) {
+                                //check if it's after end date
+                                console.log(event.target.value + " != " + startDateString)
+                                handleInputBlur(event)
+                            }
+                        }
+                        } 
+                    />
                     <hr />
-                    <p>END DATE: {formatDateNumericalMMDDYYYY(new Date(taskData.endDate))} </p>
+                    <label htmlFor="end date">End Date: </label>
+                    <input
+                        id="endDate"
+                        type="date"
+                        value={formatDateNumericalYYYYMMDDWithDashes(new Date(taskData.endDate))} // Bind the selectedDate state to input value
+                        onChange={(event) => { //can put on other things after API push check 
+                            let endDateString = formatDateNumericalYYYYMMDDWithDashes(new Date(taskData.endDate));
+                            if (event.target.value !== endDateString) {
+                                //check if it's before start date
+                                console.log(event.target.value + " != " + endDateString)
+                                handleInputBlur(event)
+                            }
+                        }
+                        } 
+                        aria-label="End Date"
+                    />
                     <hr />
-                    <p>DURATION: {taskData.duration} </p>
+                    <p>Duration: {taskData.duration} </p>
+
+
                     <hr />
-                    <p>TASK STATUS: {taskData.taskStatus.name} </p>
-                    <hr />
+
+                    <label htmlFor="task status">Task Status:</label>
+                    <select
+                        id="taskStatus"
+                        value={taskData.taskStatus.name}
+                        onChange={(event) => { //can put on other things after API push check 
+                         
+                            if (event.target.value !== taskData.taskStatus.name) {
+                                handleInputBlur(event)
+                            }
+                        }
+                        } 
+                    >
+                        {taskStatuses?.message.map((option, index) => (
+                            <option key={index} value={option.name}>
+                                {option.name}
+                            </option>
+                        ))}
+                    </select>
+
                     <p>ID: {taskData.id} </p>
+                    <hr/>
                 </div>
             );
             break;
@@ -52,7 +240,7 @@ export const Sidebar = ({
             const milestoneData = sidebarData as Milestone; 
             sidebarContent = (
                 <div>
-                    <h1>MILESTONE DETAILS</h1>
+                    <div className='font-bold text-center'>MILESTONE DETAILS</div>
                     <p>NAME: {milestoneData.name} </p>
                     <hr />
                     <p>DESCRIPTION: {milestoneData.description} </p>
@@ -68,7 +256,7 @@ export const Sidebar = ({
             const tagData = sidebarData as Tag; 
             sidebarContent = (
                 <div>
-                    <h1>TAG DETAILS</h1>
+                    <div className='font-bold text-center'>TAG DETAILS</div>
                     <p>NAME: {tagData.name} </p>
                     <hr />
                     <p>DESCRIPTION: {tagData.description} </p>
@@ -82,7 +270,7 @@ export const Sidebar = ({
             const assigneeData = sidebarData as Assignee;
             sidebarContent = (
                 <div>
-                    <h1>ASSIGNEE DETAILS</h1>
+                    <div className='font-bold text-center'>ASSIGNEE DETAILS</div>
                     <p>NAME: {assigneeData.name} </p>
                     <hr />
                     <p>DESCRIPTION: {assigneeData.description} </p>
@@ -97,7 +285,7 @@ export const Sidebar = ({
     return (
         <div className='bg-white'>
             {!hideContent &&
-                sidebarContent
+                sidebarContent  
             }
         </div>
     );
@@ -110,3 +298,4 @@ export const Sidebar = ({
 //make it so it can be closed
 //get rid of cell numbers
 //make it so you can change the date range on page
+//show which units cannot be changed - duration and id 

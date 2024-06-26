@@ -10,7 +10,7 @@ import { Task, Roadmap, TaskStatus, Milestone, Tag, Assignee } from './Interface
 import { FilterArea } from './FilterArea/FilterArea';
 
 function App() {
-    const [view, setView] = useState<string>(''); 
+    const [view, setView] = useState<string>('Table'); 
     const [selectedItem, setSelectedItem] = useState<Task | Milestone | Tag | Assignee | null>(null); 
 
     //Filter Area Necessities
@@ -43,9 +43,9 @@ function App() {
             <div className="flex flex-col bg-[#282c34] justify-ceenter">
                 <div className="font-bold text-white flex text-3xl justify-center">Project Management Tool</div>
                 <div className='flex gap-4 justify-center'>
-                    <button className='bg-cyan-400 rounded border border-cyan-200 p-2' onClick={() => handleClick("Table")}>Table</button>
-                    <button className='bg-cyan-400 rounded border border-cyan-200 p-2' onClick={() => handleClick("Kanban")}>Kanban</button>
-                    <button className='bg-cyan-400 rounded border border-cyan-200 p-2' onClick={() => handleClick("Timeline")}>Timeline</button>
+                    <button className={`bg-cyan-400 rounded border ${view === "Table" ? "bg-cyan-800" : "bg-cyan-400"} p-2`}  onClick={() => handleClick("Table")}>Table</button>
+                    <button className={`bg-cyan-400 rounded border ${view === "Kanban" ? "bg-cyan-800" : "bg-cyan-400"} p-2`} onClick={() => handleClick("Kanban")}>Kanban</button>
+                    <button className={`bg-cyan-400 rounded border ${view === "Timeline" ? "bg-cyan-800" : "bg-cyan-400"} p-2`} onClick={() => handleClick("Timeline")}>Timeline</button>
                 </div>
                 <br/>
                 <FilterArea selectedRoadmap={selectedRoadmap} selectedTaskStatus={selectedTaskStatus} handleFilterByTaskStatus={handleFilterByTaskStatus} handleFilterByRoadmap={handleFilterByRoadmap} /> 
