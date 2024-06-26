@@ -16,7 +16,7 @@ export const Sidebar = ({
     sidebarContent = <div>NAHHHHHHHHHHHHHHHHH</div>
 
     //TASKS
-    const [name, setName] = React.useState(sidebarData?.name);
+    const [name, setName] = React.useState<string>(sidebarData?.name || '');
     const [description, setDescription] = React.useState(sidebarData?.description);
     const [task, setTask] = React.useState(sidebarData)
     const [assignees, setAssignees] = React.useState<{ message: Assignee[] } | null>(null);
@@ -36,11 +36,30 @@ export const Sidebar = ({
             .catch((error) => console.error('Error fetching data:', error));
     }, []);
 
+    React.useEffect(() => {
+        if (sidebarData) {
+            setName(sidebarData.name);
+            setDescription(sidebarData.description || ''); // If description is undefined in sidebarData, default to empty string
+        }
+    }, [sidebarData]);
+
+
+
     if (sidebarData == null) {
         return <div>No details to display</div>
     }
 
     hideContent = false;
+
+    // Function to handle name change
+    const handleNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setName(event.target.value);
+    };
+
+    // Function to handle description change
+    const handleDescriptionChange = (event: any) => {
+        setDescription(event.target.value);
+    };
 
     const handleInputBlur = (event: any) => {
         //change it to call api and change backend 
@@ -168,10 +187,11 @@ export const Sidebar = ({
                     <label htmlFor="name">Name:</label>
                     <input
                         id="name"
-                        type="text"
+                        type='text'
                         value={name}
+                        onChange={handleNameChange}
                         onBlur={handleInputBlur}
-                        defaultValue={taskData.name}
+                     
                     />
                     <hr />
 
@@ -179,6 +199,7 @@ export const Sidebar = ({
                     <textarea
                         id="description"
                         value={description}
+                        onChange={handleDescriptionChange}
                         onBlur={(event) => { //can put on other things after API push check 
                             if (event.target.value !== taskData.description) {
                                 console.log(event.target.value)
@@ -186,7 +207,6 @@ export const Sidebar = ({
                             }
                         }
                         } 
-                        defaultValue={taskData.description}
                     />
                     <hr />
                     <label htmlFor="assignees">Assignee:</label>
