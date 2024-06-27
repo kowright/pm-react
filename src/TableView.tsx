@@ -4,6 +4,8 @@ import { Task, TaskStatus, Roadmap, Milestone, Assignee, Tag, formatDateNumerica
 interface TableViewProps {
     roadmap: Roadmap | null; //group filter properties together
     taskStatus: TaskStatus | null;
+    taskData: Task[];
+    milestoneData: Milestone[];
     rowClick: (task: Task | Milestone | Tag | Assignee) => void;
 
 }
@@ -17,10 +19,11 @@ type DataType = {
 } | null; 
 
 export const TableView = ({
+
     ...props
 }: TableViewProps) => {
-    const [taskData, setTaskData] = useState<{ message: Task[] } | null>(null);
-    const [milestoneData, setMilestoneData] = useState<{ message: Milestone[] } | null>(null);
+    //const [taskData, setTaskData] = useState<{ message: Task[] } | null>(null);
+    //const [milestoneData, setMilestoneData] = useState<{ message: Milestone[] } | null>(null);
     const [tagData, setTagData] = useState<{ message: Tag[] } | null>(null);
     const [assigneeData, setAssigneeData] = useState<{ message: Assignee[] } | null>(null);
 
@@ -34,7 +37,7 @@ export const TableView = ({
         props.rowClick(item); // Invoke the function with some example task data
     };
 
-    useEffect(() => {
+   /* useEffect(() => {
         switch (tableDataType) {
             case "tasks":
                 fetch(fetchURL)
@@ -62,10 +65,10 @@ export const TableView = ({
             default:
                 break;
         }
-    }, [fetchURL, tableDataType]);
+    }, [fetchURL, tableDataType]);*/
 
 
-    switch (tableDataType) {
+/*    switch (tableDataType) {
         case "tasks":
             if (!taskData) {
                 return <p>Loading...!</p>; // Render loading until data is fetched   
@@ -89,7 +92,7 @@ export const TableView = ({
         default:
             break;
     }
-
+*/
     let tableFormat: any;
     const formatHeaderLabel = (header: string): string => {
         // Example: Capitalize first letter and replace underscores with spaces
@@ -100,17 +103,17 @@ export const TableView = ({
     switch (tableDataType) {
         case "tasks":
 
-            if (!taskData || !taskData.message || taskData.message.length === 0) {
+            /*if (!taskData || !taskData.message || taskData.message.length === 0) {
                 return <p>No tasks found.</p>;
-            }
+            }*/
             
             if (props.roadmap) {
                 console.log("task " + props.roadmap.name)
             }
 
             let filteredTasks = props.taskStatus
-                ? taskData.message.filter(task => task.taskStatus.name === props.taskStatus!.name)
-                : taskData.message;
+                ? props.taskData.filter(task => task.taskStatus.name === props.taskStatus!.name)
+                : props.taskData;
 
             filteredTasks = props.roadmap
                 ? filteredTasks.filter(task => {
@@ -119,7 +122,7 @@ export const TableView = ({
                 })
                 : filteredTasks;
 
-            headers = taskData.message.length > 0 ? Object.keys(taskData.message[0]) : [];
+            headers = props.taskData.length > 0 ? Object.keys(props.taskData[0]) : [];
 
             tableFormat =
                 headers.map((header, index) => (
@@ -145,12 +148,12 @@ export const TableView = ({
             ));
             break;
         case "milestones":
-
+/*
             if (!milestoneData || !milestoneData.message || milestoneData.message.length === 0) {
                 return <p>No milestones found.</p>;
-            }
+            }*/
 
-            headers = milestoneData.message.length > 0 ? Object.keys(milestoneData.message[0]) : [];
+            headers = props.milestoneData.length > 0 ? Object.keys(props.milestoneData[0]) : [];
 
             tableFormat =
                 headers.map((header, index) => (
@@ -158,8 +161,8 @@ export const TableView = ({
                 ));
 
             let filteredMilestones = props.taskStatus
-                ? milestoneData.message.filter(milestone => milestone.taskStatus.name === props.taskStatus!.name)
-                : milestoneData.message;
+                ? props.milestoneData.filter(milestone => milestone.taskStatus.name === props.taskStatus!.name)
+                : props.milestoneData;
 
             content =
                 filteredMilestones.map((item, index) => (

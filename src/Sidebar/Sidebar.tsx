@@ -3,6 +3,8 @@ import { Milestone, Task, Tag, Assignee, TaskStatus, formatDateNumericalMMDDYYYY
 
 interface SidebarProps {
     sidebarData: Task | Milestone | Tag | Assignee | null; //what can show in the sidebar; ADD EVERYTHING ELSE
+    updateTask: (updatedTask:Task) => void;
+    updateMilestone: (updatedMilestone: Milestone) => void;
 }
 
 export const Sidebar = ({
@@ -23,26 +25,24 @@ export const Sidebar = ({
     const [taskStatuses, setTaskStatuses] = React.useState<{ message: TaskStatus[] } | null>(null);
 
     React.useEffect(() => {
+        // Fetch task statuses
         fetch("/api/taskstatus")
             .then((res) => res.json())
             .then((data) => setTaskStatuses(data))
-            .catch((error) => console.error('Error fetching data:', error));
-    }, []);
+            .catch((error) => console.error('Error fetching task statuses:', error));
 
-    React.useEffect(() => {
+        // Fetch assignees
         fetch("/api/assignees")
             .then((res) => res.json())
             .then((data) => setAssignees(data))
-            .catch((error) => console.error('Error fetching data:', error));
-    }, []);
+            .catch((error) => console.error('Error fetching assignees:', error));
 
-    React.useEffect(() => {
+        // Set initial values for name and description if sidebarData changes
         if (sidebarData) {
-            setName(sidebarData.name);
-            setDescription(sidebarData.description || ''); // If description is undefined in sidebarData, default to empty string
+            setName(sidebarData.name || '');
+            setDescription(sidebarData.description || '');
         }
-    }, [sidebarData]);
-
+    }, [sidebarData]); // Run whenever sidebarData changes
 
 
     if (sidebarData == null) {
@@ -97,7 +97,7 @@ export const Sidebar = ({
             }
 
 
-            updateTask(updatedItem as Task)
+            props.updateTask(updatedItem as Task)
         }
 
         if (sidebarData.type === 'Milestone') {
@@ -123,23 +123,19 @@ export const Sidebar = ({
             }
 
 
-            updateMilestone(updatedItem as Milestone)
+            props.updateMilestone(updatedItem as Milestone)
         }
 
 
     };
 
-    const updateTask = (item: Task) => {
+/*    const updateTask = (item: Task) => {
         fetch(`/api/tasks/${item.id}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({
-                name: item.name, description: item.description, startDate: item.startDate,
-                endDate: item.endDate, assignee: item.assignee, taskStatus: item.taskStatus,
-                type: item.type
-            }),
+            body: JSON.stringify(item),
         })
             .then(res => res.json())
             .then(data => {
@@ -174,7 +170,7 @@ export const Sidebar = ({
                 console.error('Error updating milestone:', error);
             });
     }
-
+*/
     switch (sidebarData.type) {
         case "Task":
 
@@ -234,7 +230,7 @@ export const Sidebar = ({
                      <input
                         id="startDate"
                         type="date"
-                        value={formatDateNumericalYYYYMMDDWithDashes(new Date(taskData.startDate))} // Bind the selectedDate state to input value
+                        defaultValue={formatDateNumericalYYYYMMDDWithDashes(new Date(taskData.startDate))} // Bind the selectedDate state to input value
                         //onChange={handleStartDateChange} // Handle date change
                         aria-label="Start Date"
                         onChange={(event) => { //can put on other things after API push check 
@@ -252,7 +248,7 @@ export const Sidebar = ({
                     <input
                         id="endDate"
                         type="date"
-                        value={formatDateNumericalYYYYMMDDWithDashes(new Date(taskData.endDate))} // Bind the selectedDate state to input value
+                        defaultValue={formatDateNumericalYYYYMMDDWithDashes(new Date(taskData.endDate))} // Bind the selectedDate state to input value
                         onChange={(event) => { //can put on other things after API push check 
                             let endDateString = formatDateNumericalYYYYMMDDWithDashes(new Date(taskData.endDate));
                             if (event.target.value !== endDateString) {
