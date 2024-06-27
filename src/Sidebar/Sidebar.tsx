@@ -5,6 +5,9 @@ interface SidebarProps {
     sidebarData: Task | Milestone | Tag | Assignee | null; //what can show in the sidebar; ADD EVERYTHING ELSE
     updateTask: (updatedTask:Task) => void;
     updateMilestone: (updatedMilestone: Milestone) => void;
+    updateTag: (updatedTag: Tag) => void;
+    updateAssignee: (updatedAssignee: Assignee) => void;
+
 }
 
 export const Sidebar = ({
@@ -139,15 +142,38 @@ export const Sidebar = ({
             }
 
 
-            //props.updateMilestone(updatedItem as Milestone)
+            props.updateMilestone(updatedItem as Milestone)
         }
 
         if (sidebarData.type === 'Tag') {
             console.log("tag blur")
+
+            let updatedItem = { ...sidebarData as Tag };
+
+            if (propertyName === 'name') {
+                updatedItem.name = event.target.value
+            }
+            if (propertyName === 'description') {
+                updatedItem.description = event.target.value
+            }
+
+
+            props.updateTag(updatedItem as Tag)
         }
 
         if (sidebarData.type === 'Assignee') {
             console.log("assignee blur")
+
+            let updatedItem = { ...sidebarData as Assignee };
+
+            if (propertyName === 'name') {
+                updatedItem.name = event.target.value
+            }
+            if (propertyName === 'description') {
+                updatedItem.description = event.target.value
+            }
+
+            props.updateAssignee(updatedItem as Assignee)
         }
 
 

@@ -124,6 +124,54 @@ function App() {
             });
     };
 
+    const updateTag = (updatedTag: Tag) => {
+        // Update task in API
+        fetch(`/api/tags/${updatedTag.id}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(updatedTag),
+        })
+            .then(res => res.json())
+            .then(data => {
+                console.log('Updated item:', data);
+                // Update local state with updated task
+                const updatedTags: Tag[] = tags.map(tag => (tag.id === updatedTag.id ? data : tag));
+ 
+                setTags(updatedTags);
+
+
+            })
+            .catch(error => {
+                console.error('Error updating tag:', error);
+            });
+    };
+
+    const updateAssignee = (updatedAssignee: Tag) => {
+        // Update task in API
+        fetch(`/api/assignees/${updatedAssignee.id}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(updatedAssignee),
+        })
+            .then(res => res.json())
+            .then(data => {
+                console.log('Updated item:', data);
+                // Update local state with updated task
+                const updatedTags: Assignee[] = assignees.map(assignee => (assignee.id === updatedAssignee.id ? data : assignee));
+                
+                setAssignees(updatedTags);
+
+
+            })
+            .catch(error => {
+                console.error('Error updating assignee:', error);
+            });
+    };
+
     // #endregion
 
     return (
@@ -152,7 +200,7 @@ function App() {
                     </div>
                     <br />
                     <div>
-                        <Sidebar sidebarData={selectedItem} updateTask={updateTask} updateMilestone={updateMilestone} />
+                        <Sidebar sidebarData={selectedItem} updateTask={updateTask} updateMilestone={updateMilestone} updateTag={updateTag} updateAssignee={updateAssignee} />
                     </div>
                 </div>
 
