@@ -6,44 +6,38 @@ interface TableViewProps {
     taskStatus: TaskStatus | null;
     taskData: Task[];
     milestoneData: Milestone[];
+    tagData: Tag[];
+    assigneeData: Assignee[];
     rowClick: (task: Task | Milestone | Tag | Assignee) => void;
-
+    selectedItem: Task | Milestone | Tag | Assignee | null;
 }
-
-type DataType = {
-    message: Task[]; // Assuming 'message' holds an array of Task objects
-} | {
-    message: Milestone[]; // Another possible type for 'message'
-} | {
-    message: Assignee[]; // Yet another possible type for 'message'
-} | null; 
 
 export const TableView = ({
 
     ...props
 }: TableViewProps) => {
     //const [taskData, setTaskData] = useState<{ message: Task[] } | null>(null);
-    //const [milestoneData, setMilestoneData] = useState<{ message: Milestone[] } | null>(null);
-    const [tagData, setTagData] = useState<{ message: Tag[] } | null>(null);
-    const [assigneeData, setAssigneeData] = useState<{ message: Assignee[] } | null>(null);
+    //const [milestoneData1, setMilestoneData] = useState<{ message: Milestone[] } | null>(null);
+   // const [tagData, setTagData] = useState<{ message: Tag[] } | null>(null);
+    //const [assigneeData, setAssigneeData] = useState<{ message: Assignee[] } | null>(null);
 
     const [tableDataType, setTableDataType] = React.useState("tasks")
 
-    let fetchURL = "/api/" + tableDataType + "/";
+    //let fetchURL = "/api/" + tableDataType + "/";
     let content: any = <div>hi</div>;
 
     const handleClick = (item: Task | Milestone | Tag | Assignee ) => {
         console.log("Inside Timeline component - before invoking taskClick function " + item.name);
         props.rowClick(item); // Invoke the function with some example task data
     };
-
-   /* useEffect(() => {
+/*
+    useEffect(() => {
         switch (tableDataType) {
-            case "tasks":
+           *//* case "tasks":
                 fetch(fetchURL)
                     .then((res) => res.json())
                     .then((data) => setTaskData(data));
-                break;
+                break;*//*
             case "milestones":
                 fetch(fetchURL)
                     .then((res) => res.json())
@@ -65,8 +59,8 @@ export const TableView = ({
             default:
                 break;
         }
-    }, [fetchURL, tableDataType]);*/
-
+    }, [fetchURL, tableDataType]);
+*/
 
 /*    switch (tableDataType) {
         case "tasks":
@@ -131,7 +125,8 @@ export const TableView = ({
             
             content = 
             filteredTasks.map((item, index) => (
-                <tr key={index} onClick={() => handleClick(item)} className="cursor-pointer hover:bg-lime-500">
+                <tr key={index} onClick={() => handleClick(item)} className={`cursor-pointer hover:bg-lime-500
+                ${props.selectedItem?.type === 'Task' && props.selectedItem?.id === item.id ? 'bg-lime-800' : ''}`}>
                     <td className="border border-gray-300 px-4 py-2">{item.name}</td>
                     <td className="border border-gray-300 px-4 py-2">{item.description}</td>
                     <td className="border border-gray-300 px-4 py-2">{item.roadmaps.map(map => map.name + " ")}</td>
@@ -163,10 +158,11 @@ export const TableView = ({
             let filteredMilestones = props.taskStatus
                 ? props.milestoneData.filter(milestone => milestone.taskStatus.name === props.taskStatus!.name)
                 : props.milestoneData;
-
+     
             content =
                 filteredMilestones.map((item, index) => (
-                    <tr key={index} onClick={() => handleClick(item)} className="cursor-pointer hover:bg-lime-500">
+                    <tr key={index} onClick={() => handleClick(item)} className={`cursor-pointer hover:bg-lime-500
+                ${props.selectedItem?.type === 'Milestone' && props.selectedItem?.id === item.id ? 'bg-lime-800' : ''}`}>
                         <td className="border border-gray-300 px-4 py-2">{item.name}</td>
                         <td className="border border-gray-300 px-4 py-2">{item.description}</td>
                         <td className="border border-gray-300 px-4 py-2">{formatDateNumericalMMDDYYYY(new Date(item.date))}</td>
@@ -177,21 +173,21 @@ export const TableView = ({
                 ));
             break;
         case "tags":
-            if (!tagData || !tagData.message || tagData.message.length === 0) {
+           /* if (!tagData || !tagData.message || tagData.message.length === 0) {
                 return <p>No tags found.</p>;
             }
-
-            headers = tagData.message.length > 0 ? Object.keys(tagData.message[0]) : [];
+*/
+            headers = props.tagData.length > 0 ? Object.keys(props.tagData[0]) : [];
 
             tableFormat =
                 headers.map((header, index) => (
                     <th key={index} className="border border-gray-300 px-4 py-2">{formatHeaderLabel(header)}</th>
                 ));
 
-
             content =
-                tagData?.message.map((item, index) => (
-                    <tr key={index} onClick={() => handleClick(item)} className="cursor-pointer hover:bg-lime-500">
+                props.tagData.map((item, index) => (
+                    <tr key={index} onClick={() => handleClick(item)} className={`cursor-pointer hover:bg-lime-500
+                ${props.selectedItem?.type === 'Tag' && props.selectedItem?.id === item.id ? 'bg-lime-800' : ''}`}>
                         <td className="border border-gray-300 px-4 py-2">{item.name}</td>
                         <td className="border border-gray-300 px-4 py-2">{item.description}</td>
                         <td className="border border-gray-300 px-4 py-2">{item.id}</td>
@@ -200,11 +196,11 @@ export const TableView = ({
                 ));
             break;
         case "assignees":
-            if (!assigneeData || !assigneeData.message || assigneeData.message.length === 0) {
-                return <p>No milestones found.</p>;
-            }
+          /*  if (!assigneeData || !assigneeData.message || assigneeData.message.length === 0) {
+                return <p>No assignees found.</p>;
+            }*/
 
-            headers = assigneeData.message.length > 0 ? Object.keys(assigneeData.message[0]) : [];
+            headers = props.assigneeData.length > 0 ? Object.keys(props.assigneeData[0]) : [];
 
             tableFormat =
                 headers.map((header, index) => (
@@ -213,8 +209,9 @@ export const TableView = ({
 
 
             content =
-                assigneeData?.message.map((item, index) => (
-                    <tr key={index} onClick={() => handleClick(item as Assignee)} className="cursor-pointer hover:bg-lime-500">
+                props.assigneeData.map((item, index) => (
+                    <tr key={index} onClick={() => handleClick(item as Assignee)} className={`cursor-pointer hover:bg-lime-500
+                ${props.selectedItem?.type === 'Assignee' && props.selectedItem?.id === item.id ? 'bg-lime-800' : ''}`}>
                         <td className="border border-gray-300 px-4 py-2">{item.name}</td>
                         <td className="border border-gray-300 px-4 py-2">{item.description}</td>
                         <td className="border border-gray-300 px-4 py-2">{item.id}</td>
@@ -307,7 +304,7 @@ export const TableView = ({
             <table className="min-w-full text-white border-collapse border border-gray-200">
                 <thead className="bg-gray-600">
                     <tr>
-                        {tableFormat }
+                        {tableFormat}
                     </tr>
                 </thead>
                 <tbody>

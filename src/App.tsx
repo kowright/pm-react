@@ -12,13 +12,20 @@ import { FilterArea } from './FilterArea/FilterArea';
 function App() {
     const [view, setView] = useState<string>('Table'); 
     const [selectedItem, setSelectedItem] = useState<Task | Milestone | Tag | Assignee | null>(null); 
-    const [tasks, setTasks] = useState<Task[]>([]); // State to hold tasks
-    const [milestones, setMilestones] = useState<Milestone[]>([]); // State to hold milestones
 
     React.useEffect(() => {
         fetchTasks();
         fetchMilestones();
+        fetchTags();
+        fetchAssignees();
     }, []);
+
+    // #region Fetch Units
+    const [tasks, setTasks] = useState<Task[]>([]); // State to hold tasks
+    const [milestones, setMilestones] = useState<Milestone[]>([]); // State to hold milestones
+    const [tags, setTags] = useState<Tag[]>([]); // State to hold milestones
+    const [assignees, setAssignees] = useState<Assignee[]>([]); // State to hold milestones
+
 
     const fetchTasks = () => {
         fetch("/api/tasks")
@@ -30,11 +37,26 @@ function App() {
     const fetchMilestones = () => {
         fetch("/api/milestones")
             .then((res) => res.json())
-            .then((data) => setMilestones(data))
+            .then((data) => setMilestones(data.message))
             .catch((error) => console.error('Error fetching milestones:', error));
     };
 
-    //Filter Area Necessities
+    const fetchTags = () => {
+        fetch("/api/tags")
+            .then((res) => res.json())
+            .then((data) => setTags(data.message))
+            .catch((error) => console.error('Error fetching tags:', error));
+    };
+
+    const fetchAssignees = () => {
+        fetch("/api/assignees")
+            .then((res) => res.json())
+            .then((data) => setAssignees(data.message))
+            .catch((error) => console.error('Error fetching assignees:', error));
+    };
+    // #endregion
+
+    // #region Filter Area Necessities
     const [selectedRoadmap, setSelectedRoadmap] = useState<Roadmap | null>(null); //keep
     const [selectedTaskStatus, setSelectedTaskStatus] = useState<TaskStatus | null>(null); //keep
     const handleFilterByRoadmap = (roadmap: Roadmap | null) => { //keep
@@ -53,8 +75,9 @@ function App() {
         console.log("Selected Task: ", item.name);
         setSelectedItem(item);
     };
+    // #endregion
 
-    //Unit Updates
+    // #region Unit Updates
     const updateTask = (updatedTask: Task) => {
         // Update task in API
         fetch(`/api/tasks/${updatedTask.id}`, {
@@ -101,6 +124,8 @@ function App() {
             });
     };
 
+    // #endregion
+
     return (
         <div>
             <header className="App-header">
@@ -121,7 +146,7 @@ function App() {
 
                     <div>
                         {view === 'Timeline' && <TimelineView taskClick={handleTaskClick} roadmap={selectedRoadmap} taskStatus={selectedTaskStatus} />}
-                        {view === 'Table' && <TableView rowClick={handleTaskClick} taskData={tasks} milestoneData={milestones} roadmap={selectedRoadmap} taskStatus={selectedTaskStatus} />}
+                        {view === 'Table' && <TableView rowClick={handleTaskClick} taskData={tasks} milestoneData={milestones} tagData={tags} assigneeData={assignees} roadmap={selectedRoadmap} taskStatus={selectedTaskStatus} selectedItem={selectedItem} />}
                         {/*view === 'Kanban' && <KanbanView rowClick={handleTaskClick} tasks={tasks} milestones={milestones} roadmap={selectedRoadmap} taskStatus={selectedTaskStatus} />*/}
 
                     </div>
