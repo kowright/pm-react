@@ -1,5 +1,5 @@
 import React from 'react';
-import { Milestone, Task, Tag, Assignee, TaskStatus, formatDateNumericalMMDDYYYY, formatDateNumericalYYYYMMDDWithDashes } from '../Interfaces';
+import { Milestone, Task, Tag, Assignee, TaskStatus, Roadmap, formatDateNumericalMMDDYYYY, formatDateNumericalYYYYMMDDWithDashes } from '../Interfaces';
 
 interface SidebarProps {
     sidebarData: Task | Milestone | Tag | Assignee | null; //what can show in the sidebar; ADD EVERYTHING ELSE
@@ -22,6 +22,7 @@ export const Sidebar = ({
     const [description, setDescription] = React.useState(sidebarData?.description);
     const [task, setTask] = React.useState(sidebarData)
     const [assignees, setAssignees] = React.useState<{ message: Assignee[] } | null>(null);
+    const [roadmaps, setRoadmaps] = React.useState<{ message: Roadmap[] } | null>(null);
     const [taskStatuses, setTaskStatuses] = React.useState<{ message: TaskStatus[] } | null>(null);
 
     React.useEffect(() => {
@@ -36,6 +37,12 @@ export const Sidebar = ({
             .then((res) => res.json())
             .then((data) => setAssignees(data))
             .catch((error) => console.error('Error fetching assignees:', error));
+
+        // Fetch roadmaps
+        fetch("/api/roadmaps")
+            .then((res) => res.json())
+            .then((data) => setRoadmaps(data))
+            .catch((error) => console.error('Error fetching roadmaps:', error));
 
         // Set initial values for name and description if sidebarData changes
         if (sidebarData) {
@@ -95,6 +102,17 @@ export const Sidebar = ({
             if (propertyName === 'taskStatus') {
                 updatedItem.taskStatus.name = editedValue
             }
+            if (propertyName === 'roadmap') {
+                const selectedOptions = Array.from(event.target.selectedOptions) as HTMLOptionElement[];
+                const selectedRoadmapNames = selectedOptions.map(option => option.value);
+                const selectedRoadmaps = roadmaps?.message.filter(roadmap => selectedRoadmapNames.includes(roadmap.name)) || [];
+
+                console.log("roadmaps " ,selectedRoadmapNames)
+                updatedItem.roadmaps = selectedRoadmaps;
+                
+            }
+
+
 
 
             props.updateTask(updatedItem as Task)
@@ -205,6 +223,29 @@ export const Sidebar = ({
                         } 
                     />
                     <hr />
+
+                    <label htmlFor="roadmap">Roadmap:</label>
+                    <select
+                        multiple
+                        id="roadmap"
+                        defaultValue={taskData.roadmaps.map(roadmap => roadmap.name)}
+                        onChange={(event) => { //can put on other things after API push check 
+                            
+                                console.log(event.target.value)
+                                 handleInputBlur(event)
+
+                            
+                        }
+                        }
+                           >
+                        {roadmaps?.message.map((option, index) => (
+                            <option key={index} value={option.name}>
+                                {option.name}
+                            </option>
+                        ))}
+                      </select>
+                    <hr/>
+
                     <label htmlFor="assignees">Assignee:</label>
                     <select
                         id="assignee"
@@ -223,9 +264,8 @@ export const Sidebar = ({
                             </option>
                         ))}
                     </select>
-
-                 
                     <hr />
+
                     <label htmlFor="start date">Start Date: </label>
                      <input
                         id="startDate"
