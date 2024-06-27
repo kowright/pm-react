@@ -5,6 +5,7 @@ interface KanbanViewProps {
     roadmap: Roadmap | null; //group filter properties together
     taskStatus: TaskStatus | null;
     rowClick: (task: Task | Milestone | Tag | Assignee) => void;
+    taskData: Task[];
 }
 
  export const KanbanView = ({
@@ -23,12 +24,12 @@ interface KanbanViewProps {
          props.rowClick(task); // Invoke the function with some example task data
      };
 
-    useEffect(() => { //keep for now until App gives it to you
+/*    useEffect(() => { //keep for now until App gives it to you
         fetch("/api/tasks")
             .then((res) => res.json())
             .then((data) => setTaskData(data))
             .catch((error) => console.error('Error fetching data:', error));
-    }, []);
+    }, []);*/
 
      useEffect(() => {
          fetch("/api/roadmaps")
@@ -43,17 +44,17 @@ interface KanbanViewProps {
              .then((data) => setTaskStatusData(data))
              .catch((error) => console.error('Error fetching data:', error));
      }, []);
-
+/*
     if (!taskData || !roadmapData || !taskStatusData) {
         return <div> oh no</div>
-    }
+    }*/
 
-       let filteredTasks = taskData.message;
+       let filteredTasks = props.taskData;
 
     
       filteredTasks = props.taskStatus
-         ? taskData.message.filter(task => task.taskStatus.name === props.taskStatus!.name)
-         : taskData.message;
+          ? props.taskData.filter(task => task.taskStatus.name === props.taskStatus!.name)
+          : props.taskData;
 
 
      filteredTasks = props.roadmap

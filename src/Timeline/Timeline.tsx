@@ -5,6 +5,8 @@ interface TimelineProps {
     taskClick: (task: Task | Milestone) => void;
     roadmap: Roadmap | null; //group filter properties together
     taskStatus: TaskStatus | null;
+    taskData: Task[];
+    milestoneData: Milestone[];
 }
 
 export const Timeline = ({
@@ -34,7 +36,7 @@ export const Timeline = ({
         setSelectedTaskStatus(status);
     };
 
-    React.useEffect(() => {
+/*    React.useEffect(() => {
         fetch("/api/tasks")
             .then((res) => res.json())
             .then((data) => setData(data));
@@ -44,11 +46,11 @@ export const Timeline = ({
         fetch("/api/milestones")
             .then((res) => res.json())
             .then((milestoneData) => setMilestoneData(milestoneData));
-    }, []);
+    }, []);*/
 
-    if (!data || !milestoneData) {
+  /*  if (!data || !milestoneData) {
         return <p>Loading...!</p>; // Render loading until data is fetched
-    }
+    }*/
 
     // #region Table
     // Table Header Styles
@@ -113,11 +115,11 @@ export const Timeline = ({
 
     // #region Tasks
     let filteredTasks = props.roadmap
-        ? data.message.filter((task) => {
+        ? props.taskData.filter((task) => {
             const roadmaps = task.roadmaps.map(map => map.name);
             return roadmaps.includes(props.roadmap!.name);
         })
-        : data.message;
+        : props.taskData;
 
     filteredTasks = props.taskStatus
         ? filteredTasks.filter(task => task.taskStatus.name === props.taskStatus!.name)
@@ -156,8 +158,8 @@ export const Timeline = ({
     // #region Milestones
 
      let filteredMilestones = selectedTaskStatus
-        ? milestoneData?.message.filter(milestone => milestone.taskStatus === selectedTaskStatus)
-        : milestoneData?.message;
+        ? props.milestoneData.filter(milestone => milestone.taskStatus === selectedTaskStatus)
+        : props.milestoneData;
 
     filteredMilestones = filteredMilestones.filter(milestone => new Date(milestone.date) <= endDate);
 

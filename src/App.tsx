@@ -114,9 +114,9 @@ function App() {
         })
             .then(res => res.json())
             .then(data => {
-                console.log('Updated milestone:', data.milestone);
+                console.log('Updated milestone:', data);
                 // Update local state with updated milestone
-                const updatedMilestones = milestones.map(milestone => (milestone.id === updatedMilestone.id ? data.milestone : milestone));
+                const updatedMilestones = milestones.map(milestone => (milestone.id === updatedMilestone.id ? data : milestone));
                 setMilestones(updatedMilestones);
             })
             .catch(error => {
@@ -193,9 +193,9 @@ function App() {
                 <div className="flex justify-center">
 
                     <div>
-                        {view === 'Timeline' && <TimelineView taskClick={handleTaskClick} roadmap={selectedRoadmap} taskStatus={selectedTaskStatus} />}
+                        {view === 'Timeline' && <TimelineView taskClick={handleTaskClick} roadmap={selectedRoadmap} taskStatus={selectedTaskStatus} taskData={tasks} milestoneData={milestones} />}
                         {view === 'Table' && <TableView rowClick={handleTaskClick} taskData={tasks} milestoneData={milestones} tagData={tags} assigneeData={assignees} roadmap={selectedRoadmap} taskStatus={selectedTaskStatus} selectedItem={selectedItem} />}
-                        {/*view === 'Kanban' && <KanbanView rowClick={handleTaskClick} tasks={tasks} milestones={milestones} roadmap={selectedRoadmap} taskStatus={selectedTaskStatus} />*/}
+                        {view === 'Kanban' && <KanbanView rowClick={handleTaskClick} taskData={tasks} roadmap={selectedRoadmap} taskStatus={selectedTaskStatus} />}
 
                     </div>
                     <br />
