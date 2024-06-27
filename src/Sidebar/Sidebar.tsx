@@ -112,13 +112,11 @@ export const Sidebar = ({
                 
             }
 
-
-
-
             props.updateTask(updatedItem as Task)
         }
 
         if (sidebarData.type === 'Milestone') {
+            console.log("milestone blur")
             let updatedItem = { ...sidebarData as Milestone };
 
             if (propertyName === 'name') {
@@ -141,54 +139,21 @@ export const Sidebar = ({
             }
 
 
-            props.updateMilestone(updatedItem as Milestone)
+            //props.updateMilestone(updatedItem as Milestone)
         }
+
+        if (sidebarData.type === 'Tag') {
+            console.log("tag blur")
+        }
+
+        if (sidebarData.type === 'Assignee') {
+            console.log("assignee blur")
+        }
+
 
 
     };
 
-/*    const updateTask = (item: Task) => {
-        fetch(`/api/tasks/${item.id}`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(item),
-        })
-            .then(res => res.json())
-            .then(data => {
-                console.log(data.message)
-                console.log('Updated task:', data.task);
-                // Update state immutably
-                console.log("new date " + data.task.startDate)
-                setTask(data.task);
-            })
-            .catch(error => {
-                console.error('Error updating task:', error);
-            });
-    }
-
-    const updateMilestone = (item: Milestone) => {
-        fetch(`/api/milestones/${item.id}`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                name: item.name, description: item.description, type: item.type,
-                date: item.date, taskStatus: item.taskStatus
-            }),
-        })
-            .then(res => res.json())
-            .then(data => {
-                console.log(data)
-                setTask(data);
-            })
-            .catch(error => {
-                console.error('Error updating milestone:', error);
-            });
-    }
-*/
     switch (sidebarData.type) {
         case "Task":
 
@@ -332,9 +297,6 @@ export const Sidebar = ({
             break;
         case "Milestone":
 
-
-
-
             const milestoneData = sidebarData as Milestone; 
             sidebarContent = (
                 <div>
@@ -342,37 +304,45 @@ export const Sidebar = ({
                     <label htmlFor="name">Name:</label>
                     <input
                         id="name"
-                        type="text"
+                        type='text'
                         value={name}
-                        onBlur={handleInputBlur}
-                        defaultValue={milestoneData.name}
-                    />
-          
+                        onChange={handleNameChange}
+                        onBlur={(event) => { //can put on other things after API push check 
+                            if (event.target.value !== milestoneData.name) {
+                                console.log(event.target.value)
+                                handleInputBlur(event)
+                            }
+                        }
+                        }
 
+                    />
                     <hr />
 
                     <label htmlFor="description">Description:</label>
                     <textarea
                         id="description"
                         value={description}
+                        onChange={handleDescriptionChange}
                         onBlur={(event) => { //can put on other things after API push check 
                             if (event.target.value !== milestoneData.description) {
+                                console.log(event.target.value)
                                 handleInputBlur(event)
                             }
                         }
                         }
-                        defaultValue={milestoneData.description}
                     />
                     <hr />
-                    <label htmlFor="date">Start Date: </label>
+                    <label htmlFor="date">Date: </label>
                     <input
                         id="date"
                         type="date"
-                        value={formatDateNumericalYYYYMMDDWithDashes(new Date(milestoneData.date))} // Bind the selectedDate state to input value
-                        aria-label="Start Date"
+                        defaultValue={formatDateNumericalYYYYMMDDWithDashes(new Date(milestoneData.date))} // Bind the selectedDate state to input value
+                        //onChange={handleStartDateChange} // Handle date change
+                        aria-label="date"
                         onChange={(event) => { //can put on other things after API push check 
-                            let startDateString = formatDateNumericalYYYYMMDDWithDashes(new Date(milestoneData.date));
-                            if (event.target.value !== startDateString) {
+                            let dateString = formatDateNumericalYYYYMMDDWithDashes(new Date(milestoneData.date));
+                            if (event.target.value !== dateString) {
+                                //check if it's after end date
                                 handleInputBlur(event)
                             }
                         }
@@ -381,24 +351,24 @@ export const Sidebar = ({
                     <hr />
 
 
-                        <label htmlFor="task status">Task Status:</label>
-                        <select
-                            id="taskStatus"
-                            value={milestoneData.taskStatus.name}
-                            onChange={(event) => { //can put on other things after API push check 
+                    <label htmlFor="task status">Task Status:</label>
+                    <select
+                        id="taskStatus"
+                        value={milestoneData.taskStatus.name}
+                        onChange={(event) => { //can put on other things after API push check 
 
-                                if (event.target.value !== taskData.taskStatus.name) {
-                                    handleInputBlur(event)
-                                }
+                            if (event.target.value !== taskData.taskStatus.name) {
+                                handleInputBlur(event)
                             }
-                            }
-                        >
-                            {taskStatuses?.message.map((option, index) => (
-                                <option key={index} value={option.name}>
-                                    {option.name}
-                                </option>
-                            ))}
-                        </select>
+                        }
+                        }
+                    >
+                        {taskStatuses?.message.map((option, index) => (
+                            <option key={index} value={option.name}>
+                                {option.name}
+                            </option>
+                        ))}
+                    </select>
                         <hr/>
                           <p>ID: {milestoneData.id} </p>
                         <hr />
@@ -411,9 +381,35 @@ export const Sidebar = ({
             sidebarContent = (
                 <div>
                     <div className='font-bold text-center'>TAG DETAILS</div>
-                    <p>NAME: {tagData.name} </p>
+                    <label htmlFor="name">Name:</label>
+                    <input
+                        id="name"
+                        type='text'
+                        value={name}
+                        onChange={handleNameChange}
+                        onBlur={(event) => { //can put on other things after API push check 
+                            if (event.target.value !== tagData.name) {
+                                console.log(event.target.value)
+                                handleInputBlur(event)
+                            }
+                        }
+                        }
+
+                    />
                     <hr />
-                    <p>DESCRIPTION: {tagData.description} </p>
+                    <label htmlFor="description">Description:</label>
+                    <textarea
+                        id="description"
+                        value={description}
+                        onChange={handleDescriptionChange}
+                        onBlur={(event) => { //can put on other things after API push check 
+                            if (event.target.value !== tagData.description) {
+                                console.log(event.target.value)
+                                handleInputBlur(event)
+                            }
+                        }
+                        }
+                        ></textarea>
                     <hr />
                     <p>ID: {tagData.id} </p>
                 </div>
@@ -425,9 +421,34 @@ export const Sidebar = ({
             sidebarContent = (
                 <div>
                     <div className='font-bold text-center'>ASSIGNEE DETAILS</div>
-                    <p>NAME: {assigneeData.name} </p>
+                    <label htmlFor="name">Name:</label>
+                    <input
+                        id="name"
+                        type='text'
+                        value={name}
+                        onChange={handleNameChange}
+                        onBlur={(event) => { //can put on other things after API push check 
+                            if (event.target.value !== assigneeData.name) {
+                                console.log(event.target.value)
+                                handleInputBlur(event)
+                            }
+                        }
+                        }
+
+                    />
                     <hr />
-                    <p>DESCRIPTION: {assigneeData.description} </p>
+                    <textarea
+                        id="description"
+                        value={description}
+                        onChange={handleDescriptionChange}
+                        onBlur={(event) => { //can put on other things after API push check 
+                            if (event.target.value !== assigneeData.description) {
+                                console.log(event.target.value)
+                                handleInputBlur(event)
+                            }
+                        }
+                        }
+                    ></textarea>
                     <hr />
                     <p>ID: {assigneeData.id} </p>
                 </div>
