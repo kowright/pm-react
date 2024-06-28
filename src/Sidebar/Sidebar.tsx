@@ -25,7 +25,7 @@ export const Sidebar = ({
     const [description, setDescription] = React.useState(sidebarData?.description);
     const [selectedRoadmaps, setSelectedRoadmaps] = React.useState<Roadmap[]>();
 
-    const [data, setData] = React.useState< Task | Milestone | Tag | Assignee | null>(sidebarData)
+    const [data, setData] = React.useState< Task | Milestone | Tag | Assignee | null>()
 
     const [task, setTask] = React.useState(sidebarData)
     const [assignees, setAssignees] = React.useState<{ message: Assignee[] } | null>(null);
@@ -59,7 +59,7 @@ export const Sidebar = ({
             setDescription(sidebarData.description || '');
             if (sidebarData?.type === 'Task' && 'roadmaps' in sidebarData) {
                 const taskData = sidebarData as Task;
-                const taskData1 = data as Task;
+                setData(taskData)
                 setSelectedRoadmaps(taskData.roadmaps); // Assumig Task has roadmaps property
             }
         }
@@ -335,17 +335,36 @@ export const Sidebar = ({
                     <input
                         id="endDate"
                         type="date"
-                        defaultValue={formatDateNumericalYYYYMMDDWithDashes(new Date(taskData.endDate))} // Bind the selectedDate state to input value
-                        onChange={(event) => { //can put on other things after API push check 
+                        value={formatDateNumericalYYYYMMDDWithDashes(new Date(taskData.endDate))} // Bind the selectedDate state to input value
+
+                        aria-label="End Date"
+                        onChange={(event) => { //can put on other things after API push check
+
+                            const newEndDate = event.target.value; // Get the new value from the input
+                            taskData.endDate = new Date(event.target.value)
+                            if (sidebarData?.type === 'Task') {
+                                // Assuming setData is your state update function for sidebarData
+                                setData(prevState => {
+                                    if (prevState && prevState.type === 'Task') {
+                                        // Cast prevState to Task to access and modify its properties safely
+                                        const prevTask = prevState as Task;
+                                        return {
+                                            ...prevTask, // Spread the previous state
+                                            endDate: newEndDate // Update the startDate
+                                        };
+                                    }
+                                    return prevState; // Return previous state if type is not 'Task'
+                                });
+                            }
+
                             let endDateString = formatDateNumericalYYYYMMDDWithDashes(new Date(taskData.endDate));
                             if (event.target.value !== endDateString) {
-                                //check if it's before start date
+                                //check if it's after end date
                                 console.log(event.target.value + " != " + endDateString)
                                 handleInputBlur(event)
                             }
                         }
                         } 
-                        aria-label="End Date"
                     />
                     <hr />
                     <p>Duration: {taskData.duration} </p>
