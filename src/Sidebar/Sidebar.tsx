@@ -23,10 +23,14 @@ export const Sidebar = ({
     //TASKS
     const [name, setName] = React.useState<string>(sidebarData?.name || '');
     const [description, setDescription] = React.useState(sidebarData?.description);
+    const [selectedRoadmaps, setSelectedRoadmaps] = React.useState<Roadmap[]>();
+
     const [task, setTask] = React.useState(sidebarData)
     const [assignees, setAssignees] = React.useState<{ message: Assignee[] } | null>(null);
     const [roadmaps, setRoadmaps] = React.useState<{ message: Roadmap[] } | null>(null);
     const [taskStatuses, setTaskStatuses] = React.useState<{ message: TaskStatus[] } | null>(null);
+
+   
 
     React.useEffect(() => {
         // Fetch task statuses
@@ -51,6 +55,11 @@ export const Sidebar = ({
         if (sidebarData) {
             setName(sidebarData.name || '');
             setDescription(sidebarData.description || '');
+            if (sidebarData?.type === 'Task') {
+                const taskData = sidebarData as Task;
+                setSelectedRoadmaps(taskData?.roadmaps); // Assuming Task has roadmaps property
+
+            }
         }
     }, [sidebarData]); // Run whenever sidebarData changes
 
@@ -182,7 +191,6 @@ export const Sidebar = ({
 
     switch (sidebarData.type) {
         case "Task":
-
             const taskData = sidebarData as Task;
 
             sidebarContent = (
@@ -214,20 +222,47 @@ export const Sidebar = ({
                         } 
                     />
                     <hr />
-
+                    <p>{taskData.roadmaps.map(roadmap => roadmap.name)} </p>
                     <label htmlFor="roadmap">Roadmap:</label>
                     <select
                         multiple
                         id="roadmap"
-                        defaultValue={taskData.roadmaps.map(roadmap => roadmap.name)}
+                        //defaultValue={roadmap?.map(roadmap => roadmap.name) }
+                        //defaultValue={taskData.roadmaps.map(roadmap => roadmap.name)} //will allow changes to field
+                        //value={taskData.roadmaps.map(roadmap => roadmap.name)} //will change for each task
+                        value={selectedRoadmaps?.map(roadmap => roadmap.name).sort() }
                         onChange={(event) => { //can put on other things after API push check 
-                            
-                                console.log(event.target.value)
-                                 handleInputBlur(event)
+                            /*
+                            const selectedRoadmapNames = Array.from(event.target.selectedOptions, option => option.value);
 
-                            
+                            // Map selected names back to Roadmap objects from roadmaps.message
+                            const selectedRoadmaps = selectedRoadmapNames.map(name =>
+                                roadmaps?.message.find(roadmap => roadmap.name === name)
+                            ).filter(Boolean); // Filter out undefined/null
+
+                            // Update taskData.roadmaps
+                            // Assuming taskData is immutable and you need to update it with a new object
+                            const updatedTaskData = { ...taskData, roadmaps: selectedRoadmaps };
+
+                            // Call a function to update the state or perform further actions
+                            handleTaskDataChange(updatedTaskData);
+                            */
+
+
+                            const selectedOptions = Array.from(event.target.selectedOptions).map(option => option.value);
+
+                            // Map selected option names back to Roadmap objects from roadmaps
+                            const updatedSelectedRoadmaps = roadmaps?.message.sort((a, b) => a.name.localeCompare(b.name)).filter(roadmap => selectedOptions.includes(roadmap.name));
+                            setSelectedRoadmaps(updatedSelectedRoadmaps);
+
                         }
                         }
+
+                        onBlur={(event) => { //can put on other things after API push check 
+                                console.log(event.target.value)
+                                handleInputBlur(event)
+                            }
+                        } 
                            >
                         {roadmaps?.message.map((option, index) => (
                             <option key={index} value={option.name}>
