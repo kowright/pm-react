@@ -1,3 +1,5 @@
+export type UnitData = Task | Milestone | Tag | Assignee | null;
+
 interface Unit {
     name: string;
     description: string;

@@ -6,7 +6,7 @@ import TableView from './TableView';
 import KanbanView from './KanbanView';
 import TimelineView from './TimelineView';
 import { Sidebar } from './Sidebar/Sidebar';
-import { Task, Roadmap, TaskStatus, Milestone, Tag, Assignee } from './Interfaces';
+import { Task, Roadmap, TaskStatus, Milestone, Tag, Assignee, UnitData } from './Interfaces';
 import { FilterArea } from './FilterArea/FilterArea';
 
 function App() {
@@ -78,8 +78,29 @@ function App() {
     // #endregion
 
     // #region Unit Updates
+    const updateItem = (updatedItem: UnitData) => {
+        if (updatedItem == null) {
+            return;
+        }
+
+        if (updatedItem.type === 'Task') {
+            updateTask(updatedItem as Task)
+        }
+        else if (updatedItem.type === 'Milestone') {
+            updateMilestone(updatedItem as Milestone)
+        }
+        else if (updatedItem.type === 'Tag') {
+            updateTag(updatedItem as Tag)
+        }
+        else if (updatedItem.type === 'Assignee') {
+            updateAssignee(updatedItem as Assignee)
+        }
+    }
+
+
     const updateTask = (updatedTask: Task) => {
         // Update task in API
+        console.log("sending backend: ", updatedTask)
         fetch(`/api/tasks/${updatedTask.id}`, {
             method: 'PUT',
             headers: {
@@ -93,10 +114,8 @@ function App() {
                 console.log('Updated task:', data.task);
                 // Update local state with updated task
                 const updatedTasks:Task[] = tasks.map(task => (task.id === updatedTask.id ? data.task : task));
-                console.log("updated new task to " + updatedTasks[0].startDate)
+                console.log("updated new task to ", updatedTasks[1])
                 setTasks(updatedTasks);
-                
-               
             })
             .catch(error => {
                 console.error('Error updating task:', error);
@@ -105,6 +124,7 @@ function App() {
 
     const updateMilestone = (updatedMilestone: Milestone) => {
         // Update milestone in API
+        console.log("sending backend ", updatedMilestone)
         fetch(`/api/milestones/${updatedMilestone.id}`, {
             method: 'PUT',
             headers: {
@@ -200,7 +220,7 @@ function App() {
                     </div>
                     <br />
                     <div>
-                        <Sidebar sidebarData={selectedItem} updateTask={updateTask} updateMilestone={updateMilestone} updateTag={updateTag} updateAssignee={updateAssignee} />
+                        <Sidebar sidebarData={selectedItem} updateItem={updateItem} />
                     </div>
                 </div>
 

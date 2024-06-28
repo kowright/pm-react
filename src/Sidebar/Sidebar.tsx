@@ -1,14 +1,15 @@
 import React from 'react';
-import { Milestone, Task, Tag, Assignee, TaskStatus, Roadmap, formatDateNumericalMMDDYYYY, formatDateNumericalYYYYMMDDWithDashes } from '../Interfaces';
+import { Milestone, Task, Tag, Assignee, TaskStatus, Roadmap, formatDateNumericalMMDDYYYY, formatDateNumericalYYYYMMDDWithDashes ,UnitData} from '../Interfaces';
 
 interface SidebarProps {
-    sidebarData: Task | Milestone | Tag | Assignee | null; //what can show in the sidebar; ADD EVERYTHING ELSE
-    updateTask: (updatedTask:Task) => void;
+    sidebarData: UnitData; //what can show in the sidebar; ADD EVERYTHING ELSE
+   /* updateTask: (updatedTask:Task) => void;
     updateMilestone: (updatedMilestone: Milestone) => void;
     updateTag: (updatedTag: Tag) => void;
-    updateAssignee: (updatedAssignee: Assignee) => void;
-
+    updateAssignee: (updatedAssignee: Assignee) => void;*/
+    updateItem: (updatedItem: UnitData) => void;
 }
+
 
 export const Sidebar = ({
     sidebarData = null,
@@ -18,75 +19,105 @@ export const Sidebar = ({
     let hideContent: boolean = true;
     let sidebarContent: JSX.Element;
 
-    sidebarContent = <div>NAHHHHHHHHHHHHHHHHH</div>
+    sidebarContent = <div>nothing to show.</div>
 
 
-    const [name, setName] = React.useState<string>(sidebarData?.name || '');
+   /* const [name, setName] = React.useState<string>(sidebarData?.name || '');
     const [description, setDescription] = React.useState(sidebarData?.description);
-    const [selectedRoadmaps, setSelectedRoadmaps] = React.useState<Roadmap[]>();
+    const [selectedRoadmaps, setSelectedRoadmaps] = React.useState<Roadmap[]>();*/
 
-    const [data, setData] = React.useState< Task | Milestone | Tag | Assignee | null>()
+    const [data, setData] = React.useState< Task | Milestone | Tag | Assignee | null>(sidebarData)
 
-    const [task, setTask] = React.useState(sidebarData)
+    //const [task, setTask] = React.useState(sidebarData)
     const [assignees, setAssignees] = React.useState<{ message: Assignee[] } | null>(null);
     const [roadmaps, setRoadmaps] = React.useState<{ message: Roadmap[] } | null>(null);
     const [taskStatuses, setTaskStatuses] = React.useState<{ message: TaskStatus[] } | null>(null);
 
-   
 
     React.useEffect(() => {
-        // Fetch task statuses
-        fetch("/api/taskstatus")
-            .then((res) => res.json())
-            .then((data) => setTaskStatuses(data))
-            .catch((error) => console.error('Error fetching task statuses:', error));
-
-        // Fetch assignees
-        fetch("/api/assignees")
-            .then((res) => res.json())
-            .then((data) => setAssignees(data))
-            .catch((error) => console.error('Error fetching assignees:', error));
-
-        // Fetch roadmaps
-        fetch("/api/roadmaps")
-            .then((res) => res.json())
-            .then((data) => setRoadmaps(data))
-            .catch((error) => console.error('Error fetching roadmaps:', error));
-
-        // Set initial values for name and description if sidebarData changes
-        if (sidebarData) {
-            setName(sidebarData.name || '');
-            setDescription(sidebarData.description || '');
-            if (sidebarData?.type === 'Task' && 'roadmaps' in sidebarData) {
-                const taskData = sidebarData as Task;
-                setData(taskData)
-                setSelectedRoadmaps(taskData.roadmaps); // Assumig Task has roadmaps property
+        const fetchData = async () => {
+            try {
+                const [taskStatusData, assigneesData, roadmapsData] = await Promise.all([
+                    fetch("/api/taskstatus").then(res => res.json()),
+                    fetch("/api/assignees").then(res => res.json()),
+                    fetch("/api/roadmaps").then(res => res.json())
+                ]);
+                setTaskStatuses(taskStatusData);
+                setAssignees(assigneesData);
+                setRoadmaps(roadmapsData);
+            } catch (error) {
+                console.error('Error fetching data:', error);
             }
-        }
-    }, [sidebarData]); // Run whenever sidebarData changes
+        };
+
+        fetchData();
+    }, []);
+
+    React.useEffect(() => {
+        setData(sidebarData); // Update data state with the latest sidebarData
+    }, [sidebarData]);
 
 
-    if (sidebarData == null) {
-        return <div>No details to display</div>
-    }
+    const handleInputBlur = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
 
-    hideContent = false;
-
-    // Function to handle name change
-    const handleNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setName(event.target.value);
-    };
-
-    // Function to handle description change
-    const handleDescriptionChange = (event: any) => {
-        setDescription(event.target.value);
-    };
-
-    const handleInputBlur = (event: any) => {
-        //change it to call api and change backend 
         const editedValue = event.target.value;
         const propertyName = event.target.id; // Assuming id is the property name to update
-        if (sidebarData.type === 'Task') {
+
+        if (!data) {
+            return; 
+        }
+
+        let updatedItem: Task | Milestone | Tag | Assignee;
+
+        switch (data?.type) {
+            case 'Task':
+                updatedItem = {
+                    ...(sidebarData as Task),
+                    [propertyName]: propertyName === 'startDate' || propertyName === 'endDate'
+                        ? new Date(editedValue) : editedValue
+                };
+                break;
+            case 'Milestone':
+                updatedItem = {
+                    ...(sidebarData as Milestone),
+                    [propertyName]: propertyName === 'date' ? new Date(editedValue) : editedValue,
+                    
+                      
+                };
+
+              /*  if (propertyName === 'taskStatus') {
+                    (updatedItem as Milestone).taskStatus.name = editedValue;
+                }
+                */
+                console.log("edited ", (updatedItem as Milestone).taskStatus)
+                break;
+            case 'Tag':
+                updatedItem = {
+                    ...(sidebarData as Tag),
+                    [propertyName]: editedValue
+                };
+                break;
+            case 'Assignee':
+                updatedItem = {
+                    ...(sidebarData as Assignee),
+                    [propertyName]: editedValue
+                };
+                break;
+            default:
+                throw new Error(`Unhandled sidebarData type: ${(sidebarData as any).type}`);
+        }
+
+        //setData(updatedItem);
+
+        // Assuming updateItem handles updating the state based on the item type
+        props.updateItem(updatedItem);
+
+
+
+      /*  const editedValue = event.target.value;
+        const propertyName = event.target.id; // Assuming id is the property name to update
+        
+        if (sidebarData?.type === 'Task') {
             let updatedItem = { ...sidebarData as Task };
 
             if (propertyName === 'name') {
@@ -117,19 +148,19 @@ export const Sidebar = ({
                 updatedItem.taskStatus.name = editedValue
             }
             if (propertyName === 'roadmap') {
-                const selectedOptions = Array.from(event.target.selectedOptions) as HTMLOptionElement[];
+            *//*   const selectedOptions = Array.from(event.target.selectedOptions) as HTMLOptionElement[];
                 const selectedRoadmapNames = selectedOptions.map(option => option.value);
                 const selectedRoadmaps = roadmaps?.message.filter(roadmap => selectedRoadmapNames.includes(roadmap.name)) || [];
 
-                console.log("roadmaps " ,selectedRoadmapNames)
+                console.log("roadmaps ", selectedRoadmapNames)
                 updatedItem.roadmaps = selectedRoadmaps;
-                
+                *//*
             }
 
-            props.updateTask(updatedItem as Task)
+            //props.updateItem(updatedItem)
         }
 
-        if (sidebarData.type === 'Milestone') {
+        if (sidebarData?.type === 'Milestone') {
             console.log("milestone blur")
             let updatedItem = { ...sidebarData as Milestone };
 
@@ -153,11 +184,11 @@ export const Sidebar = ({
             }
 
 
-            props.updateMilestone(updatedItem as Milestone)
+            //props.updateMilestone(updatedItem as Milestone)
+            //props.updateItem(updatedItem as Milestone);
         }
 
-        if (sidebarData.type === 'Tag') {
-            console.log("tag blur")
+        if (sidebarData?.type === 'Tag') {
 
             let updatedItem = { ...sidebarData as Tag };
 
@@ -169,11 +200,11 @@ export const Sidebar = ({
             }
 
 
-            props.updateTag(updatedItem as Tag)
+            //props.updateTag(updatedItem as Tag)
+            //props.updateItem(updatedItem as Tag);
         }
 
-        if (sidebarData.type === 'Assignee') {
-            console.log("assignee blur")
+        if (sidebarData?.type === 'Assignee') {
 
             let updatedItem = { ...sidebarData as Assignee };
 
@@ -184,205 +215,124 @@ export const Sidebar = ({
                 updatedItem.description = event.target.value
             }
 
-            props.updateAssignee(updatedItem as Assignee)
+            //props.updateAssignee(updatedItem as Assignee)
+            //props.updateItem(updatedItem as Assignee);
         }
 
 
+        props.updateItem(updatedItem)*/
 
     };
 
+
+    if (sidebarData === null) {
+        return <div>No details to display</div>
+    }
+
+    hideContent = false;
+
+    const handleInputChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+        const { id, value } = event.target;
+
+        // Special handling for assignee dropdown
+        if (id === 'assignee') {
+            const assigneeName = value;
+            const selectedAssignee = assignees?.message.find(assignee => assignee.name === assigneeName);
+
+            if (selectedAssignee) {
+                setData(prevData => ({
+                    ...(prevData as Task | Milestone | Tag | Assignee),
+                    assignee: selectedAssignee
+                }));
+            }
+        } else {
+            setData(prevData => ({
+                ...(prevData as Task | Milestone | Tag | Assignee),
+                [id]: value
+            }));
+        }
+    };
+
+    
+
     switch (sidebarData.type) {
         case "Task":
-            const taskData = sidebarData as Task;
-            //const taskDataStartDate = (data as Task).startDate; 
-            //const taskData1 = data as Task;
+            const taskData = data as Task;
+
             sidebarContent = (
                 <div>
                     <div className='font-bold text-center'>TASK DETAILS</div>
-                    <br/>
+                    <br />
+
+
                     <label htmlFor="name">Name:</label>
                     <input
                         id="name"
                         type='text'
-                        value={name}
-                        onChange={handleNameChange}
+                        value={data?.name || ''}
+                        onChange={handleInputChange}
+
                         onBlur={handleInputBlur}
-                     
                     />
                     <hr />
+
 
                     <label htmlFor="description">Description:</label>
                     <textarea
                         id="description"
-                        value={description}
-                        onChange={handleDescriptionChange}
-                        onBlur={(event) => { //can put on other things after API push check 
-                            if (event.target.value !== taskData.description) {
-                                console.log(event.target.value)
-                                handleInputBlur(event)
-                            }
-                        }
-                        } 
+                        value={data?.description || ''}
+                        onChange={handleInputChange}
+
+                        onBlur={handleInputBlur}
                     />
                     <hr />
-                    <p>{taskData.roadmaps.map(roadmap => roadmap.name)} </p>
-                    <label htmlFor="roadmap">Roadmap:</label>
-                    <select
-                        multiple
-                        id="roadmap"
-                        //defaultValue={roadmap?.map(roadmap => roadmap.name) }
-                        //defaultValue={taskData.roadmaps.map(roadmap => roadmap.name)} //will allow changes to field
-                        //value={taskData.roadmaps.map(roadmap => roadmap.name)} //will change for each task
-                        value={selectedRoadmaps?.map(roadmap => roadmap.name).sort() }
-                        onChange={(event) => { //can put on other things after API push check 
-                            /*
-                            const selectedRoadmapNames = Array.from(event.target.selectedOptions, option => option.value);
 
-                            // Map selected names back to Roadmap objects from roadmaps.message
-                            const selectedRoadmaps = selectedRoadmapNames.map(name =>
-                                roadmaps?.message.find(roadmap => roadmap.name === name)
-                            ).filter(Boolean); // Filter out undefined/null
-
-                            // Update taskData.roadmaps
-                            // Assuming taskData is immutable and you need to update it with a new object
-                            const updatedTaskData = { ...taskData, roadmaps: selectedRoadmaps };
-
-                            // Call a function to update the state or perform further actions
-                            handleTaskDataChange(updatedTaskData);
-                            */
-
-
-                            const selectedOptions = Array.from(event.target.selectedOptions).map(option => option.value);
-
-                            // Map selected option names back to Roadmap objects from roadmaps
-                            const updatedSelectedRoadmaps = roadmaps?.message.sort((a, b) => a.name.localeCompare(b.name)).filter(roadmap => selectedOptions.includes(roadmap.name));
-                            setSelectedRoadmaps(updatedSelectedRoadmaps);
-
-                        }
-                        }
-
-                        onBlur={(event) => { //can put on other things after API push check 
-                                console.log(event.target.value)
-                                handleInputBlur(event)
-                            }
-                        } 
-                           >
-                        {roadmaps?.message.map((option, index) => (
-                            <option key={index} value={option.name}>
-                                {option.name}
-                            </option>
-                        ))}
-                      </select>
-                    <hr/>
 
                     <label htmlFor="assignees">Assignee:</label>
                     <select
                         id="assignee"
-                        value={taskData.assignee.name}
-                        onChange={(event) => { //can put on other things after API push check 
-                                if (event.target.value !== taskData.assignee.name) {
-                                    console.log(event.target.value)
-                                    handleInputBlur(event)
-                                }
-                            }
-                        }
+                        value={taskData?.assignee.name}
+                        onChange={handleInputChange}
                     >
                         {assignees?.message.map((option, index) => (
                             <option key={index} value={option.name}>
-                                {option.name} 
+                                {option.name}
                             </option>
                         ))}
                     </select>
                     <hr />
 
+
                     <label htmlFor="start date">Start Date: </label>
-                     <input
+                    <input
                         id="startDate"
                         type="date"
-                        value={formatDateNumericalYYYYMMDDWithDashes(new Date(taskData.startDate))} // Bind the selectedDate state to input value
-        
-                        aria-label="Start Date"
-                        onChange={(event) => { //can put on other things after API push check
-
-                            const newStartDate = event.target.value; // Get the new value from the input
-                            taskData.startDate = new Date(event.target.value)
-                            if (sidebarData?.type === 'Task') {
-                                // Assuming setData is your state update function for sidebarData
-                                setData(prevState => {
-                                    if (prevState && prevState.type === 'Task') {
-                                        // Cast prevState to Task to access and modify its properties safely
-                                        const prevTask = prevState as Task;
-                                        return {
-                                            ...prevTask, // Spread the previous state
-                                            startDate: newStartDate // Update the startDate
-                                        };
-                                    }
-                                    return prevState; // Return previous state if type is not 'Task'
-                                });
-                            }
-                      
-                            let startDateString = formatDateNumericalYYYYMMDDWithDashes(new Date(taskData.startDate));
-                            if (event.target.value !== startDateString) {
-                                //check if it's after end date
-                                console.log(event.target.value + " != " + startDateString)
-                                handleInputBlur(event)
-                            }
-                        }
-                        } 
+                        value={formatDateNumericalYYYYMMDDWithDashes(new Date(taskData?.startDate))}
+                        onChange={handleInputChange}
+                        onBlur={handleInputBlur}
                     />
                     <hr />
+
+
                     <label htmlFor="end date">End Date: </label>
                     <input
                         id="endDate"
                         type="date"
-                        value={formatDateNumericalYYYYMMDDWithDashes(new Date(taskData.endDate))} // Bind the selectedDate state to input value
-
-                        aria-label="End Date"
-                        onChange={(event) => { //can put on other things after API push check
-
-                            const newEndDate = event.target.value; // Get the new value from the input
-                            taskData.endDate = new Date(event.target.value)
-                            if (sidebarData?.type === 'Task') {
-                                // Assuming setData is your state update function for sidebarData
-                                setData(prevState => {
-                                    if (prevState && prevState.type === 'Task') {
-                                        // Cast prevState to Task to access and modify its properties safely
-                                        const prevTask = prevState as Task;
-                                        return {
-                                            ...prevTask, // Spread the previous state
-                                            endDate: newEndDate // Update the startDate
-                                        };
-                                    }
-                                    return prevState; // Return previous state if type is not 'Task'
-                                });
-                            }
-
-                            let endDateString = formatDateNumericalYYYYMMDDWithDashes(new Date(taskData.endDate));
-                            if (event.target.value !== endDateString) {
-                                //check if it's after end date
-                                console.log(event.target.value + " != " + endDateString)
-                                handleInputBlur(event)
-                            }
-                        }
-                        } 
+                        value={formatDateNumericalYYYYMMDDWithDashes(new Date(taskData?.endDate))}
+                        onChange={handleInputChange}
+                        onBlur={handleInputBlur}
                     />
                     <hr />
-                    <p>Duration: {taskData.duration} </p>
 
-
+                    <p>Duration: {taskData?.duration === 1 ? taskData?.duration + " day" : taskData?.duration + " days"} </p>
                     <hr />
 
-                    <label htmlFor="task status">Task Status:</label>
+                    <label htmlFor="taskStatus">Task Status:</label>
                     <select
                         id="taskStatus"
-                        value={taskData.taskStatus.name}
-                        onChange={(event) => { //can put on other things after API push check 
-                         
-                            if (event.target.value !== taskData.taskStatus.name) {
-                                handleInputBlur(event)
-                            }
-                        }
-                        } 
+                        value={taskData?.taskStatus.name}
+                        onChange={handleInputChange}
+                        onBlur={handleInputBlur}
                     >
                         {taskStatuses?.message.map((option, index) => (
                             <option key={index} value={option.name}>
@@ -391,96 +341,59 @@ export const Sidebar = ({
                         ))}
                     </select>
 
-                    <p>ID: {taskData.id} </p>
-                    <hr/>
+                    <hr />
+
+                    <p>ID: {data?.id} </p>
+                    <hr />
+
                 </div>
             );
             break;
+
         case "Milestone":
 
-            const milestoneData = sidebarData as Milestone; 
+            const milestoneData = data as Milestone;
             sidebarContent = (
                 <div>
                     <div className='font-bold text-center'>MILESTONE DETAILS</div>
+                    <br />
                     <label htmlFor="name">Name:</label>
                     <input
                         id="name"
                         type='text'
-                        value={name}
-                        onChange={handleNameChange}
-                        onBlur={(event) => { //can put on other things after API push check 
-                            if (event.target.value !== milestoneData.name) {
-                                console.log(event.target.value)
-                                handleInputBlur(event)
-                            }
-                        }
-                        }
+                        value={data?.name || ''}
+                        onChange={handleInputChange}
 
+                        onBlur={handleInputBlur}
                     />
                     <hr />
 
                     <label htmlFor="description">Description:</label>
                     <textarea
                         id="description"
-                        value={description}
-                        onChange={handleDescriptionChange}
-                        onBlur={(event) => { //can put on other things after API push check 
-                            if (event.target.value !== milestoneData.description) {
-                                console.log(event.target.value)
-                                handleInputBlur(event)
-                            }
-                        }
-                        }
+                        value={data?.description || ''}
+                        onChange={handleInputChange}
+
+                        onBlur={handleInputBlur}
                     />
                     <hr />
+
                     <label htmlFor="date">Date: </label>
                     <input
                         id="date"
                         type="date"
-                        value={formatDateNumericalYYYYMMDDWithDashes(new Date(milestoneData.date))} // Bind the selectedDate state to input value
-
-                        aria-label="Date"
-                        onChange={(event) => { //can put on other things after API push check
-
-                            const newDate = event.target.value; // Get the new value from the input
-                            milestoneData.date= new Date(event.target.value)
-                            if (sidebarData?.type === 'Task') {
-                                // Assuming setData is your state update function for sidebarData
-                                setData(prevState => {
-                                    if (prevState && prevState.type === 'Task') {
-                                        // Cast prevState to Task to access and modify its properties safely
-                                        const prevTask = prevState as Task;
-                                        return {
-                                            ...prevTask, // Spread the previous state
-                                            date: newDate // Update the startDate
-                                        };
-                                    }
-                                    return prevState; // Return previous state if type is not 'Task'
-                                });
-                            }
-
-                            let dateString = formatDateNumericalYYYYMMDDWithDashes(new Date(milestoneData.date));
-                            if (event.target.value !== dateString) {
-                                //check if it's after end date
-                                console.log(event.target.value + " != " + dateString)
-                                handleInputBlur(event)
-                            }
-                        }
-                        } />
+                        value={formatDateNumericalYYYYMMDDWithDashes(new Date(milestoneData?.date))}
+                        onChange={handleInputChange}
+                        onBlur={handleInputBlur}
+                    />
                     <hr />
 
-
-                    <label htmlFor="task status">Task Status:</label>
+                    <label htmlFor="taskStatus">Task Status:</label>
                     <select
                         id="taskStatus"
-                        value={milestoneData.taskStatus.name}
-                        onChange={(event) => { //can put on other things after API push check 
-
-                            if (event.target.value !== taskData.taskStatus.name) {
-                                handleInputBlur(event)
-                            }
-                        }
-                        }
+                        value={milestoneData?.taskStatus.name}
+                        onChange={handleInputChange}
+                        onBlur={handleInputBlur}
                     >
                         {taskStatuses?.message.map((option, index) => (
                             <option key={index} value={option.name}>
@@ -488,89 +401,73 @@ export const Sidebar = ({
                             </option>
                         ))}
                     </select>
+
                         <hr/>
-                          <p>ID: {milestoneData.id} </p>
+                          <p>ID: {data?.id} </p>
                         <hr />
                 </div>
             );
 
             break;
         case "Tag":
-            const tagData = sidebarData as Tag; 
+            //const tagData = sidebarData as Tag; 
             sidebarContent = (
                 <div>
                     <div className='font-bold text-center'>TAG DETAILS</div>
+                    <br />
                     <label htmlFor="name">Name:</label>
                     <input
                         id="name"
                         type='text'
-                        value={name}
-                        onChange={handleNameChange}
-                        onBlur={(event) => { //can put on other things after API push check 
-                            if (event.target.value !== tagData.name) {
-                                console.log(event.target.value)
-                                handleInputBlur(event)
-                            }
-                        }
-                        }
+                        value={data?.name || ''}
+                        onChange={handleInputChange}
 
+                        onBlur={handleInputBlur}
                     />
                     <hr />
+
                     <label htmlFor="description">Description:</label>
                     <textarea
                         id="description"
-                        value={description}
-                        onChange={handleDescriptionChange}
-                        onBlur={(event) => { //can put on other things after API push check 
-                            if (event.target.value !== tagData.description) {
-                                console.log(event.target.value)
-                                handleInputBlur(event)
-                            }
-                        }
-                        }
-                        ></textarea>
+                        value={data?.description || ''}
+                        onChange={handleInputChange}
+
+                        onBlur={handleInputBlur}
+                    />
                     <hr />
-                    <p>ID: {tagData.id} </p>
+
                 </div>
             );
 
             break;
         case "Assignee":
-            const assigneeData = sidebarData as Assignee;
-            sidebarContent = (
-                <div>
-                    <div className='font-bold text-center'>ASSIGNEE DETAILS</div>
-                    <label htmlFor="name">Name:</label>
-                    <input
-                        id="name"
-                        type='text'
-                        value={name}
-                        onChange={handleNameChange}
-                        onBlur={(event) => { //can put on other things after API push check 
-                            if (event.target.value !== assigneeData.name) {
-                                console.log(event.target.value)
-                                handleInputBlur(event)
-                            }
-                        }
-                        }
+            //const assigneeData = sidebarData as Assignee;
+           sidebarContent = (
+               <div>
+                   <div className='font-bold text-center'>TASK DETAILS</div>
+                   <br />
+                   <label htmlFor="name">Name:</label>
+                   <input
+                       id="name"
+                       type='text'
+                       value={data?.name || ''}
+                       onChange={handleInputChange}
 
-                    />
-                    <hr />
-                    <textarea
-                        id="description"
-                        value={description}
-                        onChange={handleDescriptionChange}
-                        onBlur={(event) => { //can put on other things after API push check 
-                            if (event.target.value !== assigneeData.description) {
-                                console.log(event.target.value)
-                                handleInputBlur(event)
-                            }
-                        }
-                        }
-                    ></textarea>
-                    <hr />
-                    <p>ID: {assigneeData.id} </p>
-                </div>
+                       onBlur={handleInputBlur}
+                   />
+                   <hr />
+
+                   <label htmlFor="description">Description:</label>
+                   <textarea
+                       id="description"
+                       value={data?.description || ''}
+                       onChange={handleInputChange}
+
+                       onBlur={handleInputBlur}
+                   />
+                   <hr />
+
+               </div>
             );
 
             break;

@@ -21,7 +21,7 @@ export const TableView = ({
    // const [tagData, setTagData] = useState<{ message: Tag[] } | null>(null);
     //const [assigneeData, setAssigneeData] = useState<{ message: Assignee[] } | null>(null);
 
-    const [tableDataType, setTableDataType] = React.useState("tasks")
+    const [tableDataType, setTableDataType] = React.useState("Task") //replace with something created in Interface
 
     //let fetchURL = "/api/" + tableDataType + "/";
     let content: any = <div>hi</div>;
@@ -95,7 +95,7 @@ export const TableView = ({
     let headers: string[];
 
     switch (tableDataType) {
-        case "tasks":
+        case "Task":
 
             /*if (!taskData || !taskData.message || taskData.message.length === 0) {
                 return <p>No tasks found.</p>;
@@ -142,7 +142,7 @@ export const TableView = ({
                 </tr >
             ));
             break;
-        case "milestones":
+        case "Milestone":
 /*
             if (!milestoneData || !milestoneData.message || milestoneData.message.length === 0) {
                 return <p>No milestones found.</p>;
@@ -172,7 +172,7 @@ export const TableView = ({
                     </tr >
                 ));
             break;
-        case "tags":
+        case "Tag":
            /* if (!tagData || !tagData.message || tagData.message.length === 0) {
                 return <p>No tags found.</p>;
             }
@@ -195,7 +195,7 @@ export const TableView = ({
                     </tr >
                 ));
             break;
-        case "assignees":
+        case "Assignee":
           /*  if (!assigneeData || !assigneeData.message || assigneeData.message.length === 0) {
                 return <p>No assignees found.</p>;
             }*/
@@ -294,10 +294,10 @@ export const TableView = ({
             <br />
             <p className='flex justify-center text-3xl text-white'>TABLE VIEW</p>
             <div className='flex gap-4 justify-center'>
-                <button className={`rounded border border-cyan-200 p-2 ${tableDataType === "tasks" ? "bg-cyan-800" : "bg-cyan-400"}`} onClick={() => setTableDataType("tasks")}>Task</button>
-                <button className={`rounded border border-cyan-200 p-2 ${tableDataType === "milestones" ? "bg-cyan-800" : "bg-cyan-400"}`} onClick={() => setTableDataType("milestones")}>Milestone</button>
-                <button className={`rounded border border-cyan-200 p-2 ${tableDataType === "tags" ? "bg-cyan-800" : "bg-cyan-400"}`} onClick={() => setTableDataType("tags")}>Tag</button>
-                <button className={`rounded border border-cyan-200 p-2 ${tableDataType === "assignees" ? "bg-cyan-800" : "bg-cyan-400"}`} onClick={() => setTableDataType("assignees")}>Assignee</button>
+                <button className={`rounded border border-cyan-200 p-2 ${tableDataType === "tasks" ? "bg-cyan-800" : "bg-cyan-400"}`} onClick={() => setTableDataType("Task")}>Task</button>
+                <button className={`rounded border border-cyan-200 p-2 ${tableDataType === "milestones" ? "bg-cyan-800" : "bg-cyan-400"}`} onClick={() => setTableDataType("Milestone")}>Milestone</button>
+                <button className={`rounded border border-cyan-200 p-2 ${tableDataType === "tags" ? "bg-cyan-800" : "bg-cyan-400"}`} onClick={() => setTableDataType("Tag")}>Tag</button>
+                <button className={`rounded border border-cyan-200 p-2 ${tableDataType === "assignees" ? "bg-cyan-800" : "bg-cyan-400"}`} onClick={() => setTableDataType("Assignee")}>Assignee</button>
            </div>
   
             <br />
