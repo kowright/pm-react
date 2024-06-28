@@ -437,18 +437,36 @@ export const Sidebar = ({
                     <input
                         id="date"
                         type="date"
-                        defaultValue={formatDateNumericalYYYYMMDDWithDashes(new Date(milestoneData.date))} // Bind the selectedDate state to input value
-                        //onChange={handleStartDateChange} // Handle date change
-                        aria-label="date"
-                        onChange={(event) => { //can put on other things after API push check 
+                        value={formatDateNumericalYYYYMMDDWithDashes(new Date(milestoneData.date))} // Bind the selectedDate state to input value
+
+                        aria-label="Date"
+                        onChange={(event) => { //can put on other things after API push check
+
+                            const newDate = event.target.value; // Get the new value from the input
+                            milestoneData.date= new Date(event.target.value)
+                            if (sidebarData?.type === 'Task') {
+                                // Assuming setData is your state update function for sidebarData
+                                setData(prevState => {
+                                    if (prevState && prevState.type === 'Task') {
+                                        // Cast prevState to Task to access and modify its properties safely
+                                        const prevTask = prevState as Task;
+                                        return {
+                                            ...prevTask, // Spread the previous state
+                                            date: newDate // Update the startDate
+                                        };
+                                    }
+                                    return prevState; // Return previous state if type is not 'Task'
+                                });
+                            }
+
                             let dateString = formatDateNumericalYYYYMMDDWithDashes(new Date(milestoneData.date));
                             if (event.target.value !== dateString) {
                                 //check if it's after end date
+                                console.log(event.target.value + " != " + dateString)
                                 handleInputBlur(event)
                             }
                         }
-                        }
-                    />
+                        } />
                     <hr />
 
 
