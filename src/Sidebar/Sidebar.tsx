@@ -20,10 +20,12 @@ export const Sidebar = ({
 
     sidebarContent = <div>NAHHHHHHHHHHHHHHHHH</div>
 
-    //TASKS
+
     const [name, setName] = React.useState<string>(sidebarData?.name || '');
     const [description, setDescription] = React.useState(sidebarData?.description);
     const [selectedRoadmaps, setSelectedRoadmaps] = React.useState<Roadmap[]>();
+
+    const [data, setData] = React.useState< Task | Milestone | Tag | Assignee | null>(sidebarData)
 
     const [task, setTask] = React.useState(sidebarData)
     const [assignees, setAssignees] = React.useState<{ message: Assignee[] } | null>(null);
@@ -55,10 +57,10 @@ export const Sidebar = ({
         if (sidebarData) {
             setName(sidebarData.name || '');
             setDescription(sidebarData.description || '');
-            if (sidebarData?.type === 'Task') {
+            if (sidebarData?.type === 'Task' && 'roadmaps' in sidebarData) {
                 const taskData = sidebarData as Task;
-                setSelectedRoadmaps(taskData?.roadmaps); // Assuming Task has roadmaps property
-
+                const taskData1 = data as Task;
+                setSelectedRoadmaps(taskData.roadmaps); // Assumig Task has roadmaps property
             }
         }
     }, [sidebarData]); // Run whenever sidebarData changes
@@ -192,7 +194,8 @@ export const Sidebar = ({
     switch (sidebarData.type) {
         case "Task":
             const taskData = sidebarData as Task;
-
+            //const taskDataStartDate = (data as Task).startDate; 
+            //const taskData1 = data as Task;
             sidebarContent = (
                 <div>
                     <div className='font-bold text-center'>TASK DETAILS</div>
@@ -296,10 +299,28 @@ export const Sidebar = ({
                      <input
                         id="startDate"
                         type="date"
-                        defaultValue={formatDateNumericalYYYYMMDDWithDashes(new Date(taskData.startDate))} // Bind the selectedDate state to input value
-                        //onChange={handleStartDateChange} // Handle date change
+                        value={formatDateNumericalYYYYMMDDWithDashes(new Date(taskData.startDate))} // Bind the selectedDate state to input value
+        
                         aria-label="Start Date"
-                        onChange={(event) => { //can put on other things after API push check 
+                        onChange={(event) => { //can put on other things after API push check
+
+                            const newStartDate = event.target.value; // Get the new value from the input
+                            taskData.startDate = new Date(event.target.value)
+                            if (sidebarData?.type === 'Task') {
+                                // Assuming setData is your state update function for sidebarData
+                                setData(prevState => {
+                                    if (prevState && prevState.type === 'Task') {
+                                        // Cast prevState to Task to access and modify its properties safely
+                                        const prevTask = prevState as Task;
+                                        return {
+                                            ...prevTask, // Spread the previous state
+                                            startDate: newStartDate // Update the startDate
+                                        };
+                                    }
+                                    return prevState; // Return previous state if type is not 'Task'
+                                });
+                            }
+                      
                             let startDateString = formatDateNumericalYYYYMMDDWithDashes(new Date(taskData.startDate));
                             if (event.target.value !== startDateString) {
                                 //check if it's after end date
