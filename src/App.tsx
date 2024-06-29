@@ -10,7 +10,7 @@ import { Task, Roadmap, TaskStatus, Milestone, Tag, Assignee, UnitData } from '.
 import { FilterArea } from './FilterArea/FilterArea';
 
 function App() {
-    const [view, setView] = useState<string>('Table'); 
+    const [view, setView] = useState<string>('Timeline'); 
     const [selectedItem, setSelectedItem] = useState<Task | Milestone | Tag | Assignee | null>(null); 
 
     React.useEffect(() => {
@@ -72,7 +72,7 @@ function App() {
     };
 
     const handleTaskClick = (item: Task | Milestone | Tag | Assignee) => {
-        console.log("Selected Task: ", item.name);
+       // console.log("Selected Task: ", item.name);
         setSelectedItem(item);
     };
     // #endregion

@@ -12,11 +12,11 @@ interface TimelineProps {
 export const Timeline = ({
     ...props
 }: TimelineProps) => {
-    const day = 40; // Size of cell in pixels
+    const day = 20; // Size of cell in pixels
 
     // Example of using the taskClick function
     const handleClick = (task: Task | Milestone) => {
-        console.log("Inside Timeline component - before invoking taskClick function " + task.name);
+       // console.log("Inside Timeline component - before invoking taskClick function " + task.name);
         props.taskClick(task); // Invoke the function with some example task data
     };
 
@@ -27,6 +27,11 @@ export const Timeline = ({
     const [selectedStartDate, setSelectedStartDate] = React.useState('2024-06-01');
     const [selectedEndDate, setSelectedEndDate] = React.useState('2024-09-01');
 
+    const [draggedTask, setDraggedTask] = React.useState<Task | null>(null);
+
+    const scrollContainerRef = React.useRef<HTMLDivElement>(null);
+    const [draggedDiv, setDraggedDiv] = React.useState<HTMLDivElement | null>(null);
+    const [startDragPoint, setStartDragPoint] = React.useState<number>(0)
 
     const handleFilterByRoadmap = (roadmap: Roadmap) => {
         setSelectedRoadmap(roadmap);
@@ -113,6 +118,180 @@ export const Timeline = ({
     };
     // #endregion
 
+    function getDefaultNumberInRange(lowerNumber: number, upperNumber: number, numberToCheck: number) {
+        // Calculate the midpoint of the range
+        const midpoint = (upperNumber + lowerNumber) / 2;
+        const offset = day * 4;
+
+        // Check if the number is in the lower half or upper half
+        if (numberToCheck < midpoint) {
+            console.log('go down')
+            return lowerNumber - offset; // Default to lowerNumber if in the lower half
+        } else {
+            console.log("go up")
+            return lowerNumber + offset; // Default to upperNumber if in the upper half
+        }
+    }
+
+    const handleMouseDown = (task: Task, event: React.MouseEvent<HTMLDivElement>) => {
+        event.preventDefault();
+        setDraggedTask(task);
+        setDraggedDiv(event.currentTarget);
+
+        const scrollContainer = scrollContainerRef.current;
+        const mouseX = event.clientX;
+        if (scrollContainer) {
+            const rect = scrollContainer.getBoundingClientRect();
+            const containerLeft = rect.left;
+
+            // Calculate mouse position relative to the scroll container
+            const mouseInsideContainer = mouseX - containerLeft + scrollContainer.scrollLeft;
+            setStartDragPoint(mouseInsideContainer)
+        }
+        //console.log("set task")
+
+        //function for thirds
+/*        function getDefaultNumberInRange(lowerNumber: number, upperNumber:number, numberToCheck:number) {
+            // Calculate the midpoint of the range
+            const midpoint = (upperNumber + lowerNumber) / 2;
+
+            // Calculate offsets for thirds
+            const third = (upperNumber - lowerNumber) / 3;
+            const offset = day * 4;
+            // Check which third the numberToCheck falls into
+            if (numberToCheck < midpoint - third) {
+                console.log('Go down'); // Lower third
+                return lowerNumber - offset; // Return lowerNumber minus an offset
+            } else if (numberToCheck > midpoint + third) {
+                console.log('Go up'); // Upper third
+                return lowerNumber + offset; // Return upperNumber plus an offset
+            } else {
+                console.log('Stay in middle'); // Middle third
+                return lowerNumber; // Return lowerNumber for the middle third
+            }
+        }*/
+        //works for click moves
+/*
+        function getDefaultNumberInRange(lowerNumber: number, upperNumber: number, numberToCheck: number) {
+            // Calculate the midpoint of the range
+            const midpoint = (upperNumber + lowerNumber) / 2;
+            const offset = day * 4;
+
+            // Check if the number is in the lower half or upper half
+            if (numberToCheck < midpoint) {
+                console.log('go down')
+                return lowerNumber - offset; // Default to lowerNumber if in the lower half
+            } else {
+                console.log("go up")
+                return lowerNumber + offset ; // Default to upperNumber if in the upper half
+            }
+        }
+
+
+        // Access the HTML element and print its left position relative to its offset parent
+        const element = event.currentTarget;
+        const elementCurrentLeft = element.offsetLeft
+        let lengthRange = Math.round((endDate.getTime() - new Date(task.endDate).getTime()) / (1000 * 3600 * 24));
+        let width = lengthRange < 0 ? day * (task.duration + lengthRange + 1) * 4 : day * task.duration * 4;
+        const elementCurrentRight = elementCurrentLeft + width;
+        //console.log("width " + width);
+        //console.log('Div element left position:', element.offsetLeft);
+
+
+        const mouseX = event.clientX;
+        // Get the scroll container element
+        const scrollContainer = scrollContainerRef.current;
+
+        if (scrollContainer) {
+            const rect = scrollContainer.getBoundingClientRect();
+            const containerLeft = rect.left;
+
+            // Calculate mouse position relative to the scroll container
+            const mouseInsideContainer = mouseX - containerLeft + scrollContainer.scrollLeft;
+
+            //console.log('Mouse position inside scroll container:', mouseInsideContainer);
+
+            const newLeft = getDefaultNumberInRange(elementCurrentLeft, elementCurrentRight, mouseInsideContainer);
+            console.log("new left " + newLeft)
+
+            element.style.left = `${newLeft}px`; // Update 'left' position
+
+
+
+        }*/
+
+        attachMouseMoveListener();
+
+    };
+
+    React.useEffect(() => {
+        console.log('Component mounted.'); // Check if this log is triggered on component mount
+
+        // Cleanup function to remove event listener when component unmounts
+        return () => {
+            console.log('Component unmounted.'); // Check if this log is triggered on component unmount
+            document.removeEventListener('mousemove', handleMouseMove);
+        };
+    }, []); // Empty dependency array ensures this effect runs only once on mount
+
+
+    // Function to handle mouseup event
+    const handleMouseUp = () => {
+        console.log("mouse up")
+        document.removeEventListener('mousemove', handleMouseMove, true);
+
+    };
+
+
+    const attachMouseMoveListener = () => {
+        document.addEventListener('mousemove', handleMouseMove);
+        document.addEventListener('mouseup', function () {
+            document.removeEventListener('mousemove', handleMouseMove);
+            document.onmouseup = null;
+        })
+    };
+
+
+
+    const handleMouseMove = (event: MouseEvent) => {
+        const mouseX = event.clientX;
+        // Get the scroll container element
+        const scrollContainer = scrollContainerRef.current;
+
+        if (!draggedTask) return;
+        const element = draggedDiv; // Type assertion to HTMLDivElement
+
+        if (!element) {
+            return;
+        }
+
+        const elementCurrentLeft = element.offsetLeft;
+        let endDate = new Date(draggedTask.endDate); // Assuming draggedTask.endDate is of type Date or string
+        let lengthRange = Math.round((endDate.getTime() - new Date(draggedTask.endDate).getTime()) / (1000 * 3600 * 24));
+        let width = lengthRange < 0 ? day * (draggedTask.duration + lengthRange + 1) * 4 : day * draggedTask.duration * 4;
+        const elementCurrentRight = elementCurrentLeft + width;
+
+        console.log('Div element left position:', element.offsetLeft);
+
+        if (scrollContainer) {
+            const rect = scrollContainer.getBoundingClientRect();
+            const containerLeft = rect.left;
+
+            // Calculate mouse position relative to the scroll container
+            const mouseInsideContainer = mouseX - containerLeft + scrollContainer.scrollLeft;
+
+            console.log('Mouse position inside scroll container:', mouseInsideContainer);
+
+            const modulo = mouseInsideContainer % (day * 4);
+            const leftNum = mouseInsideContainer - modulo;
+            console.log("left px " + leftNum)
+            
+            element.style.left = `${leftNum}px`; // Update 'left' position
+        }
+    }
+
+    
+
     // #region Tasks
     let filteredTasks = props.roadmap
         ? props.taskData.filter((task) => {
@@ -148,7 +327,7 @@ export const Timeline = ({
         };
 
         return (
-            <div key={task.id} style={containerStyles} onClick={() => handleClick(task)}>
+            <div key={task.id} style={containerStyles} onClick={() => handleClick(task)} onMouseDown={(event => handleMouseDown(task, event))} onMouseUp={() => handleMouseUp() }> 
                 <p className="text-white text-center">{task.name}</p>
             </div>
         );
@@ -230,7 +409,7 @@ export const Timeline = ({
               
             </div>
 
-            <div className='7h-full bg-purple-100 overflow-x-auto relative shrink-0 flex' style={{ width: '2000px' }}>
+            <div className='7h-full bg-purple-100 overflow-x-auto relative shrink-0 flex' ref={scrollContainerRef} style={{ width: '2000px' }}>
                 {milestones}
                 {tasks}
                 <table className="border-collapse border border-gray-800 shrink-0 z-0">
