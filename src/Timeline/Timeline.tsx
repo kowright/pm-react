@@ -320,15 +320,17 @@ export const Timeline = ({
             top: top,
             width: width,
             height: `${day * 4}px`,
-            backgroundColor: 'gray',
             borderRadius: '0.5rem',
             boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
             zIndex: 20
         };
 
         return (
-            <div key={task.id} style={containerStyles} onClick={() => handleClick(task)} onMouseDown={(event => handleMouseDown(task, event))} onMouseUp={() => handleMouseUp() }> 
-                <p className="text-white text-center">{task.name}</p>
+            <div key={task.id} style={containerStyles}
+                className={`relative ${draggedTask?.id === task.id ? 'bg-lime-800' : 'bg-gray-400'}`}
+
+                onClick={() => handleClick(task)} onMouseDown={(event => handleMouseDown(task, event))} onMouseUp={() => handleMouseUp()}> 
+                <p className={`text-white text-center`}>{task.name}</p>
             </div>
         );
     });
