@@ -283,6 +283,16 @@ export const Timeline = ({
         document.removeEventListener('mousemove', handleMouseMove);
         document.removeEventListener('mouseup', handleMouseUp);
         setDragId(-1);
+
+        if (draggedDiv) {
+            const daysAfterStart = (draggedDiv.offsetLeft / (day * 4)) + 1; //+1 for date not coming out right
+            const editedStartDate = new Date(startDate);
+            editedStartDate.setDate(startDate.getDate() + daysAfterStart);
+            console.log("NEW DATE: " + formatDateNumericalMMDD(editedStartDate))
+        }
+        else {
+            console.log("dragged div null")
+        }
         //setDraggedTask(null);
     };
 
@@ -290,7 +300,10 @@ export const Timeline = ({
         const mouseX = event.clientX;
         const scrollContainer = scrollContainerRef.current;
 
-        if (!draggedDiv || !scrollContainer) return;
+        if (!draggedDiv || !scrollContainer) {
+            console.log("dragged div empty")
+            return;
+        }
 
         const element = draggedDiv as HTMLDivElement;
 
@@ -315,11 +328,15 @@ export const Timeline = ({
                 document.removeEventListener('mouseup', handleMouseUp);
             };
         }
-    }, [draggedTask, draggedDiv]);
+        else {
+            console.log("dragged task is empty")
+        }
+    }, [draggedTask, draggedDiv, handleMouseMove, handleMouseUp]);
 
     const handleMouseDown = (task: Task, event: React.MouseEvent<HTMLDivElement>) => {
         event.preventDefault();
         setDraggedTask(task);
+        console.log("dragged task " + task.name)
         setDraggedDiv(event.currentTarget);
         setDragId(task.id);
     };
