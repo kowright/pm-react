@@ -294,10 +294,10 @@ export const TableView = ({
             <br />
             <p className='flex justify-center text-3xl text-white'>TABLE VIEW</p>
             <div className='flex gap-4 justify-center'>
-                <button className={`rounded border border-cyan-200 p-2 ${tableDataType === "tasks" ? "bg-cyan-800" : "bg-cyan-400"}`} onClick={() => setTableDataType("Task")}>Task</button>
-                <button className={`rounded border border-cyan-200 p-2 ${tableDataType === "milestones" ? "bg-cyan-800" : "bg-cyan-400"}`} onClick={() => setTableDataType("Milestone")}>Milestone</button>
-                <button className={`rounded border border-cyan-200 p-2 ${tableDataType === "tags" ? "bg-cyan-800" : "bg-cyan-400"}`} onClick={() => setTableDataType("Tag")}>Tag</button>
-                <button className={`rounded border border-cyan-200 p-2 ${tableDataType === "assignees" ? "bg-cyan-800" : "bg-cyan-400"}`} onClick={() => setTableDataType("Assignee")}>Assignee</button>
+                <button className={`rounded border border-cyan-200 p-2 ${tableDataType === "Task" ? "bg-cyan-800" : "bg-cyan-400"}`} onClick={() => setTableDataType("Task")}>Task</button>
+                <button className={`rounded border border-cyan-200 p-2 ${tableDataType === "Milestone" ? "bg-cyan-800" : "bg-cyan-400"}`} onClick={() => setTableDataType("Milestone")}>Milestone</button>
+                <button className={`rounded border border-cyan-200 p-2 ${tableDataType === "Tag" ? "bg-cyan-800" : "bg-cyan-400"}`} onClick={() => setTableDataType("Tag")}>Tag</button>
+                <button className={`rounded border border-cyan-200 p-2 ${tableDataType === "Assignee" ? "bg-cyan-800" : "bg-cyan-400"}`} onClick={() => setTableDataType("Assignee")}>Assignee</button>
            </div>
   
             <br />
