@@ -34,10 +34,10 @@ export const FilterArea = ({
     };
 
     let roadmapButtons = roadmapData.message.map(roadmap =>
-        <button className={`rounded border border-cyan-200 p-2 ${props.selectedRoadmap?.name === roadmap.name ? "bg-cyan-800" : "bg-cyan-400"}`} onClick={() => props.handleFilterByRoadmap(roadmap)}>{roadmap.name}</button>
+        <button key={roadmap.id} className={`rounded border border-cyan-200 p-2 ${props.selectedRoadmap?.name === roadmap.name ? "bg-cyan-800" : "bg-cyan-400"}`} onClick={() => props.handleFilterByRoadmap(roadmap)}>{roadmap.name}</button>
     );
     let taskStatusButtons = taskStatusData?.message.map(status =>
-        <button className={`rounded border border-cyan-200 p-2 ${props.selectedTaskStatus?.name === status.name ? "bg-cyan-800" : "bg-cyan-400"}`} onClick={ () => props.handleFilterByTaskStatus(status) } >{status.name}</button>
+        <button key={status.id} className={`rounded border border-cyan-200 p-2 ${props.selectedTaskStatus?.name === status.name ? "bg-cyan-800" : "bg-cyan-400"}`} onClick={ () => props.handleFilterByTaskStatus(status) } >{status.name}</button>
 
     );
   

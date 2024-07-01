@@ -30,12 +30,13 @@ export const Timeline = ({
     const [selectedEndDate, setSelectedEndDate] = React.useState('2024-09-01');
 
     const [draggedTask, setDraggedTask] = React.useState<Task>(props.taskData[0]);
+    const [draggedMilestone, setDraggedMilestone] = React.useState<Milestone>(props.milestoneData[0]);
 
     const scrollContainerRef = React.useRef<HTMLDivElement>(null);
     const [draggedDiv, setDraggedDiv] = React.useState<HTMLDivElement | null>(null);
     const [startDragPoint, setStartDragPoint] = React.useState<number>(0)
     const [dragId, setDragId] = React.useState<number>(-1)
-
+    const [milestoneDragId, setMilestoneDragId] = React.useState<number>(-1);
     const handleFilterByRoadmap = (roadmap: Roadmap) => {
         setSelectedRoadmap(roadmap);
     };
@@ -308,35 +309,53 @@ export const Timeline = ({
         setDragId(-1);
 
         if (draggedDiv) {
-            const daysAfterStart = (draggedDiv.offsetLeft / (day * 4));
-            const editedStartDate = new Date(startDate);
-            editedStartDate.setDate(startDate.getDate() + daysAfterStart);
-            console.log("NEW DATE: " + formatDateNumericalMMDD(editedStartDate))
-  
-            console.log("draggedTask duration " + draggedTask?.duration)
-            // Calculate milliseconds to add
-            const millisecondsToAdd = draggedTask.duration * 24 * 60 * 60 * 1000;
 
-            // Calculate end date timestamp
-            const editedEndDateTimestamp = editedStartDate.getTime() + millisecondsToAdd;
+            if (dragId !== -1) {
+                const daysAfterStart = (draggedDiv.offsetLeft / (day * 4));
+                const editedStartDate = new Date(startDate);
+                editedStartDate.setDate(startDate.getDate() + daysAfterStart);
+                console.log("NEW DATE: " + formatDateNumericalMMDD(editedStartDate))
 
-            // Create new Date object from timestamp
-            const editedEndDate = new Date();
-            editedEndDate.setTime(editedEndDateTimestamp);
+                console.log("draggedTask duration " + draggedTask?.duration)
+                // Calculate milliseconds to add
+                const millisecondsToAdd = draggedTask.duration * 24 * 60 * 60 * 1000;
+
+                // Calculate end date timestamp
+                const editedEndDateTimestamp = editedStartDate.getTime() + millisecondsToAdd;
+
+                // Create new Date object from timestamp
+                const editedEndDate = new Date();
+                editedEndDate.setTime(editedEndDateTimestamp);
 
 
-            console.log("NEW DATE: " + formatDateNumericalMMDD(editedStartDate) + " - " + formatDateNumericalMMDD(editedEndDate));
+                console.log("NEW DATE: " + formatDateNumericalMMDD(editedStartDate) + " - " + formatDateNumericalMMDD(editedEndDate));
 
-           const updatedItem = {
-                ...(draggedTask as Task),
-                'startDate': editedStartDate,
-                'endDate' : editedEndDate,
+                const updatedItem = {
+                    ...(draggedTask as Task),
+                    'startDate': editedStartDate,
+                    'endDate': editedEndDate,
 
-            };
+                };
 
-            //console.log("updated item " + formatDateNumericalMMDD(updatedItem.startDate))
-                    
-            props.updateItem(updatedItem as Task);
+                //console.log("updated item " + formatDateNumericalMMDD(updatedItem.startDate))
+
+                props.updateItem(updatedItem as Task);
+            }
+            else {
+                const daysAfterStart = (draggedDiv.offsetLeft / (day * 4));
+                const editedStartDate = new Date(startDate);
+                editedStartDate.setDate(startDate.getDate() + daysAfterStart);
+                console.log("NEW DATE: " + formatDateNumericalMMDD(editedStartDate))
+
+                const updatedItem = {
+                    ...(draggedMilestone as Milestone),
+                    'date': editedStartDate,
+                };
+
+
+                props.updateItem(updatedItem as Milestone);
+            }
+       
 
         } 
 
@@ -346,12 +365,22 @@ export const Timeline = ({
 
     }, [handleMouseMove, draggedDiv, startDate, draggedTask, props.updateItem]);
 
-    const handleMouseDown = (task: Task, event: React.MouseEvent<HTMLDivElement>) => {
+    const handleMouseDown = (item: Task | Milestone, event: React.MouseEvent<HTMLDivElement>) => {
         event.preventDefault();
-        setDraggedTask(task);
-        console.log("dragged task " + task.name)
+
+        if (item.type === 'Task') {
+            setDraggedTask(item as Task);
+            setDragId(item.id);
+
+        }
+        if (item.type === 'Milestone') {
+            setDraggedMilestone(item as Milestone);
+            setMilestoneDragId(item.id);
+        }
+
+        //setDraggedTask(task);
+        //console.log("dragged task " + task.name)
         setDraggedDiv(event.currentTarget);
-        setDragId(task.id);
     };
 
 
@@ -366,8 +395,18 @@ export const Timeline = ({
                 document.removeEventListener('mouseup', handleMouseUp);
             };
         }
+        if (draggedMilestone) {
+
+            document.addEventListener('mousemove', handleMouseMove);
+            document.addEventListener('mouseup', handleMouseUp);
+
+            return () => {
+                document.removeEventListener('mousemove', handleMouseMove);
+                document.removeEventListener('mouseup', handleMouseUp);
+            };
+        }
         else {
-            console.log("dragged task is empty")
+            console.log("dragged item is empty")
         }
     }, [draggedTask, draggedDiv, handleMouseMove, handleMouseUp]);
 
@@ -446,7 +485,7 @@ export const Timeline = ({
         };
 
         return (
-            <div key={index} style={containerStyles} onClick={() => handleClick(milestone)}>
+            <div key={index} style={containerStyles} onClick={() => handleClick(milestone)} onMouseDown={(event => handleMouseDown(milestone, event))} onMouseUp={() => handleMouseUp()}>
                 <p className="text-white text-center">{milestone.name}</p>
             </div>
         );
