@@ -115,7 +115,7 @@ export const TableView = ({
                     return roadmaps.includes(props.roadmap!.name);
                 })
                 : filteredTasks;
-
+                console.log("task data ", props.taskData)
             headers = props.taskData.length > 0 ? Object.keys(props.taskData[0]) : [];
 
             tableFormat =

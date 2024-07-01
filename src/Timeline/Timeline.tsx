@@ -1,5 +1,5 @@
 import React from 'react';
-import { Milestone, Task, TaskStatus, Roadmap, formatDateNumericalMMDD, addDaysToDate } from '../Interfaces';
+import { Milestone, Task, TaskStatus, Roadmap, Tag, Assignee, formatDateNumericalMMDD, addDaysToDate } from '../Interfaces';
 
 interface TimelineProps {
     taskClick: (task: Task | Milestone) => void;
@@ -7,6 +7,8 @@ interface TimelineProps {
     taskStatus: TaskStatus | null;
     taskData: Task[];
     milestoneData: Milestone[];
+    updateItem: (task: Task | Milestone | Tag | Assignee) => void;
+
 }
 
 export const Timeline = ({
@@ -27,7 +29,7 @@ export const Timeline = ({
     const [selectedStartDate, setSelectedStartDate] = React.useState('2024-06-01');
     const [selectedEndDate, setSelectedEndDate] = React.useState('2024-09-01');
 
-    const [draggedTask, setDraggedTask] = React.useState<Task | null>(null);
+    const [draggedTask, setDraggedTask] = React.useState<Task>(props.taskData[0]);
 
     const scrollContainerRef = React.useRef<HTMLDivElement>(null);
     const [draggedDiv, setDraggedDiv] = React.useState<HTMLDivElement | null>(null);
@@ -86,8 +88,8 @@ export const Timeline = ({
     adjustedEndDate.setDate(endDate.getDate() + 1);
 
     for (let currentDate = adjustedStartDate; currentDate <= adjustedEndDate; currentDate.setDate(currentDate.getDate() + 1)) {
-        numberedDateElements.push(<th key={currentDate.toISOString()} style={tableHeaderStyle}>{formatDateNumericalMMDD(currentDate)}</th>);
-        dayOfWeekDateElements.push(<th key={currentDate.toISOString()} style={tableHeaderStyle}>{formatDayOfWeek(currentDate)}</th>);
+        numberedDateElements.push(<th key={currentDate.toISOString()} className='bg-purple-300' style={tableHeaderStyle}>{formatDateNumericalMMDD(currentDate)}</th>);
+        dayOfWeekDateElements.push(<th key={currentDate.toISOString()} className='bg-purple-300' style={tableHeaderStyle}>{formatDayOfWeek(currentDate)}</th>);
     }
 
     // Generating table rows
@@ -279,29 +281,12 @@ export const Timeline = ({
 
     */
 
-    const handleMouseUp = () => {
-        document.removeEventListener('mousemove', handleMouseMove);
-        document.removeEventListener('mouseup', handleMouseUp);
-        setDragId(-1);
-
-        if (draggedDiv) {
-            const daysAfterStart = (draggedDiv.offsetLeft / (day * 4)) + 1; //+1 for date not coming out right
-            const editedStartDate = new Date(startDate);
-            editedStartDate.setDate(startDate.getDate() + daysAfterStart);
-            console.log("NEW DATE: " + formatDateNumericalMMDD(editedStartDate))
-        }
-        else {
-            console.log("dragged div null")
-        }
-        //setDraggedTask(null);
-    };
-
-    const handleMouseMove = (event: MouseEvent) => {
+    const handleMouseMove = React.useCallback((event: MouseEvent) => {
         const mouseX = event.clientX;
         const scrollContainer = scrollContainerRef.current;
 
         if (!draggedDiv || !scrollContainer) {
-            console.log("dragged div empty")
+            //console.log("dragged div empty");
             return;
         }
 
@@ -315,7 +300,60 @@ export const Timeline = ({
         const leftNum = mouseInsideContainer - modulo;
 
         element.style.left = `${leftNum}px`;
+    }, [draggedDiv, day, scrollContainerRef]);
+
+    const handleMouseUp = React.useCallback(() => {
+        document.removeEventListener('mousemove', handleMouseMove);
+        document.removeEventListener('mouseup', handleMouseUp);
+        setDragId(-1);
+
+        if (draggedDiv) {
+            const daysAfterStart = (draggedDiv.offsetLeft / (day * 4));
+            const editedStartDate = new Date(startDate);
+            editedStartDate.setDate(startDate.getDate() + daysAfterStart);
+            console.log("NEW DATE: " + formatDateNumericalMMDD(editedStartDate))
+  
+            console.log("draggedTask duration " + draggedTask?.duration)
+            // Calculate milliseconds to add
+            const millisecondsToAdd = draggedTask.duration * 24 * 60 * 60 * 1000;
+
+            // Calculate end date timestamp
+            const editedEndDateTimestamp = editedStartDate.getTime() + millisecondsToAdd;
+
+            // Create new Date object from timestamp
+            const editedEndDate = new Date();
+            editedEndDate.setTime(editedEndDateTimestamp);
+
+
+            console.log("NEW DATE: " + formatDateNumericalMMDD(editedStartDate) + " - " + formatDateNumericalMMDD(editedEndDate));
+
+           const updatedItem = {
+                ...(draggedTask as Task),
+                'startDate': editedStartDate,
+                'endDate' : editedEndDate,
+
+            };
+
+            //console.log("updated item " + formatDateNumericalMMDD(updatedItem.startDate))
+                    
+            props.updateItem(updatedItem as Task);
+
+        } 
+
+        // Reset draggedTask and draggedDiv states
+
+        setDraggedDiv(null);
+
+    }, [handleMouseMove, draggedDiv, startDate, draggedTask, props.updateItem]);
+
+    const handleMouseDown = (task: Task, event: React.MouseEvent<HTMLDivElement>) => {
+        event.preventDefault();
+        setDraggedTask(task);
+        console.log("dragged task " + task.name)
+        setDraggedDiv(event.currentTarget);
+        setDragId(task.id);
     };
+
 
     React.useEffect(() => {
         if (draggedTask) {
@@ -333,13 +371,6 @@ export const Timeline = ({
         }
     }, [draggedTask, draggedDiv, handleMouseMove, handleMouseUp]);
 
-    const handleMouseDown = (task: Task, event: React.MouseEvent<HTMLDivElement>) => {
-        event.preventDefault();
-        setDraggedTask(task);
-        console.log("dragged task " + task.name)
-        setDraggedDiv(event.currentTarget);
-        setDragId(task.id);
-    };
 
     // #region Tasks
     let filteredTasks = props.roadmap

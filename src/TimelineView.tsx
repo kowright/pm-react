@@ -1,6 +1,6 @@
 import React from "react";
 import { Timeline } from './Timeline/Timeline';
-import { Task, Milestone, Roadmap, TaskStatus } from './Interfaces';
+import { Task, Milestone, Roadmap, TaskStatus, Tag, Assignee } from './Interfaces';
 
 export interface TimelineViewProps {
     taskClick: (task: Task | Milestone) => void;
@@ -8,6 +8,7 @@ export interface TimelineViewProps {
     taskStatus: TaskStatus | null;
     taskData: Task[];
     milestoneData: Milestone[];
+    updateItem: (task: Task | Milestone | Tag | Assignee) => void;
 }
 
 export const TimelineView = ({
@@ -19,7 +20,7 @@ export const TimelineView = ({
             <br />
             <p className='flex justify-center text-3xl text-white'>TIMELINE VIEW</p>
             <br />
-            <Timeline taskClick={props.taskClick} roadmap={props.roadmap} taskStatus={props.taskStatus} taskData={props.taskData} milestoneData={props.milestoneData} />
+            <Timeline taskClick={props.taskClick} roadmap={props.roadmap} taskStatus={props.taskStatus} taskData={props.taskData} milestoneData={props.milestoneData} updateItem={props.updateItem} />
         </div>
     );
 };

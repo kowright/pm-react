@@ -108,18 +108,22 @@ function App() {
             },
             body: JSON.stringify(updatedTask),
         })
-            .then(res => res.json())
-            .then(data => {
-                console.log(data.message)
-                console.log('Updated task:', data.task);
-                // Update local state with updated task
-                const updatedTasks:Task[] = tasks.map(task => (task.id === updatedTask.id ? data.task : task));
-                console.log("updated new task to ", updatedTasks[1])
-                setTasks(updatedTasks);
-            })
-            .catch(error => {
-                console.error('Error updating task:', error);
-            });
+        .then(res => res.json())
+        .then(data => {
+            console.log(data.message)
+            if (data.message === undefined) {
+                console.log("data returned from backend is null")
+                console.log("data error: ", data.error)
+            }
+            console.log('Updated task:', data.task);
+            // Update local state with updated task
+            const updatedTasks:Task[] = tasks.map(task => (task.id === updatedTask.id ? data.task : task));
+            console.log("updated new task to ", updatedTasks[1])
+            setTasks(updatedTasks);
+        })
+        .catch(error => {
+            console.error('Error updating task:', error);
+        });
     };
 
     const updateMilestone = (updatedMilestone: Milestone) => {
@@ -213,7 +217,7 @@ function App() {
                 <div className="flex justify-center">
 
                     <div>
-                        {view === 'Timeline' && <TimelineView taskClick={handleTaskClick} roadmap={selectedRoadmap} taskStatus={selectedTaskStatus} taskData={tasks} milestoneData={milestones} />}
+                        {view === 'Timeline' && <TimelineView taskClick={handleTaskClick} roadmap={selectedRoadmap} taskStatus={selectedTaskStatus} taskData={tasks} milestoneData={milestones} updateItem={updateItem} />}
                         {view === 'Table' && <TableView rowClick={handleTaskClick} taskData={tasks} milestoneData={milestones} tagData={tags} assigneeData={assignees} roadmap={selectedRoadmap} taskStatus={selectedTaskStatus} selectedItem={selectedItem} />}
                         {view === 'Kanban' && <KanbanView rowClick={handleTaskClick} taskData={tasks} roadmap={selectedRoadmap} taskStatus={selectedTaskStatus} />}
 
