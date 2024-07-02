@@ -10,7 +10,7 @@ import { Task, Roadmap, TaskStatus, Milestone, Tag, Assignee, UnitData } from '.
 import { FilterArea } from './FilterArea/FilterArea';
 
 function App() {
-    const [view, setView] = useState<string>('Timeline'); 
+    const [view, setView] = useState<string>('Table'); 
     const [selectedItem, setSelectedItem] = useState<Task | Milestone | Tag | Assignee | null>(null); 
 
     React.useEffect(() => {
@@ -114,11 +114,13 @@ function App() {
             if (data.message === undefined) {
                 console.log("data returned from backend is null")
                 console.log("data error: ", data.error)
+                return;
             }
             console.log('Updated task:', data.task);
             // Update local state with updated task
-            const updatedTasks:Task[] = tasks.map(task => (task.id === updatedTask.id ? data.task : task));
-            console.log("updated new task to ", updatedTasks[1])
+            const updatedTasks: Task[] = tasks.map(task => (task.id === updatedTask.id ? data.task : task));
+           setSelectedItem(data.task)
+            console.log("updated new task to ", updatedTasks.find(task => task.id === data.task.id));
             setTasks(updatedTasks);
         })
         .catch(error => {

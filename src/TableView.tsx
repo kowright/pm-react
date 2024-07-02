@@ -100,7 +100,10 @@ export const TableView = ({
             /*if (!taskData || !taskData.message || taskData.message.length === 0) {
                 return <p>No tasks found.</p>;
             }*/
-            
+            if (!props.taskData) {
+                return <p>No tasks found.</p>
+            }
+            console.log("props task data", props.taskData)
             if (props.roadmap) {
                 console.log("task " + props.roadmap.name)
             }
@@ -115,7 +118,8 @@ export const TableView = ({
                     return roadmaps.includes(props.roadmap!.name);
                 })
                 : filteredTasks;
-                console.log("task data ", props.taskData)
+            console.log("task data ", props.taskData);
+
             headers = props.taskData.length > 0 ? Object.keys(props.taskData[0]) : [];
 
             tableFormat =
@@ -147,6 +151,9 @@ export const TableView = ({
             if (!milestoneData || !milestoneData.message || milestoneData.message.length === 0) {
                 return <p>No milestones found.</p>;
             }*/
+            if (!props.selectedItem) {
+                return <p>No milestone found.</p>
+            }
 
             headers = props.milestoneData.length > 0 ? Object.keys(props.milestoneData[0]) : [];
 

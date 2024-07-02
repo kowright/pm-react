@@ -62,7 +62,7 @@ export const Sidebar = ({
 
         const editedValue = event.target.value;
         const propertyName = event.target.id; // Assuming id is the property name to update
-
+        console.log("property name handle input blur ", propertyName);
         if (!data) {
             return; 
         }
@@ -71,11 +71,33 @@ export const Sidebar = ({
 
         switch (data?.type) {
             case 'Task':
+                console.log("handle input blur task ", sidebarData)
+              //  const taskStatusToAssign = taskStatuses && taskStatuses.length > 0 ? taskStatuses[0] : undefined;
+                let taskStatusToAssign;
+
+                if (propertyName === 'taskStatus') {
+                    taskStatusToAssign = taskStatuses?.message.find(status => editedValue === status.name);
+                } else {
+                    taskStatusToAssign = taskStatuses?.message[0];
+                }
+
+                const selectElement = event.target as HTMLSelectElement;
+                const selectedOptions = selectElement.selectedOptions;
+                const selectedRoadmapNames = selectedOptions ? Array.from(selectedOptions).map(option => option.value) : [];
+
+
+                const selectedRoadmaps = roadmaps?.message.filter(roadmap => selectedRoadmapNames.includes(roadmap.name));
+
                 updatedItem = {
                     ...(sidebarData as Task),
                     [propertyName]: propertyName === 'startDate' || propertyName === 'endDate'
-                        ? new Date(editedValue) : editedValue
+                        ? new Date(editedValue) : editedValue,
+                    taskStatus: taskStatusToAssign,
+                    roadmaps: selectedRoadmaps || roadmaps?.message
+
                 };
+               
+                console.log("updated item in sidebar",updatedItem)
                 break;
             case 'Milestone':
                 updatedItem = {
@@ -244,7 +266,23 @@ export const Sidebar = ({
                     ...(prevData as Task | Milestone | Tag | Assignee),
                     assignee: selectedAssignee
                 }));
+                console.log("handle input change assignee", data)
             }
+        }
+        else if (id === 'roadmap') {
+            const selectElement = event.target as HTMLSelectElement;
+            const selectedOptions = Array.from(selectElement.selectedOptions).map(option => option.value);
+
+            const selectedRoadmapObjects = roadmaps?.message.filter(roadmap => selectedOptions.includes(roadmap.name));
+
+            if (selectedRoadmapObjects) {
+                setData(prevData => ({
+                    ...(prevData as Task | Milestone | Tag | Assignee),
+                    roadmaps: selectedRoadmapObjects
+                }));
+                console.log("handle input change roadmap", data);
+            }
+        
         } else {
             setData(prevData => ({
                 ...(prevData as Task | Milestone | Tag | Assignee),
@@ -258,12 +296,13 @@ export const Sidebar = ({
     switch (sidebarData.type) {
         case "Task":
             const taskData = data as Task;
+            console.log("taskDAta", taskData)
+            console.log("data", data)
 
             sidebarContent = (
                 <div>
                     <div className='font-bold text-center'>TASK DETAILS</div>
                     <br />
-
 
                     <label htmlFor="name">Name:</label>
                     <input
@@ -287,16 +326,32 @@ export const Sidebar = ({
                     />
                     <hr />
 
+                    <label htmlFor="roadmap">Roadmap:</label>
+                    <select
+                        multiple
+                        id="roadmap"
+                        value={taskData?.roadmaps?.map(roadmap => roadmap.name)}
+                        onChange={handleInputChange}
+                        onBlur={handleInputBlur}
+                    >
+                        {roadmaps?.message.map((option, index) => (
+                            <option key={index} value={option.name}>
+                                {option.name}
+                            </option>
+                        ))}
+                    </select>
 
+                    <hr />
+                    
                     <label htmlFor="assignees">Assignee:</label>
                     <select
                         id="assignee"
-                        value={taskData?.assignee.name}
+                        value={taskData?.assignee?.name || ''}
                         onChange={handleInputChange}
                     >
                         {assignees?.message.map((option, index) => (
                             <option key={index} value={option.name}>
-                                {option.name}
+                                {option.name} 
                             </option>
                         ))}
                     </select>
@@ -330,7 +385,7 @@ export const Sidebar = ({
                     <label htmlFor="taskStatus">Task Status:</label>
                     <select
                         id="taskStatus"
-                        value={taskData?.taskStatus.name}
+                        value={taskData?.taskStatus?.name}
                         onChange={handleInputChange}
                         onBlur={handleInputBlur}
                     >
