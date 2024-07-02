@@ -72,29 +72,35 @@ export const Sidebar = ({
         switch (data?.type) {
             case 'Task':
                 console.log("handle input blur task ", sidebarData)
-              //  const taskStatusToAssign = taskStatuses && taskStatuses.length > 0 ? taskStatuses[0] : undefined;
-                let taskStatusToAssign;
 
+                let taskStatusToAssign;
                 if (propertyName === 'taskStatus') {
                     taskStatusToAssign = taskStatuses?.message.find(status => editedValue === status.name);
                 } else {
-                    taskStatusToAssign = taskStatuses?.message[0];
+                    taskStatusToAssign = (sidebarData as Task).taskStatus
                 }
 
                 const selectElement = event.target as HTMLSelectElement;
+
                 const selectedOptions = selectElement.selectedOptions;
                 const selectedRoadmapNames = selectedOptions ? Array.from(selectedOptions).map(option => option.value) : [];
 
+                let selectedRoadmaps;
+                if (propertyName === 'roadmap') {
+                    selectedRoadmaps = roadmaps?.message.filter(roadmap => selectedRoadmapNames.includes(roadmap.name));
+                } else {
+                    selectedRoadmaps = (sidebarData as Task).roadmaps
+                }
 
-                const selectedRoadmaps = roadmaps?.message.filter(roadmap => selectedRoadmapNames.includes(roadmap.name));
+                const selectedAssignee = propertyName === 'assignee' ? assignees?.message.find(assignee => assignee.name === editedValue) : (sidebarData as Task).assignee;
 
                 updatedItem = {
                     ...(sidebarData as Task),
                     [propertyName]: propertyName === 'startDate' || propertyName === 'endDate'
                         ? new Date(editedValue) : editedValue,
                     taskStatus: taskStatusToAssign,
-                    roadmaps: selectedRoadmaps || roadmaps?.message
-
+                    roadmaps: selectedRoadmaps, 
+                    assignee: selectedAssignee 
                 };
                
                 console.log("updated item in sidebar",updatedItem)
@@ -348,6 +354,8 @@ export const Sidebar = ({
                         id="assignee"
                         value={taskData?.assignee?.name || ''}
                         onChange={handleInputChange}
+                        onBlur={handleInputBlur}
+
                     >
                         {assignees?.message.map((option, index) => (
                             <option key={index} value={option.name}>
