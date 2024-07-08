@@ -133,16 +133,19 @@ export const TableView = ({
                 ${props.selectedItem?.type === 'Task' && props.selectedItem?.id === item.id ? 'bg-lime-800' : ''}`}>
                     <td className="border border-gray-300 px-4 py-2">{item.name}</td>
                     <td className="border border-gray-300 px-4 py-2">{item.description}</td>
-                    <td className="border border-gray-300 px-4 py-2">{item.roadmaps.map(map => map.name + " ")}</td>
-
+                    <td className="border border-gray-300 px-4 py-2">{item.roadmaps.map((map, index) => (
+                        index === item.roadmaps.length - 1 ? map.name : map.name + " | "
+                    ))} </td>
+                    <td className="border border-gray-300 px-4 py-2"> {item.tags.map((tag, index) => (
+                        index === item.tags.length - 1 ? tag.name : tag.name + " | "
+                    ))} </td>
                     <td className="border border-gray-300 px-4 py-2">{item.assignee.name}</td>
                     <td className="border border-gray-300 px-4 py-2">{formatDateNumericalMMDDYYYY(new Date(item.startDate))}</td>
                     <td className="border border-gray-300 px-4 py-2">{formatDateNumericalMMDDYYYY(new Date(item.endDate))}</td>
                     <td className="border border-gray-300 px-4 py-2">{item.duration}</td>
-
                     <td className="border border-gray-300 px-4 py-2">{item.taskStatus.name}</td>
                     <td className="border border-gray-300 px-4 py-2">{item.id}</td>
-                    <td className="border border-gray-300 px-4 py-2">{item.type}</td>
+                    <td className="border border-gray-300 px-4 py-2">Task</td>
                 </tr >
             ));
             break;
@@ -151,7 +154,7 @@ export const TableView = ({
             if (!milestoneData || !milestoneData.message || milestoneData.message.length === 0) {
                 return <p>No milestones found.</p>;
             }*/
-            if (!props.selectedItem) {
+            if (!props.milestoneData) {
                 return <p>No milestone found.</p>
             }
 
@@ -172,10 +175,18 @@ export const TableView = ({
                 ${props.selectedItem?.type === 'Milestone' && props.selectedItem?.id === item.id ? 'bg-lime-800' : ''}`}>
                         <td className="border border-gray-300 px-4 py-2">{item.name}</td>
                         <td className="border border-gray-300 px-4 py-2">{item.description}</td>
+                        <td className="border border-gray-300 px-4 py-2">{item.roadmaps.map((map, index) => (
+                            index === item.roadmaps.length - 1 ? map.name : map.name + " | "
+                        ))} </td>
+                        <td className="border border-gray-300 px-4 py-2"> {item.tags.map((tag, index) => (
+                            index === item.tags.length - 1 ? tag.name : tag.name + " | "
+                        ))} </td>
+             
                         <td className="border border-gray-300 px-4 py-2">{formatDateNumericalMMDDYYYY(new Date(item.date))}</td>
                         <td className="border border-gray-300 px-4 py-2">{item.taskStatus.name}</td>
                         <td className="border border-gray-300 px-4 py-2">{item.id}</td>
-                        <td className="border border-gray-300 px-4 py-2">{item.type}</td>
+                     
+                        <td className="border border-gray-300 px-4 py-2">Milestone</td>
                     </tr >
                 ));
             break;
@@ -195,10 +206,10 @@ export const TableView = ({
                 props.tagData.map((item, index) => (
                     <tr key={index} onClick={() => handleClick(item)} className={`cursor-pointer hover:bg-lime-500
                 ${props.selectedItem?.type === 'Tag' && props.selectedItem?.id === item.id ? 'bg-lime-800' : ''}`}>
+                        <td className="border border-gray-300 px-4 py-2">{item.id}</td>
                         <td className="border border-gray-300 px-4 py-2">{item.name}</td>
                         <td className="border border-gray-300 px-4 py-2">{item.description}</td>
-                        <td className="border border-gray-300 px-4 py-2">{item.id}</td>
-                        <td className="border border-gray-300 px-4 py-2">{item.type}</td>
+                        <td className="border border-gray-300 px-4 py-2">Tag</td>
                     </tr >
                 ));
             break;
@@ -219,10 +230,10 @@ export const TableView = ({
                 props.assigneeData.map((item, index) => (
                     <tr key={index} onClick={() => handleClick(item as Assignee)} className={`cursor-pointer hover:bg-lime-500
                 ${props.selectedItem?.type === 'Assignee' && props.selectedItem?.id === item.id ? 'bg-lime-800' : ''}`}>
+                        <td className="border border-gray-300 px-4 py-2">{item.id}</td>
                         <td className="border border-gray-300 px-4 py-2">{item.name}</td>
                         <td className="border border-gray-300 px-4 py-2">{item.description}</td>
-                        <td className="border border-gray-300 px-4 py-2">{item.id}</td>
-                        <td className="border border-gray-300 px-4 py-2">{item.type}</td>
+                        <td className="border border-gray-300 px-4 py-2">Assignee</td>
                     </tr >
                 ));
             break;

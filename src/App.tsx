@@ -28,30 +28,37 @@ function App() {
 
 
     const fetchTasks = () => {
-        fetch("/api/tasks")
+        fetch("/api/tasks?roadmaps=true&tags=true")
             .then((res) => res.json())
-            .then((data) => setTasks(data.message))
+            .then((data) => setTasks(data))
             .catch((error) => console.error('Error fetching tasks:', error));
     };
 
     const fetchMilestones = () => {
-        fetch("/api/milestones")
+        fetch("/api/milestones?roadmaps=true&tags=true")
             .then((res) => res.json())
-            .then((data) => setMilestones(data.message))
+            .then((data) => {
+                console.log("data", data)
+                setMilestones(data)
+    })
             .catch((error) => console.error('Error fetching milestones:', error));
     };
 
     const fetchTags = () => {
         fetch("/api/tags")
             .then((res) => res.json())
-            .then((data) => setTags(data.message))
+            .then((data) => setTags(data))
             .catch((error) => console.error('Error fetching tags:', error));
     };
 
     const fetchAssignees = () => {
         fetch("/api/assignees")
             .then((res) => res.json())
-            .then((data) => setAssignees(data.message))
+            .then((data) => {
+                console.log("data", data)
+
+                setAssignees(data)
+            })
             .catch((error) => console.error('Error fetching assignees:', error));
     };
     // #endregion
@@ -214,8 +221,8 @@ function App() {
                     <button className={`bg-cyan-400 rounded border ${view === "Timeline" ? "bg-cyan-800" : "bg-cyan-400"} p-2`} onClick={() => handleClick("Timeline")}>Timeline</button>
                 </div>
                 <br />
-                <FilterArea selectedRoadmap={selectedRoadmap} selectedTaskStatus={selectedTaskStatus} handleFilterByTaskStatus={handleFilterByTaskStatus} handleFilterByRoadmap={handleFilterByRoadmap} />
-
+{/*                <FilterArea selectedRoadmap={selectedRoadmap} selectedTaskStatus={selectedTaskStatus} handleFilterByTaskStatus={handleFilterByTaskStatus} handleFilterByRoadmap={handleFilterByRoadmap} />
+*/}
                 <div className="flex justify-center">
 
                     <div>
@@ -225,9 +232,9 @@ function App() {
 
                     </div>
                     <br />
-                    <div>
+                   {/* <div>
                         <Sidebar sidebarData={selectedItem} updateItem={updateItem} />
-                    </div>
+                    </div>*/}
                 </div>
 
                 <div>

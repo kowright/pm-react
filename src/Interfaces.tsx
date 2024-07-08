@@ -10,11 +10,14 @@ interface Unit {
 export interface Milestone extends Unit { //MIGHT NEED TO CHANGE THESE TO DISCRIMINANT UNIONS
     date: Date;
     taskStatus: TaskStatus;
+    roadmaps: Roadmap[];
+    tags: Tag[];
 }
 
 export interface Task extends Unit {
     duration: number;
     roadmaps: Roadmap[],
+    tags: Tag[];
     assignee: Assignee,
     startDate: Date,
     endDate: Date,
