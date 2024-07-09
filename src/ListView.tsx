@@ -153,7 +153,7 @@ export const ListView = ({
 
                 {tableDataType === 'Task' &&
                     props.taskData.map((item, index) => (
-                        <button className='w-full h-[50px] bg-green-300 rounded-xl flex items-center p-4'>
+                        <button className='w-full h-[40px] bg-green-300 rounded-xl flex items-center p-4'>
                             <div className='w-auto'>{item.name}</div>
                             <div className='flex-1'>{item.description}</div>
                             <div className='w-auto flex justify-end gap-x-2'>
