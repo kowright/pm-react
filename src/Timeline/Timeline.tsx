@@ -530,7 +530,7 @@ export const Timeline = ({
               
             </div>
 
-            <div className='7h-full bg-purple-100 overflow-x-auto relative shrink-0 flex' ref={scrollContainerRef} style={{ width: '2000px' }}>
+            <div className='7h-full bg-purple-100 relative shrink-0 flex' ref={scrollContainerRef} style={{ width: '2000px' }}>
                 {milestones}
                 {tasks}
                 <table className="border-collapse border border-gray-800 shrink-0 z-0">

@@ -231,7 +231,7 @@ function App() {
                             <FilterButton text="Add" onClick={() => console.log("hi")} />
                         </div>
                     </div>
-                    <div className='bg-orange-500 flex-1'>
+                    <div className='bg-orange-500 flex-1 max-w-full overflow-x-auto'>
 
                         
                             {view === 'Timeline' && <TimelineView taskClick={handleTaskClick} roadmap={selectedRoadmap} taskStatus={selectedTaskStatus} taskData={tasks} milestoneData={milestones} updateItem={updateItem} />}
