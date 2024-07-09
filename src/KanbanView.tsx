@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { Task, TaskStatus, Roadmap, Milestone, Assignee, Tag } from './Interfaces';
+import { Task, TaskStatus, Roadmap, Milestone, Assignee, Tag, formatDateNumericalMMDDYYYY } from './Interfaces';
+import { FilterButton } from './FilterButton';
 
 interface KanbanViewProps {
     roadmap: Roadmap | null; //group filter properties together
@@ -75,15 +76,24 @@ interface KanbanViewProps {
 
      let statusColumns = Object.keys(tasksByStatus).map(key =>
          tasksByStatus[key]?.map((task, index) => (
-             <div key={task.id} onClick={() => handleClick(task)} className="cursor-pointer hover:bg-lime-500 bg-cyan-400 rounded-md flex text-xl justify-center w-80">
-                 {task.name}
+             <div key={task.id} onClick={() => handleClick(task)} className="cursor-pointer hover:bg-lime-500 bg-cyan-400 rounded-md flex flex-col text-xl justify-center w-[320px] gap-1 p-2">
+                 <div className='text-lg font-bold'> {task.name}</div>
+                 <div className='text-sm'>{task.description}</div>
+                 <div className='text-xs'>{formatDateNumericalMMDDYYYY(new Date (task.startDate))} - {formatDateNumericalMMDDYYYY( new Date(task.endDate))}</div>
+                 <div className='w-auto flex justify-start gap-x-2'>
+                     {task.tags.map(tag =>
+                         <FilterButton text={tag.name} onClick={() => console.log("eng")} />
+                     )}
+                     {task.roadmaps.map(map =>
+                         <FilterButton text={map.name} onClick={() => console.log("eng")} />
+                     )}
+                 </div>
              </div>
          )));
 
     return (
-        <div>
+        <div className='mx-8'>
             <br/>
-            <p className='flex justify-center text-3xl text-white'>KANBAN VIEW</p>
             <div className='flex gap-4'>
                 <div className='flex gap-4'>
                     {statusColumns.map((column, columnIndex) => (

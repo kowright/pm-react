@@ -17,10 +17,6 @@ export const ListView = ({
 
     ...props
 }: ListViewProps) => {
-    //const [taskData, setTaskData] = useState<{ message: Task[] } | null>(null);
-    //const [milestoneData1, setMilestoneData] = useState<{ message: Milestone[] } | null>(null);
-    // const [tagData, setTagData] = useState<{ message: Tag[] } | null>(null);
-    //const [assigneeData, setAssigneeData] = useState<{ message: Assignee[] } | null>(null);
 
     const [tableDataType, setTableDataType] = React.useState("Task") //replace with something created in Interface
 
@@ -31,63 +27,7 @@ export const ListView = ({
         console.log("Inside Timeline component - before invoking taskClick function " + item.name);
         props.rowClick(item); // Invoke the function with some example task data
     };
-    /*
-        useEffect(() => {
-            switch (tableDataType) {
-               *//* case "tasks":
-         fetch(fetchURL)
-             .then((res) => res.json())
-             .then((data) => setTaskData(data));
-         break;*//*
-case "milestones":
-    fetch(fetchURL)
-        .then((res) => res.json())
-        .then((data) => setMilestoneData(data));
-    console.log("milestones");
-    break;
-case "tags":
-    fetch(fetchURL)
-        .then((res) => res.json())
-        .then((data) => setTagData(data));
-    console.log("tags");
-    break;
-case "assignees":
-    fetch(fetchURL)
-        .then((res) => res.json())
-        .then((data) => setAssigneeData(data));
-    console.log("assignees")
-    break;
-default:
-    break;
-}
-}, [fetchURL, tableDataType]);
-*/
 
-    /*    switch (tableDataType) {
-            case "tasks":
-                if (!taskData) {
-                    return <p>Loading...!</p>; // Render loading until data is fetched   
-                }
-                break;
-            case "milestones":
-                if (!milestoneData) {
-                    return <p>Loading...!</p>; // Render loading until data is fetched   
-                }
-                break;
-            case "tags":
-                if (!tagData) {
-                    return <p>Loading...!</p>; // Render loading until data is fetched   
-                }
-                break;
-            case "assignees":
-                if (!assigneeData) {
-                    return <p>Loading...!</p>; // Render loading until data is fetched   
-                }
-                break;
-            default:
-                break;
-        }
-    */
     let tableFormat: any;
     const formatHeaderLabel = (header: string): string => {
         // Example: Capitalize first letter and replace underscores with spaces
@@ -193,122 +133,11 @@ default:
                     </tr >
                 ));
             break;
-        /*        case "Tag":
-                   *//* if (!tagData || !tagData.message || tagData.message.length === 0) {
-             return <p>No tags found.</p>;
-         }
-*//*
-                    headers = props.tagData.length > 0 ? Object.keys(props.tagData[0]) : [];
-        
-                    tableFormat =
-                        headers.map((header, index) => (
-                            <th key={index} className="border border-gray-300 px-4 py-2">{formatHeaderLabel(header)}</th>
-                        ));
-        
-                    content =
-                        props.tagData.map((item, index) => (
-                            <tr key={index} onClick={() => handleClick(item)} className={`cursor-pointer hover:bg-lime-500
-                        ${props.selectedItem?.type === 'Tag' && props.selectedItem?.id === item.id ? 'bg-lime-800' : ''}`}>
-                                <td className="border border-gray-300 px-4 py-2">{item.id}</td>
-                                <td className="border border-gray-300 px-4 py-2">{item.name}</td>
-                                <td className="border border-gray-300 px-4 py-2">{item.description}</td>
-                                <td className="border border-gray-300 px-4 py-2">Tag</td>
-                            </tr >
-                        ));
-                    break;
-                case "Assignee":
-                  *//*  if (!assigneeData || !assigneeData.message || assigneeData.message.length === 0) {
-              return <p>No assignees found.</p>;
-          }*//*
-
-        headers = props.assigneeData.length > 0 ? Object.keys(props.assigneeData[0]) : [];
-
-        tableFormat =
-            headers.map((header, index) => (
-                <th key={index} className="border border-gray-300 px-4 py-2">{formatHeaderLabel(header)}</th>
-            ));
-
-
-        content =
-            props.assigneeData.map((item, index) => (
-                <tr key={index} onClick={() => handleClick(item as Assignee)} className={`cursor-pointer hover:bg-lime-500
-            ${props.selectedItem?.type === 'Assignee' && props.selectedItem?.id === item.id ? 'bg-lime-800' : ''}`}>
-                    <td className="border border-gray-300 px-4 py-2">{item.id}</td>
-                    <td className="border border-gray-300 px-4 py-2">{item.name}</td>
-                    <td className="border border-gray-300 px-4 py-2">{item.description}</td>
-                    <td className="border border-gray-300 px-4 py-2">Assignee</td>
-                </tr >
-            ));
-        break;*/
         default:
             break;
     }
 
 
-    //let filteredTasks = data.message;
-    /*  let filteredTasks = selectedRoadmap
-          ? data.message.filter(task => task.roadmaps.includes(selectedRoadmap))
-          : data.message;
-  
-      filteredTasks = selectedTaskStatus
-          ? filteredTasks.filter(task => task.taskStatus === selectedTaskStatus)
-          : filteredTasks;*/
-
-    /*    switch (tableDataType) {
-            case "tasks":
-                    
-        
-                    content = 
-                   taskData.map((item, index) => (
-                        <tr key={index}>
-                            <td className="border border-gray-300 px-4 py-2">{item.name}</td>
-                            <td className="border border-gray-300 px-4 py-2">{item.description}</td>
-    
-                            <td className="border border-gray-300 px-4 py-2">{item.assignee.name}</td>
-                            <td className="border border-gray-300 px-4 py-2">{formatDateNumericalMMDDYYYY(new Date(item.startDate))}</td>
-                            <td className="border border-gray-300 px-4 py-2">{formatDateNumericalMMDDYYYY(new Date(item.endDate))}</td>
-                            <td className="border border-gray-300 px-4 py-2">{item.taskStatus.name}</td>
-                        </tr >
-                    ));
-                
-                break;
-            case "milestones":
-           content = 
-                    milestoneData.map((item, index) => (
-                        <tr key={index}>
-                            <td className="border border-gray-300 px-4 py-2">{item.name}</td>
-                            <td className="border border-gray-300 px-4 py-2">{item.description}</td>
-                            <td className="border border-gray-300 px-4 py-2">{item.taskStatus.name}</td>
-                        </tr >
-                    ));
-                console.log("milestones");
-                break;
-    *//*        case "tags":
-                filteredTasks = (filteredTasks as Tag[]);
-    
-                content = (
-                    filteredTasks.map((item, index) => (
-                        <tr key={index}>
-                            <td className="border border-gray-300 px-4 py-2">{item.name}</td>
-                        </tr >
-                    )))
-                console.log("tags");
-                break;
-            case "assignees":
-                filteredTasks = (filteredTasks as Assignee[]);
-    
-                content = (
-                    filteredTasks.map((item, index) => (
-                        <tr key={index}>
-                            <td className="border border-gray-300 px-4 py-2">{item.name}</td>
-                        </tr >
-                    )))
-                console.log("assignees")
-                break;*//*
-default:
-    break;
-}
-*/
 
     return (
         <div className='mx-8'>
