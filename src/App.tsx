@@ -1,5 +1,3 @@
-import logo from './logo.svg';
-import './App.css';
 
 import React, { useState } from 'react';
 import TableView from './TableView';
@@ -8,9 +6,11 @@ import TimelineView from './TimelineView';
 import { Sidebar } from './Sidebar/Sidebar';
 import { Task, Roadmap, TaskStatus, Milestone, Tag, Assignee, UnitData } from './Interfaces';
 import { FilterArea } from './FilterArea/FilterArea';
-
+import { NavBar } from './NavBar/NavBar';
+import { FilterButton } from './FilterButton';
+import { ListView } from './ListView';
 function App() {
-    const [view, setView] = useState<string>('Table'); 
+    const [view, setView] = useState<string>('List'); 
     const [selectedItem, setSelectedItem] = useState<Task | Milestone | Tag | Assignee | null>(null); 
 
     React.useEffect(() => {
@@ -75,6 +75,7 @@ function App() {
     };
 
     const handleClick = (viewName: string) => {
+        console.log("clicked " + viewName)
         setView(viewName);
     };
 
@@ -208,40 +209,63 @@ function App() {
     // #endregion
 
     return (
-        <div>
-            <header className="App-header">
-                <img src={logo} className="App-logo" alt="logo" />
-            </header>
+        <div className="flex h-full w-full bg-alabaster gap-16">
+            <NavBar handleNavItemClick={handleClick} />
 
-            <div className="flex flex-col bg-[#282c34] justify-center">
-                <div className="font-bold text-white flex text-3xl justify-center">Project Management Tool</div>
-                <div className='flex gap-4 justify-center'>
-                    <button className={`bg-cyan-400 rounded border ${view === "Table" ? "bg-cyan-800" : "bg-cyan-400"} p-2`} onClick={() => handleClick("Table")}>Table</button>
-                    <button className={`bg-cyan-400 rounded border ${view === "Kanban" ? "bg-cyan-800" : "bg-cyan-400"} p-2`} onClick={() => handleClick("Kanban")}>Kanban</button>
-                    <button className={`bg-cyan-400 rounded border ${view === "Timeline" ? "bg-cyan-800" : "bg-cyan-400"} p-2`} onClick={() => handleClick("Timeline")}>Timeline</button>
-                </div>
-                <br />
-{/*                <FilterArea selectedRoadmap={selectedRoadmap} selectedTaskStatus={selectedTaskStatus} handleFilterByTaskStatus={handleFilterByTaskStatus} handleFilterByRoadmap={handleFilterByRoadmap} />
-*/}
-                <div className="flex justify-center">
 
-                    <div>
-                        {view === 'Timeline' && <TimelineView taskClick={handleTaskClick} roadmap={selectedRoadmap} taskStatus={selectedTaskStatus} taskData={tasks} milestoneData={milestones} updateItem={updateItem} />}
-                        {view === 'Table' && <TableView rowClick={handleTaskClick} taskData={tasks} milestoneData={milestones} tagData={tags} assigneeData={assignees} roadmap={selectedRoadmap} taskStatus={selectedTaskStatus} selectedItem={selectedItem} />}
-                        {view === 'Kanban' && <KanbanView rowClick={handleTaskClick} taskData={tasks} roadmap={selectedRoadmap} taskStatus={selectedTaskStatus} />}
+            <div className='w-[300px] bg-red-300 flex-1 h-full flex flex-col bg-black'>
+
+                <div className=" h-[50px] shrink-0"></div>
+
+
+                <div className='bg-white h-full flex flex-col'>
+                    <div className='bg-red-500 h-auto flex'>
+                        <div className='bg-pink-700 flex-1 h-full flex-wrap'>
+                            <FilterArea selectedRoadmap={selectedRoadmap} selectedTaskStatus={selectedTaskStatus} handleFilterByTaskStatus={handleFilterByTaskStatus} handleFilterByRoadmap={handleFilterByRoadmap} />
+
+                        </div>
+
+
+
+                        <div className='bg-pink-200 w-[100px] flex justify-end items-start'>
+                            <FilterButton text="Add" onClick={() => console.log("hi")} />
+                        </div>
+                    </div>
+                    <div className='bg-orange-500 flex-1'>
+
+                        
+                            {view === 'Timeline' && <TimelineView taskClick={handleTaskClick} roadmap={selectedRoadmap} taskStatus={selectedTaskStatus} taskData={tasks} milestoneData={milestones} updateItem={updateItem} />}
+                            {view === 'Table' && <TableView rowClick={handleTaskClick} taskData={tasks} milestoneData={milestones} tagData={tags} assigneeData={assignees} roadmap={selectedRoadmap} taskStatus={selectedTaskStatus} selectedItem={selectedItem} />}
+                            {view === 'Kanban' && <KanbanView rowClick={handleTaskClick} taskData={tasks} roadmap={selectedRoadmap} taskStatus={selectedTaskStatus} />}
+                            {view === 'List' && <ListView rowClick={handleTaskClick} taskData={tasks} milestoneData={milestones} tagData={tags} assigneeData={assignees} roadmap={selectedRoadmap} taskStatus={selectedTaskStatus} selectedItem={selectedItem} />}
+
+                       
 
                     </div>
-                    <br />
-                   {/* <div>
-                        <Sidebar sidebarData={selectedItem} updateItem={updateItem} />
-                    </div>*/}
+
                 </div>
 
-                <div>
-                    <p className='text-white flex justify-center my-4'>Kortney Wright</p>
+
+            </div>
+
+
+
+
+
+
+            <div className='w-[300px] h-full flex flex-col bg-blue-300'>
+
+                <div className="bg-yellow-300 h-[50px] p-2 shrink-0">
+                    <div className='bg-yellow-800 rounded-full'>SEARCH</div>
                 </div>
+
+                <div className='bg-white h-full'>SIDEBAR</div>
+
+
             </div>
         </div>
+
+
     );
 }
 
@@ -250,6 +274,12 @@ export default App;
 
 //things to do
 //put view/filter changing things in a component and do api call on parent to pass to children data and filters
-//make roadmaps and tags be held in database and populate into header component 
-//put sidebar component in here 
-                   
+//make roadmaps and tags be held in database and populate into header component
+//put sidebar component in here
+
+/* <div>
+                        <Sidebar sidebarData={selectedItem} updateItem={updateItem} />
+                    </div>
+
+                <FilterArea selectedRoadmap={selectedRoadmap} selectedTaskStatus={selectedTaskStatus} handleFilterByTaskStatus={handleFilterByTaskStatus} handleFilterByRoadmap={handleFilterByRoadmap} />
+*/

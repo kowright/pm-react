@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Task, TaskStatus, Roadmap, Milestone, Assignee, Tag, formatDateNumericalMMDDYYYY } from './Interfaces';
+import { FilterButton } from './FilterButton'
 
 interface TableViewProps {
     roadmap: Roadmap | null; //group filter properties together
@@ -148,6 +149,8 @@ export const TableView = ({
                     <td className="border border-gray-300 px-4 py-2">Task</td>
                 </tr >
             ));
+
+
             break;
         case "Milestone":
 /*
@@ -190,11 +193,11 @@ export const TableView = ({
                     </tr >
                 ));
             break;
-        case "Tag":
-           /* if (!tagData || !tagData.message || tagData.message.length === 0) {
+/*        case "Tag":
+           *//* if (!tagData || !tagData.message || tagData.message.length === 0) {
                 return <p>No tags found.</p>;
             }
-*/
+*//*
             headers = props.tagData.length > 0 ? Object.keys(props.tagData[0]) : [];
 
             tableFormat =
@@ -214,9 +217,9 @@ export const TableView = ({
                 ));
             break;
         case "Assignee":
-          /*  if (!assigneeData || !assigneeData.message || assigneeData.message.length === 0) {
+          *//*  if (!assigneeData || !assigneeData.message || assigneeData.message.length === 0) {
                 return <p>No assignees found.</p>;
-            }*/
+            }*//*
 
             headers = props.assigneeData.length > 0 ? Object.keys(props.assigneeData[0]) : [];
 
@@ -236,7 +239,7 @@ export const TableView = ({
                         <td className="border border-gray-300 px-4 py-2">Assignee</td>
                     </tr >
                 ));
-            break;
+            break;*/
         default:
             break;
     }
@@ -310,15 +313,13 @@ export const TableView = ({
     return (
         <div className='mx-8'>
             <br />
-            <p className='flex justify-center text-3xl text-white'>TABLE VIEW</p>
             <div className='flex gap-4 justify-center'>
-                <button className={`rounded border border-cyan-200 p-2 ${tableDataType === "Task" ? "bg-cyan-800" : "bg-cyan-400"}`} onClick={() => setTableDataType("Task")}>Task</button>
-                <button className={`rounded border border-cyan-200 p-2 ${tableDataType === "Milestone" ? "bg-cyan-800" : "bg-cyan-400"}`} onClick={() => setTableDataType("Milestone")}>Milestone</button>
-                <button className={`rounded border border-cyan-200 p-2 ${tableDataType === "Tag" ? "bg-cyan-800" : "bg-cyan-400"}`} onClick={() => setTableDataType("Tag")}>Tag</button>
-                <button className={`rounded border border-cyan-200 p-2 ${tableDataType === "Assignee" ? "bg-cyan-800" : "bg-cyan-400"}`} onClick={() => setTableDataType("Assignee")}>Assignee</button>
+                <FilterButton text='Task' onClick={() => setTableDataType("Task")} />
+                <FilterButton text='Milestone' onClick={() => setTableDataType("Milestone")} /> 
            </div>
   
             <br />
+
             <table className="min-w-full text-white border-collapse border border-gray-200">
                 <thead className="bg-gray-600">
                     <tr>
@@ -329,6 +330,8 @@ export const TableView = ({
                     {content}
                 </tbody>
             </table>
+
+          
         </div>
     );
 }
