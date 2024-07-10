@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Task, TaskStatus, Roadmap, Milestone, Assignee, Tag, formatDateNumericalMMDDYYYY } from './Interfaces';
+import { Task, TaskStatus, Roadmap, Milestone, Assignee, Tag, formatDateNumericalMMDDYYYY, findIdForUnitType, UnitType } from './Interfaces';
 import { FilterButton } from './FilterButton'
 
 interface TableViewProps {
@@ -11,6 +11,7 @@ interface TableViewProps {
     assigneeData: Assignee[];
     rowClick: (task: Task | Milestone | Tag | Assignee) => void;
     selectedItem: Task | Milestone | Tag | Assignee | null;
+    unitTypeData: UnitType[];
 }
 
 export const TableView = ({
@@ -131,7 +132,7 @@ export const TableView = ({
             content = 
             filteredTasks.map((item, index) => (
                 <tr key={index} onClick={() => handleClick(item)} className={`cursor-pointer hover:bg-lime-500
-                ${props.selectedItem?.type === 'Task' && props.selectedItem?.id === item.id ? 'bg-lime-800' : ''}`}>
+                ${props.selectedItem?.type === findIdForUnitType('Task', props.unitTypeData) && props.selectedItem?.id === item.id ? 'bg-lime-800' : ''}`}>
                     <td className="border border-gray-300 px-4 py-2">{item.name}</td>
                     <td className="border border-gray-300 px-4 py-2">{item.description}</td>
                     <td className="border border-gray-300 px-4 py-2">{item.roadmaps.map((map, index) => (
@@ -175,7 +176,7 @@ export const TableView = ({
             content =
                 filteredMilestones.map((item, index) => (
                     <tr key={index} onClick={() => handleClick(item)} className={`cursor-pointer hover:bg-lime-500
-                ${props.selectedItem?.type === 'Milestone' && props.selectedItem?.id === item.id ? 'bg-lime-800' : ''}`}>
+                ${props.selectedItem?.type === findIdForUnitType('Milestone', props.unitTypeData) && props.selectedItem?.id === item.id ? 'bg-lime-800' : ''}`}>
                         <td className="border border-gray-300 px-4 py-2">{item.name}</td>
                         <td className="border border-gray-300 px-4 py-2">{item.description}</td>
                         <td className="border border-gray-300 px-4 py-2">{item.roadmaps.map((map, index) => (

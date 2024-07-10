@@ -1,5 +1,5 @@
 import React from 'react';
-import { Milestone, Task, TaskStatus, Roadmap, Tag, Assignee, formatDateNumericalMMDD, addDaysToDate } from '../Interfaces';
+import { Milestone, Task, TaskStatus, Roadmap, Tag, Assignee, formatDateNumericalMMDD, addDaysToDate, findIdForUnitType, UnitType } from '../Interfaces';
 
 interface TimelineProps {
     taskClick: (task: Task | Milestone) => void;
@@ -8,7 +8,7 @@ interface TimelineProps {
     taskData: Task[];
     milestoneData: Milestone[];
     updateItem: (task: Task | Milestone | Tag | Assignee) => void;
-
+    unitTypeData: UnitType[];
 }
 
 export const Timeline = ({
@@ -368,12 +368,12 @@ export const Timeline = ({
     const handleMouseDown = (item: Task | Milestone, event: React.MouseEvent<HTMLDivElement>) => {
         event.preventDefault();
 
-        if (item.type === 'Task') {
+        if (item.type === findIdForUnitType('Task', props.unitTypeData)) {
             setDraggedTask(item as Task);
             setDragId(item.id);
 
         }
-        if (item.type === 'Milestone') {
+        if (item.type === findIdForUnitType('Milestone', props.unitTypeData)) {
             setDraggedMilestone(item as Milestone);
             setMilestoneDragId(item.id);
         }

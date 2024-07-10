@@ -4,7 +4,7 @@ import TableView from './TableView';
 import KanbanView from './KanbanView';
 import TimelineView from './TimelineView';
 import { Sidebar } from './Sidebar/Sidebar';
-import { Task, Roadmap, TaskStatus, Milestone, Tag, Assignee, UnitData } from './Interfaces';
+import { Task, Roadmap, TaskStatus, Milestone, Tag, Assignee, UnitData, findIdForUnitType, UnitType } from './Interfaces';
 import { FilterArea } from './FilterArea/FilterArea';
 import { NavBar } from './NavBar/NavBar';
 import { FilterButton } from './FilterButton';
@@ -25,6 +25,7 @@ function App() {
     const [milestones, setMilestones] = useState<Milestone[]>([]); // State to hold milestones
     const [tags, setTags] = useState<Tag[]>([]); // State to hold milestones
     const [assignees, setAssignees] = useState<Assignee[]>([]); // State to hold milestones
+    const [unitTypes, setUnitTypes] = React.useState<UnitType[]>([]);
 
 
     const fetchTasks = () => {
@@ -54,13 +55,16 @@ function App() {
     const fetchAssignees = () => {
         fetch("/api/assignees")
             .then((res) => res.json())
-            .then((data) => {
-                console.log("data", data)
-
-                setAssignees(data)
-            })
+            .then((data) => setAssignees(data))
             .catch((error) => console.error('Error fetching assignees:', error));
     };
+
+    const fetchUnitTypes = () => {
+        fetch("/api/unittypes")
+            .then((res) => res.json())
+            .then((data) => setUnitTypes(data))
+            .catch((error) => console.error('Error fetching unit types:', error));
+    }
     // #endregion
 
     // #region Filter Area Necessities
@@ -91,16 +95,16 @@ function App() {
             return;
         }
 
-        if (updatedItem.type === 'Task') {
+        if (updatedItem.type === findIdForUnitType('Task', unitTypes)) {
             updateTask(updatedItem as Task)
         }
-        else if (updatedItem.type === 'Milestone') {
+        else if (updatedItem.type === findIdForUnitType('Milestone', unitTypes)) {
             updateMilestone(updatedItem as Milestone)
         }
-        else if (updatedItem.type === 'Tag') {
+        else if (updatedItem.type === findIdForUnitType('Tag', unitTypes)) {
             updateTag(updatedItem as Tag)
         }
-        else if (updatedItem.type === 'Assignee') {
+        else if (updatedItem.type === findIdForUnitType('Assignee', unitTypes)) {
             updateAssignee(updatedItem as Assignee)
         }
     }
@@ -234,10 +238,10 @@ function App() {
                     <div className='bg-orange-500 flex-1 max-w-full overflow-x-auto'>
 
                         
-                            {view === 'Timeline' && <TimelineView taskClick={handleTaskClick} roadmap={selectedRoadmap} taskStatus={selectedTaskStatus} taskData={tasks} milestoneData={milestones} updateItem={updateItem} />}
-                            {view === 'Table' && <TableView rowClick={handleTaskClick} taskData={tasks} milestoneData={milestones} tagData={tags} assigneeData={assignees} roadmap={selectedRoadmap} taskStatus={selectedTaskStatus} selectedItem={selectedItem} />}
+                        {view === 'Timeline' && <TimelineView taskClick={handleTaskClick} roadmap={selectedRoadmap} taskStatus={selectedTaskStatus} taskData={tasks} milestoneData={milestones} updateItem={updateItem} unitTypeData={unitTypes} />}
+                        {view === 'Table' && <TableView rowClick={handleTaskClick} taskData={tasks} milestoneData={milestones} tagData={tags} assigneeData={assignees} roadmap={selectedRoadmap} taskStatus={selectedTaskStatus} selectedItem={selectedItem} unitTypeData={unitTypes} />}
                             {view === 'Kanban' && <KanbanView rowClick={handleTaskClick} taskData={tasks} roadmap={selectedRoadmap} taskStatus={selectedTaskStatus} />}
-                            {view === 'List' && <ListView rowClick={handleTaskClick} taskData={tasks} milestoneData={milestones} tagData={tags} assigneeData={assignees} roadmap={selectedRoadmap} taskStatus={selectedTaskStatus} selectedItem={selectedItem} />}
+                        {view === 'List' && <ListView rowClick={handleTaskClick} taskData={tasks} milestoneData={milestones} tagData={tags} assigneeData={assignees} roadmap={selectedRoadmap} taskStatus={selectedTaskStatus} selectedItem={selectedItem} unitTypeData={unitTypes} />}
 
                        
 
@@ -259,7 +263,7 @@ function App() {
                     <div className='bg-yellow-800 rounded-full'>SEARCH</div>
                 </div>
 
-                <div className='bg-white h-full'>SIDEBAR</div>
+                <Sidebar sidebarData={selectedItem} updateItem={updateItem} />
 
 
             </div>

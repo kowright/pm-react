@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Task, TaskStatus, Roadmap, Milestone, Assignee, Tag, formatDateNumericalMMDDYYYY } from './Interfaces';
+import { Task, TaskStatus, Roadmap, Milestone, Assignee, Tag, formatDateNumericalMMDDYYYY,findIdForUnitType, UnitType } from './Interfaces';
 import { FilterButton } from './FilterButton'
 
 interface ListViewProps {
@@ -11,6 +11,7 @@ interface ListViewProps {
     assigneeData: Assignee[];
     rowClick: (task: Task | Milestone | Tag | Assignee) => void;
     selectedItem: Task | Milestone | Tag | Assignee | null;
+    unitTypeData: UnitType[];
 }
 
 export const ListView = ({
@@ -24,8 +25,8 @@ export const ListView = ({
     let content: any = <div>hi</div>;
 
     const handleClick = (item: Task | Milestone | Tag | Assignee) => {
-        console.log("Inside Timeline component - before invoking taskClick function " + item.name);
-        props.rowClick(item); // Invoke the function with some example task data
+        console.log("Inside List component - before invoking taskClick function " + item.name);
+        props.rowClick(item);
     };
 
     let tableFormat: any;
@@ -71,7 +72,7 @@ export const ListView = ({
             content =
                 filteredTasks.map((item, index) => (
                     <tr key={index} onClick={() => handleClick(item)} className={`cursor-pointer hover:bg-lime-500
-                ${props.selectedItem?.type === 'Task' && props.selectedItem?.id === item.id ? 'bg-lime-800' : ''}`}>
+                ${props.selectedItem?.type === findIdForUnitType('Task', props.unitTypeData) && props.selectedItem?.id === item.id ? 'bg-lime-800' : ''}`}>
                         <td className="border border-gray-300 px-4 py-2">{item.name}</td>
                         <td className="border border-gray-300 px-4 py-2">{item.description}</td>
                         <td className="border border-gray-300 px-4 py-2">{item.roadmaps.map((map, index) => (
@@ -115,7 +116,7 @@ export const ListView = ({
             content =
                 filteredMilestones.map((item, index) => (
                     <tr key={index} onClick={() => handleClick(item)} className={`cursor-pointer hover:bg-lime-500
-                ${props.selectedItem?.type === 'Milestone' && props.selectedItem?.id === item.id ? 'bg-lime-800' : ''}`}>
+                ${props.selectedItem?.type === findIdForUnitType('Milestone', props.unitTypeData) && props.selectedItem?.id === item.id ? 'bg-lime-800' : ''}`}>
                         <td className="border border-gray-300 px-4 py-2">{item.name}</td>
                         <td className="border border-gray-300 px-4 py-2">{item.description}</td>
                         <td className="border border-gray-300 px-4 py-2">{item.roadmaps.map((map, index) => (
@@ -153,7 +154,7 @@ export const ListView = ({
 
                 {tableDataType === 'Task' &&
                     props.taskData.map((item, index) => (
-                        <button className='w-full h-[40px] bg-green-300 rounded-xl flex items-center p-4'>
+                        <button className='w-full h-[40px] bg-green-300 rounded-xl flex items-center p-4' onClick={() => handleClick(item)}>
                             <div className='w-auto'>{item.name}</div>
                             <div className='flex-1'>{item.description}</div>
                             <div className='w-auto flex justify-end gap-x-2'>
@@ -173,7 +174,7 @@ export const ListView = ({
 
                 {tableDataType === 'Milestone' &&
                     props.milestoneData.map((item, index) => (
-                        <button className='w-full h-[50px] bg-green-300 rounded-xl flex items-center p-4'>
+                        <button className='w-full h-[50px] bg-green-300 rounded-xl flex items-center p-4' onClick={() => handleClick(item)}>
                             <div className='w-auto'>{item.name}</div>
                             <div className='flex-1'>{item.description}</div>
                             <div className='w-auto flex justify-end gap-x-2'>

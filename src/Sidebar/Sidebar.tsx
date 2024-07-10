@@ -1,5 +1,5 @@
 import React from 'react';
-import { Milestone, Task, Tag, Assignee, TaskStatus, Roadmap, formatDateNumericalMMDDYYYY, formatDateNumericalYYYYMMDDWithDashes ,UnitData} from '../Interfaces';
+import { Milestone, Task, Tag, Assignee, TaskStatus, Roadmap, UnitType, findIdForUnitType, formatDateNumericalMMDDYYYY, formatDateNumericalYYYYMMDDWithDashes ,UnitData} from '../Interfaces';
 
 interface SidebarProps {
     sidebarData: UnitData; //what can show in the sidebar; ADD EVERYTHING ELSE
@@ -29,22 +29,25 @@ export const Sidebar = ({
     const [data, setData] = React.useState< Task | Milestone | Tag | Assignee | null>(sidebarData)
 
     //const [task, setTask] = React.useState(sidebarData)
-    const [assignees, setAssignees] = React.useState<{ message: Assignee[] } | null>(null);
-    const [roadmaps, setRoadmaps] = React.useState<{ message: Roadmap[] } | null>(null);
-    const [taskStatuses, setTaskStatuses] = React.useState<{ message: TaskStatus[] } | null>(null);
+    const [assignees, setAssignees] = React.useState<Assignee[] | null>(null);
+    const [roadmaps, setRoadmaps] = React.useState<Roadmap[] | null>(null);
+    const [taskStatuses, setTaskStatuses] = React.useState<TaskStatus[] | null>(null);
+    const [unitTypes, setUnitTypes] = React.useState<UnitType[]>([]);
 
 
     React.useEffect(() => {
         const fetchData = async () => {
             try {
-                const [taskStatusData, assigneesData, roadmapsData] = await Promise.all([
+                const [taskStatusData, assigneesData, roadmapsData, unitTypeData] = await Promise.all([
                     fetch("/api/taskstatus").then(res => res.json()),
                     fetch("/api/assignees").then(res => res.json()),
-                    fetch("/api/roadmaps").then(res => res.json())
+                    fetch("/api/roadmaps").then(res => res.json()),
+                    fetch("/api/unittypes").then(res => res.json())
                 ]);
                 setTaskStatuses(taskStatusData);
                 setAssignees(assigneesData);
                 setRoadmaps(roadmapsData);
+                setUnitTypes(unitTypeData)
             } catch (error) {
                 console.error('Error fetching data:', error);
             }
@@ -70,12 +73,13 @@ export const Sidebar = ({
         let updatedItem: Task | Milestone | Tag | Assignee;
 
         switch (data?.type) {
-            case 'Task':
+            case findIdForUnitType('Task', unitTypes):
+
                 console.log("handle input blur task ", sidebarData)
 
                 let taskStatusToAssign;
                 if (propertyName === 'taskStatus') {
-                    taskStatusToAssign = taskStatuses?.message.find(status => editedValue === status.name);
+                    taskStatusToAssign = taskStatuses?.find(status => editedValue === status.name);
                 } else {
                     taskStatusToAssign = (sidebarData as Task).taskStatus
                 }
@@ -87,12 +91,12 @@ export const Sidebar = ({
 
                 let selectedRoadmaps;
                 if (propertyName === 'roadmap') {
-                    selectedRoadmaps = roadmaps?.message.filter(roadmap => selectedRoadmapNames.includes(roadmap.name));
+                    selectedRoadmaps = roadmaps?.filter(roadmap => selectedRoadmapNames.includes(roadmap.name));
                 } else {
                     selectedRoadmaps = (sidebarData as Task).roadmaps
                 }
 
-                const selectedAssignee = propertyName === 'assignee' ? assignees?.message.find(assignee => assignee.name === editedValue) : (sidebarData as Task).assignee;
+                const selectedAssignee = propertyName === 'assignee' ? assignees?.find(assignee => assignee.name === editedValue) : (sidebarData as Task).assignee;
 
                 updatedItem = {
                     ...(sidebarData as Task),
@@ -105,7 +109,7 @@ export const Sidebar = ({
                
                 console.log("updated item in sidebar",updatedItem)
                 break;
-            case 'Milestone':
+            case findIdForUnitType('Milestone', unitTypes):
                 updatedItem = {
                     ...(sidebarData as Milestone),
                     [propertyName]: propertyName === 'date' ? new Date(editedValue) : editedValue,
@@ -119,13 +123,13 @@ export const Sidebar = ({
                 */
                 console.log("edited ", (updatedItem as Milestone).taskStatus)
                 break;
-            case 'Tag':
+            case findIdForUnitType('Tag', unitTypes):
                 updatedItem = {
                     ...(sidebarData as Tag),
                     [propertyName]: editedValue
                 };
                 break;
-            case 'Assignee':
+            case findIdForUnitType('Assignee', unitTypes):
                 updatedItem = {
                     ...(sidebarData as Assignee),
                     [propertyName]: editedValue
@@ -254,7 +258,10 @@ export const Sidebar = ({
 
 
     if (sidebarData === null) {
-        return <div>No details to display</div>
+        return <div>Select an item to see details</div>
+    }
+    else {
+        console.log("sidebar data is not null- continue")
     }
 
     hideContent = false;
@@ -265,7 +272,7 @@ export const Sidebar = ({
         // Special handling for assignee dropdown
         if (id === 'assignee') {
             const assigneeName = value;
-            const selectedAssignee = assignees?.message.find(assignee => assignee.name === assigneeName);
+            const selectedAssignee = assignees?.find(assignee => assignee.name === assigneeName);
 
             if (selectedAssignee) {
                 setData(prevData => ({
@@ -279,7 +286,7 @@ export const Sidebar = ({
             const selectElement = event.target as HTMLSelectElement;
             const selectedOptions = Array.from(selectElement.selectedOptions).map(option => option.value);
 
-            const selectedRoadmapObjects = roadmaps?.message.filter(roadmap => selectedOptions.includes(roadmap.name));
+            const selectedRoadmapObjects = roadmaps?.filter(roadmap => selectedOptions.includes(roadmap.name));
 
             if (selectedRoadmapObjects) {
                 setData(prevData => ({
@@ -297,127 +304,140 @@ export const Sidebar = ({
         }
     };
 
-    
+    console.log("sidebardata", sidebarData )
+    if (data === null) {
+        return <div>Select an item to see details</div>
+
+    }
 
     switch (sidebarData.type) {
-        case "Task":
+        case findIdForUnitType('Task', unitTypes):
             const taskData = data as Task;
             console.log("taskDAta", taskData)
             console.log("data", data)
 
             sidebarContent = (
-                <div>
-                    <div className='font-bold text-center'>TASK DETAILS</div>
+                <div className='p-4'>
+                    <div className='font-bold'>TASK DETAILS</div>
                     <br />
 
-                    <label htmlFor="name">Name:</label>
+                    <div>Name</div>
                     <input
                         id="name"
                         type='text'
                         value={data?.name || ''}
                         onChange={handleInputChange}
-
                         onBlur={handleInputBlur}
+                        className='border border-black rounded-lg w-full'
                     />
-                    <hr />
 
 
-                    <label htmlFor="description">Description:</label>
+                    <div>Description</div>
                     <textarea
                         id="description"
                         value={data?.description || ''}
                         onChange={handleInputChange}
-
                         onBlur={handleInputBlur}
-                    />
-                    <hr />
+                        className='border border-black rounded-lg w-full'
 
-                    <label htmlFor="roadmap">Roadmap:</label>
+                    />
+                    
+
+                    <div>Roadmap</div>
                     <select
                         multiple
                         id="roadmap"
                         value={taskData?.roadmaps?.map(roadmap => roadmap.name)}
                         onChange={handleInputChange}
                         onBlur={handleInputBlur}
+                        className='border border-black rounded-lg w-full'
                     >
-                        {roadmaps?.message.map((option, index) => (
+                        {roadmaps?.map((option, index) => (
                             <option key={index} value={option.name}>
                                 {option.name}
                             </option>
                         ))}
                     </select>
 
-                    <hr />
                     
-                    <label htmlFor="assignees">Assignee:</label>
+                    
+                    <div>Assignee</div>
                     <select
                         id="assignee"
                         value={taskData?.assignee?.name || ''}
                         onChange={handleInputChange}
                         onBlur={handleInputBlur}
-
+                        className='border border-black rounded-lg w-full'
                     >
-                        {assignees?.message.map((option, index) => (
+                        {assignees?.map((option, index) => (
                             <option key={index} value={option.name}>
                                 {option.name} 
                             </option>
                         ))}
                     </select>
-                    <hr />
+                    
 
 
-                    <label htmlFor="start date">Start Date: </label>
+                    <div>Start Date: </div>
                     <input
                         id="startDate"
                         type="date"
                         value={formatDateNumericalYYYYMMDDWithDashes(new Date(taskData?.startDate))}
                         onChange={handleInputChange}
                         onBlur={handleInputBlur}
+                        className='border border-black rounded-lg'
+
                     />
-                    <hr />
+                    
 
 
-                    <label htmlFor="end date">End Date: </label>
+                    <div>End Date: </div>
                     <input
                         id="endDate"
                         type="date"
                         value={formatDateNumericalYYYYMMDDWithDashes(new Date(taskData?.endDate))}
                         onChange={handleInputChange}
                         onBlur={handleInputBlur}
+                        className='border border-black rounded-lg'
                     />
-                    <hr />
+                    
 
-                    <p>Duration: {taskData?.duration === 1 ? taskData?.duration + " day" : taskData?.duration + " days"} </p>
-                    <hr />
+                    <div>Duration:</div>
+                    
+                    <p> {taskData?.duration === 1 ? taskData?.duration + " day" : taskData?.duration + " days"} </p>
+                    
 
-                    <label htmlFor="taskStatus">Task Status:</label>
-                    <select
+                    <div>Task Status</div>
+                   <select
                         id="taskStatus"
                         value={taskData?.taskStatus?.name}
                         onChange={handleInputChange}
                         onBlur={handleInputBlur}
+                        className='border border-black rounded-lg w-full'
+
                     >
-                        {taskStatuses?.message.map((option, index) => (
+                        {taskStatuses?.map((option, index) => (
                             <option key={index} value={option.name}>
                                 {option.name}
                             </option>
                         ))}
                     </select>
 
-                    <hr />
+                    
 
-                    <p>ID: {data?.id} </p>
-                    <hr />
+                    <div>ID</div>
+                    <p>{data?.id} </p>
+                    
 
                 </div>
             );
             break;
 
-        case "Milestone":
+        case findIdForUnitType('Milestone', unitTypes):
 
             const milestoneData = data as Milestone;
             sidebarContent = (
-                <div>
+                <div className='p-4'>
                     <div className='font-bold text-center'>MILESTONE DETAILS</div>
                     <br />
                     <label htmlFor="name">Name:</label>
@@ -429,7 +449,7 @@ export const Sidebar = ({
 
                         onBlur={handleInputBlur}
                     />
-                    <hr />
+                    
 
                     <label htmlFor="description">Description:</label>
                     <textarea
@@ -439,7 +459,7 @@ export const Sidebar = ({
 
                         onBlur={handleInputBlur}
                     />
-                    <hr />
+                    
 
                     <label htmlFor="date">Date: </label>
                     <input
@@ -449,16 +469,18 @@ export const Sidebar = ({
                         onChange={handleInputChange}
                         onBlur={handleInputBlur}
                     />
-                    <hr />
+                    
 
-                    <label htmlFor="taskStatus">Task Status:</label>
+                    <div>Task Status:</div>
                     <select
                         id="taskStatus"
                         value={milestoneData?.taskStatus.name}
                         onChange={handleInputChange}
                         onBlur={handleInputBlur}
+                        className='border border-black rounded-lg w-full'
+
                     >
-                        {taskStatuses?.message.map((option, index) => (
+                        {taskStatuses?.map((option, index) => (
                             <option key={index} value={option.name}>
                                 {option.name}
                             </option>
@@ -467,15 +489,15 @@ export const Sidebar = ({
 
                         <hr/>
                           <p>ID: {data?.id} </p>
-                        <hr />
+                        
                 </div>
             );
 
             break;
-        case "Tag":
+        case findIdForUnitType('Tag', unitTypes):
             //const tagData = sidebarData as Tag; 
             sidebarContent = (
-                <div>
+                <div className='p-4'>
                     <div className='font-bold text-center'>TAG DETAILS</div>
                     <br />
                     <label htmlFor="name">Name:</label>
@@ -487,7 +509,7 @@ export const Sidebar = ({
 
                         onBlur={handleInputBlur}
                     />
-                    <hr />
+                    
 
                     <label htmlFor="description">Description:</label>
                     <textarea
@@ -497,16 +519,16 @@ export const Sidebar = ({
 
                         onBlur={handleInputBlur}
                     />
-                    <hr />
+                    
 
                 </div>
             );
 
             break;
-        case "Assignee":
+        case findIdForUnitType('Assignee', unitTypes):
             //const assigneeData = sidebarData as Assignee;
            sidebarContent = (
-               <div>
+               <div className='p-4'>
                    <div className='font-bold text-center'>TASK DETAILS</div>
                    <br />
                    <label htmlFor="name">Name:</label>
@@ -518,7 +540,7 @@ export const Sidebar = ({
 
                        onBlur={handleInputBlur}
                    />
-                   <hr />
+                   
 
                    <label htmlFor="description">Description:</label>
                    <textarea
@@ -528,7 +550,7 @@ export const Sidebar = ({
 
                        onBlur={handleInputBlur}
                    />
-                   <hr />
+                   
 
                </div>
             );

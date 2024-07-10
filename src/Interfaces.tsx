@@ -3,8 +3,13 @@ export type UnitData = Task | Milestone | Tag | Assignee | null;
 interface Unit {
     name: string;
     description: string;
-    type: string;
+    type: number;
     id: number;
+}
+
+export interface UnitType {
+    id: number;
+    name: string;
 }
 
 export interface Milestone extends Unit { //MIGHT NEED TO CHANGE THESE TO DISCRIMINANT UNIONS
@@ -84,4 +89,8 @@ export function addDaysToDate(date: Date, daysToAdd: number): Date {
     newDate.setDate(currentDay + daysToAdd);
 
     return newDate;
+}
+
+export function findIdForUnitType(type: string, unitTypes: UnitType[]) {
+    return unitTypes.find(item => item.name === type)?.id
 }
