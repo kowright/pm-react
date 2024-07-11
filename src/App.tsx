@@ -10,7 +10,7 @@ import { NavBar } from './NavBar/NavBar';
 import { FilterButton } from './FilterButton';
 import { ListView } from './ListView';
 function App() {
-    const [view, setView] = useState<string>('List'); 
+    const [view, setView] = React.useState<string>('List'); 
     const [selectedItem, setSelectedItem] = useState<Task | Milestone | Tag | Assignee | null>(null); 
 
     React.useEffect(() => {
@@ -214,7 +214,7 @@ function App() {
 
     return (
         <div className="flex h-full w-full bg-alabaster gap-16">
-            <NavBar handleNavItemClick={handleClick} />
+            <NavBar handleNavItemClick={handleClick} view={view} />
 
 
             <div className='w-[300px] bg-red-300 flex-1 h-full flex flex-col bg-black'>

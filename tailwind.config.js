@@ -7,7 +7,7 @@ module.exports = {
       extend: {
           colors: {
               'alabaster': '#E0DFD5',
-              "ash-gray": "#C5C3B2",
+              "ash_gray": "#C5C3B2",
               'sage': '#C5C3B2',
               'yinmn_blue': '#355070',
               'cerulean': '#82A7BC',
