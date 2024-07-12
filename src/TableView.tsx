@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Task, TaskStatus, Roadmap, Milestone, Assignee, Tag, formatDateNumericalMMDDYYYY, findIdForUnitType, UnitType } from './Interfaces';
+import { Task, TaskStatus, Roadmap, Milestone, Assignee, Tag, formatDateNumericalMMDDYYYY, findIdForUnitType, UnitType, colorSets } from './Interfaces';
 import { FilterButton } from './FilterButton'
 
 interface TableViewProps {
@@ -20,7 +20,6 @@ export const TableView = ({
 
     const [tableDataType, setTableDataType] = React.useState("Task");
 
-    //let fetchURL = "/api/" + tableDataType + "/";
     let content: any = <div>hi</div>;
 
     const handleClick = (item: Task | Milestone | Tag | Assignee ) => {
@@ -30,11 +29,12 @@ export const TableView = ({
 
     let tableFormat: any;
     const formatHeaderLabel = (header: string): string => {
-        // Example: Capitalize first letter and replace underscores with spaces
+        //  Capitalize first letter and replace underscores with spaces
         return header.charAt(0).toUpperCase() + header.slice(1).replace(/_/g, ' ');
     };
     let headers: string[];
 
+    const color = colorSets['blue']
     switch (tableDataType) {
         case "Task":
 
@@ -68,10 +68,10 @@ export const TableView = ({
                     <th key={index} className="border border-gray-300 px-4 py-2">{formatHeaderLabel(header)}</th>
                 ));
             
-            content = 
-            filteredTasks.map((item, index) => (
-                <tr key={index} onClick={() => handleClick(item)} className={`cursor-pointer hover:bg-lime-500
-                ${props.selectedItem?.type === findIdForUnitType('Task', props.unitTypeData) && props.selectedItem?.id === item.id ? 'bg-lime-800' : ''}`}>
+            content =
+                filteredTasks.map((item, index) => (
+                    <tr key={index} onClick={() => handleClick(item)} className={`cursor-pointer ${color.hover}
+                ${props.selectedItem?.type === findIdForUnitType('Task', props.unitTypeData) && props.selectedItem?.id === item.id ? color.default : 'bg-white text-smoky-black'}`}>
                     <td className="border border-gray-300 px-4 py-2">{item.name}</td>
                     <td className="border border-gray-300 px-4 py-2">{item.description}</td>
                     <td className="border border-gray-300 px-4 py-2">{item.roadmaps.map((map, index) => (
@@ -268,7 +268,7 @@ export const TableView = ({
             <br />
 
             <table className="min-w-full text-white border-collapse border border-gray-200">
-                <thead className="bg-gray-600">
+                <thead className={`${color.selected}`}>
                     <tr>
                         {tableFormat}
                     </tr>
