@@ -12,6 +12,8 @@ interface TableViewProps {
     rowClick: (task: Task | Milestone | Tag | Assignee) => void;
     selectedItem: Task | Milestone | Tag | Assignee | null;
     unitTypeData: UnitType[];
+    roadmapFilterState: string[];
+    taskStatusFilterState: string[];
 }
 
 export const TableView = ({
@@ -49,14 +51,17 @@ export const TableView = ({
                 console.log("task " + props.roadmap.name)
             }
 
-            let filteredTasks = props.taskStatus
-                ? props.taskData.filter(task => task.taskStatus.name === props.taskStatus!.name)
+           let filteredTasks = props.taskStatusFilterState && props.taskStatusFilterState.length > 0
+                ? props.taskData.filter(task => props.taskStatusFilterState.includes(task.taskStatus.name))
                 : props.taskData;
 
-            filteredTasks = props.roadmap
+
+            filteredTasks = props.roadmapFilterState
                 ? filteredTasks.filter(task => {
-                    const roadmaps = task.roadmaps.map(map => map.name);
-                    return roadmaps.includes(props.roadmap!.name);
+                    const taskRoadmapNames = task.roadmaps.map(map => map.name);
+                    return props.roadmapFilterState.every(name => taskRoadmapNames.includes(name)); //AND
+                    // return props.roadmapFilterState.some(name => taskRoadmapNames.includes(name)); //OR
+
                 })
                 : filteredTasks;
             console.log("task data ", props.taskData);

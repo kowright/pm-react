@@ -101,7 +101,7 @@ export const ListView = ({
                 {listDataType === 'Milestone' &&
                     filteredMilestones.map((item, index) => (
                         <button className={`w-full h-[40px] rounded-xl flex items-center p-4 ${color.focusRing} ${color.hover} focus:ring-offset-alabaster
-                        ${props.selectedItem?.type === findIdForUnitType('Task', props.unitTypeData) && props.selectedItem?.id === item.id ?
+                        ${props.selectedItem?.type === findIdForUnitType('Milestone', props.unitTypeData) && props.selectedItem?.id === item.id ?
                                 color.default : 'bg-white text-smoky-black'} `}
                             onClick={() => handleClick(item)}>
                             <div className='w-auto'>{item.name}</div>
