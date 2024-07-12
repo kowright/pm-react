@@ -280,10 +280,10 @@ function App() {
                             <FilterButton text="Add" onClick={() => console.log("hi")} />
                         </div>
                     </div>
-                    <div className='flex-1 max-w-full overflow-x-auto'>
+                    <div className='flex-1 max-w-full overflow-x-auto relative'>
 
                         
-                        {view === 'Timeline' && <TimelineView taskClick={handleTaskClick} roadmap={selectedRoadmap} taskStatus={selectedTaskStatus} taskData={tasks} milestoneData={milestones} updateItem={updateItem} unitTypeData={unitTypes} />}
+                        {view === 'Timeline' && <TimelineView taskClick={handleTaskClick} roadmap={selectedRoadmap} taskStatus={selectedTaskStatus} taskData={tasks} milestoneData={milestones} updateItem={updateItem} unitTypeData={unitTypes} taskStatusFilterState={taskStatusFilterState} roadmapFilterState={roadmapFilterState} />}
                         {view === 'Table' && <TableView rowClick={handleTaskClick} taskData={tasks} milestoneData={milestones} tagData={tags} assigneeData={assignees} roadmap={selectedRoadmap} taskStatus={selectedTaskStatus} selectedItem={selectedItem} unitTypeData={unitTypes} taskStatusFilterState={taskStatusFilterState} roadmapFilterState={roadmapFilterState} />}
                         {view === 'Kanban' && <KanbanView rowClick={handleTaskClick} taskData={tasks} roadmap={selectedRoadmap} taskStatus={selectedTaskStatus} selectedItem={selectedItem} taskStatusFilterState={taskStatusFilterState} roadmapFilterState={roadmapFilterState} />}
                         {view === 'List' && <ListView rowClick={handleTaskClick} taskData={tasks} milestoneData={milestones} tagData={tags} assigneeData={assignees} roadmap={selectedRoadmap} taskStatus={selectedTaskStatus} selectedItem={selectedItem} unitTypeData={unitTypes} roadmapFilterState={roadmapFilterState} taskStatusFilterState={taskStatusFilterState} />}

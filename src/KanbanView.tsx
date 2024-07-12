@@ -95,7 +95,7 @@ interface KanbanViewProps {
          )));
 
     return (
-        <div className='mx-8'>
+        <div className=''>
             <br/>
             <div className='flex gap-4'>
                 <div className='flex gap-4'>

@@ -10,7 +10,8 @@ export interface TimelineViewProps {
     milestoneData: Milestone[];
     updateItem: (task: Task | Milestone | Tag | Assignee) => void;
     unitTypeData: UnitType[];
-
+    roadmapFilterState: string[];
+    taskStatusFilterState: string[];
 }
 
 export const TimelineView = ({
@@ -20,9 +21,7 @@ export const TimelineView = ({
     return (
         <div>
             <br />
-            <p className='flex justify-center text-3xl text-white'>TIMELINE VIEW</p>
-            <br />
-            <Timeline taskClick={props.taskClick} roadmap={props.roadmap} taskStatus={props.taskStatus} taskData={props.taskData} milestoneData={props.milestoneData} updateItem={props.updateItem} unitTypeData={props.unitTypeData } />
+            <Timeline taskClick={props.taskClick} roadmap={props.roadmap} taskStatus={props.taskStatus} taskData={props.taskData} milestoneData={props.milestoneData} updateItem={props.updateItem} unitTypeData={props.unitTypeData} taskStatusFilterState={props.taskStatusFilterState} roadmapFilterState={props.roadmapFilterState} />
         </div>
     );
 };
