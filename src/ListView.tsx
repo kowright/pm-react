@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Task, TaskStatus, Roadmap, Milestone, Assignee, Tag, formatDateNumericalMMDDYYYY,findIdForUnitType, UnitType } from './Interfaces';
+import { Task, TaskStatus, Roadmap, Milestone, Assignee, Tag, formatDateNumericalMMDDYYYY,findIdForUnitType, UnitType, colorSets } from './Interfaces';
 import { FilterButton } from './FilterButton'
 
 interface ListViewProps {
@@ -59,11 +59,12 @@ export const ListView = ({
 
             })
             : filteredMilestones;
-
     }
 
+    const color = colorSets['blue'];
+
     return (
-        <div className='mx-8'>
+        <div className=''>
             <br />
             <div className='flex gap-4 justify-center'>
                 <FilterButton text='Task' onClick={() => setListDataType("Task")} active={listDataType === 'Task'} showX={false} />
@@ -76,7 +77,10 @@ export const ListView = ({
 
                 {listDataType === 'Task' &&
                     filteredTasks.map((item, index) => (
-                        <button className='w-full h-[40px] bg-green-300 rounded-xl flex items-center p-4' onClick={() => handleClick(item)}>
+                        <button className={`w-full h-[40px] rounded-xl flex items-center p-4 ${color.focusRing} ${color.hover} focus:ring-offset-alabaster
+                        ${props.selectedItem?.type === findIdForUnitType('Task', props.unitTypeData) && props.selectedItem?.id === item.id ? 
+                            color.default : 'bg-white text-smoky-black'} `}
+                            onClick={() => handleClick(item)}>
                             <div className='w-auto'>{item.name}</div>
                             <div className='flex-1'>{item.description}</div>
                             <div className='w-auto flex justify-end gap-x-2'>
@@ -96,7 +100,10 @@ export const ListView = ({
 
                 {listDataType === 'Milestone' &&
                     filteredMilestones.map((item, index) => (
-                        <button className='w-full h-[50px] bg-green-300 rounded-xl flex items-center p-4' onClick={() => handleClick(item)}>
+                        <button className={`w-full h-[40px] rounded-xl flex items-center p-4 ${color.focusRing} ${color.hover} focus:ring-offset-alabaster
+                        ${props.selectedItem?.type === findIdForUnitType('Task', props.unitTypeData) && props.selectedItem?.id === item.id ?
+                                color.default : 'bg-white text-smoky-black'} `}
+                            onClick={() => handleClick(item)}>
                             <div className='w-auto'>{item.name}</div>
                             <div className='flex-1'>{item.description}</div>
                             <div className='w-auto flex justify-end gap-x-2'>
@@ -113,10 +120,6 @@ export const ListView = ({
                         </button>
                     ))
                 }
-
-
-
-
             </div>
         </div>
     );

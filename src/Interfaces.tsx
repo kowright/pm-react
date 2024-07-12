@@ -81,7 +81,6 @@ export const formatDateNumericalYYYYMMDDWithDashes = (date: Date): string => {
 };
 
 export function addDaysToDate(date: Date, daysToAdd: number): Date {
-    // Create a new Date object to avoid mutating the original date
     const newDate = new Date(date);
 
     const currentDay = newDate.getDate();
@@ -103,10 +102,16 @@ export interface ColorSet {
 }
 
 export const colorSets: Record<string, ColorSet> = {
-    blue: {
+    blueLite: {
         default: 'bg-cerulean text-white',
         hover: 'hover:bg-yinmn-blue text-white',
         focusRing: 'focus:ring-offset-4 focus:ring-cerulean focus:ring text-white',
+        selected: 'bg-oxford-blue text-white',
+    },
+    blue: {
+        default: 'bg-yinmn-blue text-white',
+        hover: 'hover:bg-cerulean text-white',
+        focusRing: 'focus:ring-offset-4 focus:ring-yinmn-blue focus:ring text-white',
         selected: 'bg-oxford-blue text-white',
     },
     green: {

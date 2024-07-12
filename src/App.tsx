@@ -265,7 +265,7 @@ function App() {
                 <div className=" h-[50px] shrink-0"></div>
 
 
-                <div className='bg-white h-full flex flex-col'>
+                <div className='h-full flex flex-col'>
                     <div className='h-auto flex'>
                         <div className='flex-1 h-full flex-wrap'>
                             <FilterArea selectedRoadmap={selectedRoadmap} selectedTaskStatus={selectedTaskStatus}
