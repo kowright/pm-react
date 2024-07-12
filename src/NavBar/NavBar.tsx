@@ -22,7 +22,8 @@ export const NavBar = ({
 
     const NavItem = (view: string, white_svg: any, black_svg: any) => {
         return (
-        <button className={`h-[50px] flex p-2 rounded-xl hover:bg-cerulean focus:ring-offset-4 focus:ring-yinmn_blue focus:ring ${props.view === view ? 'bg-yinmn_blue text-white' : ''} `} onClick={() => props.handleNavItemClick(view)}>
+            <button className={`h-[50px] flex p-2 rounded-xl hover:bg-cerulean focus:ring-offset-4 focus:ring-yinmn-blue focus:ring
+        ${props.view === view ? 'bg-yinmn-blue text-white' : ''} `} onClick={() => props.handleNavItemClick(view)}>
             <div className='w-[34px] h-full flex justify-center items-center'>
                 {props.view === view ? <img src={white_svg} alt={`${view} Icon`} /> : <img src={black_svg} alt={`${view} Icon`} />}
             </div>

@@ -1,6 +1,6 @@
 export type UnitData = Task | Milestone | Tag | Assignee | null;
 
-interface Unit {
+export interface Unit {
     name: string;
     description: string;
     type: number;
@@ -94,3 +94,25 @@ export function addDaysToDate(date: Date, daysToAdd: number): Date {
 export function findIdForUnitType(type: string, unitTypes: UnitType[]) {
     return unitTypes.find(item => item.name === type)?.id
 }
+
+export interface ColorSet {
+    default: string;
+    hover: string;
+    focusRing: string;
+    selected: string;
+}
+
+export const colorSets: Record<string, ColorSet> = {
+    blue: {
+        default: 'bg-cerulean text-white',
+        hover: 'hover:bg-yinmn-blue text-white',
+        focusRing: 'focus:ring-offset-4 focus:ring-cerulean focus:ring text-white',
+        selected: 'bg-oxford-blue text-white',
+    },
+    green: {
+        default: 'bg-ash-gray text-white',
+        hover: 'hover:bg-sage text-white',
+        focusRing: 'focus:ring-offset-4 focus:ring-bg-dark-moss-green focus:ring text-white',
+        selected: 'bg-dark-moss-green text-white',
+    },
+};

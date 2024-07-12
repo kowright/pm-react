@@ -15,15 +15,10 @@ interface TableViewProps {
 }
 
 export const TableView = ({
-
     ...props
 }: TableViewProps) => {
-    //const [taskData, setTaskData] = useState<{ message: Task[] } | null>(null);
-    //const [milestoneData1, setMilestoneData] = useState<{ message: Milestone[] } | null>(null);
-   // const [tagData, setTagData] = useState<{ message: Tag[] } | null>(null);
-    //const [assigneeData, setAssigneeData] = useState<{ message: Assignee[] } | null>(null);
 
-    const [tableDataType, setTableDataType] = React.useState("Task") //replace with something created in Interface
+    const [tableDataType, setTableDataType] = React.useState("Task");
 
     //let fetchURL = "/api/" + tableDataType + "/";
     let content: any = <div>hi</div>;
@@ -32,63 +27,7 @@ export const TableView = ({
         console.log("Inside Timeline component - before invoking taskClick function " + item.name);
         props.rowClick(item); // Invoke the function with some example task data
     };
-/*
-    useEffect(() => {
-        switch (tableDataType) {
-           *//* case "tasks":
-                fetch(fetchURL)
-                    .then((res) => res.json())
-                    .then((data) => setTaskData(data));
-                break;*//*
-            case "milestones":
-                fetch(fetchURL)
-                    .then((res) => res.json())
-                    .then((data) => setMilestoneData(data));
-                console.log("milestones");
-                break;
-            case "tags":
-                fetch(fetchURL)
-                    .then((res) => res.json())
-                    .then((data) => setTagData(data));
-                console.log("tags");
-                break;
-            case "assignees":
-                fetch(fetchURL)
-                    .then((res) => res.json())
-                    .then((data) => setAssigneeData(data));
-                console.log("assignees")
-                break;
-            default:
-                break;
-        }
-    }, [fetchURL, tableDataType]);
-*/
 
-/*    switch (tableDataType) {
-        case "tasks":
-            if (!taskData) {
-                return <p>Loading...!</p>; // Render loading until data is fetched   
-            }
-            break;
-        case "milestones":
-            if (!milestoneData) {
-                return <p>Loading...!</p>; // Render loading until data is fetched   
-            }
-            break;
-        case "tags":
-            if (!tagData) {
-                return <p>Loading...!</p>; // Render loading until data is fetched   
-            }
-            break;
-        case "assignees":
-            if (!assigneeData) {
-                return <p>Loading...!</p>; // Render loading until data is fetched   
-            }
-            break;
-        default:
-            break;
-    }
-*/
     let tableFormat: any;
     const formatHeaderLabel = (header: string): string => {
         // Example: Capitalize first letter and replace underscores with spaces
@@ -172,6 +111,13 @@ export const TableView = ({
             let filteredMilestones = props.taskStatus
                 ? props.milestoneData.filter(milestone => milestone.taskStatus.name === props.taskStatus!.name)
                 : props.milestoneData;
+
+            filteredMilestones = props.roadmap
+                ? filteredMilestones.filter(ms => {
+                    const roadmaps = ms.roadmaps.map(map => map.name);
+                    return roadmaps.includes(props.roadmap!.name);
+                })
+                : filteredMilestones;
      
             content =
                 filteredMilestones.map((item, index) => (

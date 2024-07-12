@@ -18,6 +18,8 @@ function App() {
         fetchMilestones();
         fetchTags();
         fetchAssignees();
+        fetchUnitTypes();
+        fetchRoadmaps();
     }, []);
 
     // #region Fetch Units
@@ -26,6 +28,7 @@ function App() {
     const [tags, setTags] = useState<Tag[]>([]); // State to hold milestones
     const [assignees, setAssignees] = useState<Assignee[]>([]); // State to hold milestones
     const [unitTypes, setUnitTypes] = React.useState<UnitType[]>([]);
+    const [roadmaps, setRoadmaps] = React.useState<Roadmap[]>([]);
 
 
     const fetchTasks = () => {
@@ -40,9 +43,18 @@ function App() {
             .then((res) => res.json())
             .then((data) => {
                 console.log("data", data)
-                setMilestones(data)
-    })
+                setMilestones(data) })
             .catch((error) => console.error('Error fetching milestones:', error));
+    };
+
+    const fetchRoadmaps = () => {
+        fetch("/api/roadmaps")
+            .then((res) => res.json())
+            .then((data) => {
+                setRoadmaps(data);
+                //console.log("roadmapss ", (data as Roadmap[])?.map(map => map.name))
+            })
+            .catch((error) => console.error('Error fetching data:', error));
     };
 
     const fetchTags = () => {
@@ -70,12 +82,43 @@ function App() {
     // #region Filter Area Necessities
     const [selectedRoadmap, setSelectedRoadmap] = useState<Roadmap | null>(null); //keep
     const [selectedTaskStatus, setSelectedTaskStatus] = useState<TaskStatus | null>(null); //keep
-    const handleFilterByRoadmap = (roadmap: Roadmap | null) => { //keep
-        setSelectedRoadmap(roadmap);
+    const [roadmapFilterState, setRoadmapFilterState] = React.useState<string[]>([]);
+    const [taskStatusFilterState, setTaskStatusFilterState] = React.useState<string[]>([]);
+
+    const handleFilterByRoadmap = (roadmap: Roadmap) => { //keep
+        
+        //setSelectedRoadmap(roadmap);
+        if (roadmap === null) {
+            return;
+        }
+
+        if (roadmapFilterState.includes(roadmap?.name)) {
+            console.log("take out " + roadmap?.name)
+            setRoadmapFilterState(prev => prev.filter(map => map !== roadmap?.name));
+        }
+        else {
+            console.log("add " + roadmap?.name)
+            setRoadmapFilterState(prev => [...prev, roadmap?.name]);
+        }
+
+
     };
-    const handleFilterByTaskStatus = (status: TaskStatus | null) => { //keep
-        console.log("task status is " + status)
-        setSelectedTaskStatus(status);
+
+    const handleFilterByTaskStatus = (status: TaskStatus) => { //keep
+        // setSelectedTaskStatus(status);
+        console.log("clicked " + status.name)
+        if (taskStatusFilterState.includes(status.name)) {
+            console.log("take out " + status.name)
+
+            setTaskStatusFilterState(prev => prev.filter(stat => stat !== status.name));
+        }
+        else {
+            console.log("add " + status.name)
+
+            setTaskStatusFilterState(prev => [...prev, status.name]);
+        }
+
+
     };
 
     const handleClick = (viewName: string) => {
@@ -217,31 +260,33 @@ function App() {
             <NavBar handleNavItemClick={handleClick} view={view} />
 
 
-            <div className='w-[300px] bg-red-300 flex-1 h-full flex flex-col bg-black'>
+            <div className='w-[300px] flex-1 h-full flex flex-col'>
 
                 <div className=" h-[50px] shrink-0"></div>
 
 
                 <div className='bg-white h-full flex flex-col'>
-                    <div className='bg-red-500 h-auto flex'>
-                        <div className='bg-pink-700 flex-1 h-full flex-wrap'>
-                            <FilterArea selectedRoadmap={selectedRoadmap} selectedTaskStatus={selectedTaskStatus} handleFilterByTaskStatus={handleFilterByTaskStatus} handleFilterByRoadmap={handleFilterByRoadmap} />
+                    <div className='h-auto flex'>
+                        <div className='flex-1 h-full flex-wrap'>
+                            <FilterArea selectedRoadmap={selectedRoadmap} selectedTaskStatus={selectedTaskStatus}
+                                handleFilterByTaskStatus={handleFilterByTaskStatus} handleFilterByRoadmap={handleFilterByRoadmap}
+                                roadmapFilterState={roadmapFilterState} taskStatusFilterState={taskStatusFilterState} />
 
                         </div>
 
 
 
-                        <div className='bg-pink-200 w-[100px] flex justify-end items-start'>
+                        <div className='w-[100px] flex justify-end items-start'>
                             <FilterButton text="Add" onClick={() => console.log("hi")} />
                         </div>
                     </div>
-                    <div className='bg-orange-500 flex-1 max-w-full overflow-x-auto'>
+                    <div className='flex-1 max-w-full overflow-x-auto'>
 
                         
                         {view === 'Timeline' && <TimelineView taskClick={handleTaskClick} roadmap={selectedRoadmap} taskStatus={selectedTaskStatus} taskData={tasks} milestoneData={milestones} updateItem={updateItem} unitTypeData={unitTypes} />}
                         {view === 'Table' && <TableView rowClick={handleTaskClick} taskData={tasks} milestoneData={milestones} tagData={tags} assigneeData={assignees} roadmap={selectedRoadmap} taskStatus={selectedTaskStatus} selectedItem={selectedItem} unitTypeData={unitTypes} />}
                             {view === 'Kanban' && <KanbanView rowClick={handleTaskClick} taskData={tasks} roadmap={selectedRoadmap} taskStatus={selectedTaskStatus} />}
-                        {view === 'List' && <ListView rowClick={handleTaskClick} taskData={tasks} milestoneData={milestones} tagData={tags} assigneeData={assignees} roadmap={selectedRoadmap} taskStatus={selectedTaskStatus} selectedItem={selectedItem} unitTypeData={unitTypes} />}
+                        {view === 'List' && <ListView rowClick={handleTaskClick} taskData={tasks} milestoneData={milestones} tagData={tags} assigneeData={assignees} roadmap={selectedRoadmap} taskStatus={selectedTaskStatus} selectedItem={selectedItem} unitTypeData={unitTypes} roadmapFilterState={roadmapFilterState} taskStatusFilterState={taskStatusFilterState} />}
 
                        
 
@@ -280,7 +325,7 @@ export default App;
 //put view/filter changing things in a component and do api call on parent to pass to children data and filters
 //make roadmaps and tags be held in database and populate into header component
 //put sidebar component in here
-
+//could reduce amount of props params by putting it in a variable first
 /* <div>
                         <Sidebar sidebarData={selectedItem} updateItem={updateItem} />
                     </div>

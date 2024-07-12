@@ -12,6 +12,8 @@ interface ListViewProps {
     rowClick: (task: Task | Milestone | Tag | Assignee) => void;
     selectedItem: Task | Milestone | Tag | Assignee | null;
     unitTypeData: UnitType[];
+    roadmapFilterState: string[];
+    taskStatusFilterState: string[];
 }
 
 export const ListView = ({
@@ -19,30 +21,61 @@ export const ListView = ({
     ...props
 }: ListViewProps) => {
 
-    const [tableDataType, setTableDataType] = React.useState("Task") //replace with something created in Interface
-
-    //let fetchURL = "/api/" + tableDataType + "/";
+    const [listDataType, setListDataType] = React.useState("Task");
 
     const handleClick = (item: Task | Milestone | Tag | Assignee) => {
         console.log("Inside List component - before invoking taskClick function " + item.name);
         props.rowClick(item);
     };
 
+    let filteredTasks: Task[] = [];
+    let filteredMilestones: Milestone[] = [];
+
+    if (listDataType === 'Task') {
+        filteredTasks = props.taskStatusFilterState && props.taskStatusFilterState.length > 0
+            ? props.taskData.filter(task => props.taskStatusFilterState.includes(task.taskStatus.name))
+            : props.taskData;
+
+
+        filteredTasks = props.roadmapFilterState
+            ? filteredTasks.filter(task => {
+                const taskRoadmapNames = task.roadmaps.map(map => map.name);
+                return props.roadmapFilterState.every(name => taskRoadmapNames.includes(name)); //AND
+               // return props.roadmapFilterState.some(name => taskRoadmapNames.includes(name)); //OR
+
+            })
+            : filteredTasks;
+    }
+    else {
+        filteredMilestones = props.taskStatusFilterState && props.taskStatusFilterState.length > 0
+            ? props.milestoneData.filter(task => props.taskStatusFilterState.includes(task.taskStatus.name))
+            : props.milestoneData;
+
+        filteredMilestones = props.roadmap
+            ? filteredMilestones.filter(ms => {
+                const milestoneRoadmapNames = ms.roadmaps.map(map => map.name);
+                return props.roadmapFilterState.every(name => milestoneRoadmapNames.includes(name)); //AND
+                // return props.roadmapFilterState.some(name => milestoneRoadmapNames.includes(name)); //OR
+
+            })
+            : filteredMilestones;
+
+    }
 
     return (
         <div className='mx-8'>
             <br />
             <div className='flex gap-4 justify-center'>
-                <FilterButton text='Task' onClick={() => setTableDataType("Task")} />
-                <FilterButton text='Milestone' onClick={() => setTableDataType("Milestone")} />
+                <FilterButton text='Task' onClick={() => setListDataType("Task")} active={listDataType === 'Task'} showX={false} />
+                <FilterButton text='Milestone' onClick={() => setListDataType("Milestone")} active={listDataType === 'Milestone'} showX={false} />
             </div>
 
             <br />
 
             <div className='flex flex-col gap-4'>
 
-                {tableDataType === 'Task' &&
-                    props.taskData.map((item, index) => (
+                {listDataType === 'Task' &&
+                    filteredTasks.map((item, index) => (
                         <button className='w-full h-[40px] bg-green-300 rounded-xl flex items-center p-4' onClick={() => handleClick(item)}>
                             <div className='w-auto'>{item.name}</div>
                             <div className='flex-1'>{item.description}</div>
@@ -61,8 +94,8 @@ export const ListView = ({
                     ))
                 }
 
-                {tableDataType === 'Milestone' &&
-                    props.milestoneData.map((item, index) => (
+                {listDataType === 'Milestone' &&
+                    filteredMilestones.map((item, index) => (
                         <button className='w-full h-[50px] bg-green-300 rounded-xl flex items-center p-4' onClick={() => handleClick(item)}>
                             <div className='w-auto'>{item.name}</div>
                             <div className='flex-1'>{item.description}</div>
