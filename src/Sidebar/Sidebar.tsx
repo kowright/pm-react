@@ -1,5 +1,9 @@
 import React from 'react';
-import { Milestone, Task, Tag, Assignee, TaskStatus, Roadmap, UnitType, findIdForUnitType, formatDateNumericalMMDDYYYY, formatDateNumericalYYYYMMDDWithDashes ,UnitData} from '../Interfaces';
+import {
+    Milestone, Task, Tag, Assignee, TaskStatus, Roadmap, UnitType, Unit,
+    findIdForUnitType, formatDateNumericalMMDDYYYY, formatDateNumericalYYYYMMDDWithDashes,
+    UnitData, toCamelCase
+} from '../Interfaces';
 
 interface SidebarProps {
     sidebarData: UnitData; //what can show in the sidebar; ADD EVERYTHING ELSE
@@ -21,17 +25,12 @@ export const Sidebar = ({
 
     sidebarContent = <div>nothing to show.</div>
 
-
-   /* const [name, setName] = React.useState<string>(sidebarData?.name || '');
-    const [description, setDescription] = React.useState(sidebarData?.description);
-    const [selectedRoadmaps, setSelectedRoadmaps] = React.useState<Roadmap[]>();*/
-
     const [data, setData] = React.useState< Task | Milestone | Tag | Assignee | null>(sidebarData)
 
     //const [task, setTask] = React.useState(sidebarData)
     const [assignees, setAssignees] = React.useState<Assignee[] | null>(null);
     const [roadmaps, setRoadmaps] = React.useState<Roadmap[] | null>(null);
-    const [taskStatuses, setTaskStatuses] = React.useState<TaskStatus[] | null>(null);
+    const [taskStatuses, setTaskStatuses] = React.useState<TaskStatus[]>([]);
     const [unitTypes, setUnitTypes] = React.useState<UnitType[]>([]);
 
 
@@ -144,116 +143,6 @@ export const Sidebar = ({
         // Assuming updateItem handles updating the state based on the item type
         props.updateItem(updatedItem);
 
-
-
-      /*  const editedValue = event.target.value;
-        const propertyName = event.target.id; // Assuming id is the property name to update
-        
-        if (sidebarData?.type === 'Task') {
-            let updatedItem = { ...sidebarData as Task };
-
-            if (propertyName === 'name') {
-                updatedItem.name = event.target.value
-            }
-            if (propertyName === 'description') {
-                updatedItem.description = event.target.value
-            }
-            //start date and end date for some reason gets set to the day before without this
-            if (propertyName === 'startDate') {
-                const originalDate = new Date(editedValue); // Parse editedValue into a Date object
-                const nextDay = new Date(originalDate); // Create a new Date object based on originalDate
-                nextDay.setDate(originalDate.getDate() + 1); // Set next day
-
-                updatedItem.startDate = nextDay;
-            }
-            if (propertyName === 'endDate') {
-                const originalDate = new Date(editedValue); // Parse editedValue into a Date object
-                const nextDay = new Date(originalDate); // Create a new Date object based on originalDate
-                nextDay.setDate(originalDate.getDate() + 1); // Set next day
-
-                updatedItem.endDate = nextDay;
-            }
-            if (propertyName === 'assignee') {
-                updatedItem.assignee.name = editedValue
-            }
-            if (propertyName === 'taskStatus') {
-                updatedItem.taskStatus.name = editedValue
-            }
-            if (propertyName === 'roadmap') {
-            *//*   const selectedOptions = Array.from(event.target.selectedOptions) as HTMLOptionElement[];
-                const selectedRoadmapNames = selectedOptions.map(option => option.value);
-                const selectedRoadmaps = roadmaps?.message.filter(roadmap => selectedRoadmapNames.includes(roadmap.name)) || [];
-
-                console.log("roadmaps ", selectedRoadmapNames)
-                updatedItem.roadmaps = selectedRoadmaps;
-                *//*
-            }
-
-            //props.updateItem(updatedItem)
-        }
-
-        if (sidebarData?.type === 'Milestone') {
-            console.log("milestone blur")
-            let updatedItem = { ...sidebarData as Milestone };
-
-            if (propertyName === 'name') {
-                updatedItem.name = event.target.value
-            }
-            if (propertyName === 'description') {
-                updatedItem.description = event.target.value
-            }
-            //start date and end date for some reason gets set to the day before without this
-            if (propertyName === 'date') {
-                const originalDate = new Date(editedValue); // Parse editedValue into a Date object
-                const nextDay = new Date(originalDate); // Create a new Date object based on originalDate
-                nextDay.setDate(originalDate.getDate() + 1); // Set next day
-
-                updatedItem.date = nextDay;
-            }
-
-            if (propertyName === 'taskStatus') {
-                updatedItem.taskStatus.name = editedValue
-            }
-
-
-            //props.updateMilestone(updatedItem as Milestone)
-            //props.updateItem(updatedItem as Milestone);
-        }
-
-        if (sidebarData?.type === 'Tag') {
-
-            let updatedItem = { ...sidebarData as Tag };
-
-            if (propertyName === 'name') {
-                updatedItem.name = event.target.value
-            }
-            if (propertyName === 'description') {
-                updatedItem.description = event.target.value
-            }
-
-
-            //props.updateTag(updatedItem as Tag)
-            //props.updateItem(updatedItem as Tag);
-        }
-
-        if (sidebarData?.type === 'Assignee') {
-
-            let updatedItem = { ...sidebarData as Assignee };
-
-            if (propertyName === 'name') {
-                updatedItem.name = event.target.value
-            }
-            if (propertyName === 'description') {
-                updatedItem.description = event.target.value
-            }
-
-            //props.updateAssignee(updatedItem as Assignee)
-            //props.updateItem(updatedItem as Assignee);
-        }
-
-
-        props.updateItem(updatedItem)*/
-
     };
 
 
@@ -304,35 +193,136 @@ export const Sidebar = ({
         }
     };
 
-    console.log("sidebardata", sidebarData )
     if (data === null) {
         return <div>Select an item to see details</div>
-
     }
 
+    const nameField = (value: string) => {
+        return (
+        <div className='text-smoky-black'>
+            <div className='text-xs pb-1'>Name</div>
+            <input
+                id="name"
+                type='text'
+                value={value || ''}
+                onChange={handleInputChange}
+                onBlur={handleInputBlur}
+                className='border border-black rounded-lg text-md pl-1 focus:ring-yinmn-blue focus:ring w-full' 
+            />
+            </div>
+        )
+    };
+
+    const descriptionField = (value: string) => {
+        return (
+            <div className='text-smoky-black'>
+                <div className='text-xs pb-1'>Description</div>
+                <textarea
+                    id="description"
+                    value={value}
+                    onChange={handleInputChange}
+                    onBlur={handleInputBlur}
+                    className='border border-black rounded-lg text-md pl-1 focus:ring-yinmn-blue focus:ring w-full' 
+                />
+            </div>
+        )
+    };
+
+    const roadmapField = (roadmapNames: string[]) => {
+        return (
+            <div className='text-smoky-black'>
+                <div className='text-xs pb-1'>Roadmap</div>
+                <select
+                    multiple
+                    id="roadmap"
+                    value={roadmapNames}
+                    onChange={handleInputChange}
+                    onBlur={handleInputBlur}
+                    className='border border-black rounded-lg text-md pl-1 focus:ring-yinmn-blue focus:ring w-full' 
+                >
+                    {roadmaps?.map((option, index) => (
+                        <option key={index} value={option.name}>
+                            {option.name}
+                        </option>
+                    ))}
+                </select>
+
+
+            </div>
+
+        )
+    };
+
+    const selectOptionsField = (title: string, array: Unit[]) => {
+        return (
+            <div className='text-smoky-black'>
+                <div className='text-xs pb-1'>{title}</div>
+                <select
+                    id="taskStatus"
+                    value={toCamelCase(title)}
+                    onChange={handleInputChange}
+                    onBlur={handleInputBlur}
+                    className='border border-black rounded-lg text-md pl-1 focus:ring-yinmn-blue focus:ring w-full'
+                >
+                    {array?.map((option, index) => (
+                        <option key={index} value={option.name}>
+                            {option.name}
+                        </option>
+                    ))}
+                </select>
+            </div>
+
+        )
+    };
+
+    const dateField = (date: Date, dateTitle: string) => {
+        return (
+            <div className='text-smoky-black'>
+                <div className='text-xs pb-1'>{dateTitle}</div>
+                <input
+                    id={toCamelCase(dateTitle)}
+                    type="date"
+                    value={formatDateNumericalYYYYMMDDWithDashes(date)}
+                    onChange={handleInputChange}
+                    onBlur={handleInputBlur}
+                    className='border border-black rounded-lg text-md pl-1 focus:ring-yinmn-blue focus:ring w-full'
+                />
+
+            </div>
+        )
+    };
+
+    const stringFieldDisplay = (title: string,  value: string) => {
+        return (
+            <div>
+                <div className='text-xs pb-1'>{title}</div>
+                <p>{value}</p>
+            </div>
+
+        )
+    }
     switch (sidebarData.type) {
         case findIdForUnitType('Task', unitTypes):
             const taskData = data as Task;
-            console.log("taskDAta", taskData)
-            console.log("data", data)
+            
 
             sidebarContent = (
-                <div className='p-4'>
-                    <div className='font-bold'>TASK DETAILS</div>
-                    <br />
+                <div className='p-4 flex flex-col gap-2'>
+                    <div className='font-bold text-xl'>TASK DETAILS</div>
+                  
 
-                    <div>Name</div>
+                   {/* <div>Name</div>
                     <input
                         id="name"
                         type='text'
                         value={data?.name || ''}
                         onChange={handleInputChange}
                         onBlur={handleInputBlur}
-                        className='border border-black rounded-lg w-full'
-                    />
+                        className='border border-black rounded-lg text-md pl-1 focus:ring-yinmn-blue focus:ring w-full' 
+                    />*/}
+                    {nameField(data?.name)}
 
-
-                    <div>Description</div>
+              {/*      <div>Description</div>
                     <textarea
                         id="description"
                         value={data?.description || ''}
@@ -340,10 +330,11 @@ export const Sidebar = ({
                         onBlur={handleInputBlur}
                         className='border border-black rounded-lg w-full'
 
-                    />
+                    />*/}
+                    {descriptionField(data?.description)}
                     
 
-                    <div>Roadmap</div>
+                {/*    <div>Roadmap</div>
                     <select
                         multiple
                         id="roadmap"
@@ -357,11 +348,12 @@ export const Sidebar = ({
                                 {option.name}
                             </option>
                         ))}
-                    </select>
+                    </select>*/}
 
+                    {roadmapField(taskData?.roadmaps?.map(roadmap => roadmap.name)) }
                     
                     
-                    <div>Assignee</div>
+                {/*    <div>Assignee</div>
                     <select
                         id="assignee"
                         value={taskData?.assignee?.name || ''}
@@ -374,12 +366,14 @@ export const Sidebar = ({
                                 {option.name} 
                             </option>
                         ))}
-                    </select>
-                    
+                    </select>*/}
 
+                    {selectOptionsField('Assignee', assignees as Unit[])}
 
-                    <div>Start Date: </div>
-                    <input
+                   {/*
+                                           <div>Start Date: </div>
+
+                       <input
                         id="startDate"
                         type="date"
                         value={formatDateNumericalYYYYMMDDWithDashes(new Date(taskData?.startDate))}
@@ -387,11 +381,11 @@ export const Sidebar = ({
                         onBlur={handleInputBlur}
                         className='border border-black rounded-lg'
 
-                    />
+                    />*/}
                     
+                    {dateField(new Date(taskData?.startDate), "Start Date")}
 
-
-                    <div>End Date: </div>
+                 {/*   <div>End Date: </div>
                     <input
                         id="endDate"
                         type="date"
@@ -399,15 +393,11 @@ export const Sidebar = ({
                         onChange={handleInputChange}
                         onBlur={handleInputBlur}
                         className='border border-black rounded-lg'
-                    />
+                    />*/}
+                    {dateField(new Date(taskData?.endDate), "End Date")}
                     
 
-                    <div>Duration:</div>
-                    
-                    <p> {taskData?.duration === 1 ? taskData?.duration + " day" : taskData?.duration + " days"} </p>
-                    
-
-                    <div>Task Status</div>
+                  {/*  <div>Task Status</div>
                    <select
                         id="taskStatus"
                         value={taskData?.taskStatus?.name}
@@ -421,13 +411,18 @@ export const Sidebar = ({
                                 {option.name}
                             </option>
                         ))}
-                    </select>
+                    </select>*/}
+                    {selectOptionsField('Task Status', taskStatuses as Unit[])}
 
-                    
+                    {/*<div className='text-xs pb-1'>Duration</div>
+                    <p> {taskData?.duration === 1 ? taskData?.duration + " day" : taskData?.duration + " days"} </p>*/}
+                    {stringFieldDisplay('Duration', taskData?.duration === 1 ? taskData?.duration + " day" : taskData?.duration + " days") }
 
-                    <div>ID</div>
+                    {/*<div className='text-xs pb-1'>Duration</div>
                     <p>{data?.id} </p>
-                    
+                    */}
+                    {stringFieldDisplay('ID', data?.id.toString() )}
+
 
                 </div>
             );
@@ -559,7 +554,7 @@ export const Sidebar = ({
     }
 
     return (
-        <div className='bg-white'>
+        <div className='bg-white rounded-xl'>
             {!hideContent &&
                 sidebarContent  
             }

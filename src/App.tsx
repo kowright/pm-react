@@ -302,11 +302,12 @@ function App() {
 
 
 
-            <div className='w-[300px] h-full flex flex-col bg-blue-300'>
-
-                <div className="bg-yellow-300 h-[50px] p-2 shrink-0">
-                    <div className='bg-yellow-800 rounded-full'>SEARCH</div>
-                </div>
+            <div className='w-[300px] h-full flex flex-col'>
+                <input
+                    className="rounded-full px-4 py-2 my-2 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 shrink-0"
+                    type="search"
+                    placeholder="Search..."
+                />
 
                 <Sidebar sidebarData={selectedItem} updateItem={updateItem} />
 

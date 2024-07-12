@@ -132,3 +132,18 @@ export const colorSets: Record<string, ColorSet> = {
         selected: 'bg-dark-moss-green text-white',
     },
 };
+
+
+export function toCamelCase(input: string): string {
+    const words = input.split(' ');
+
+    const camelCased = words.map((word, index) => {
+        if (index === 0) {
+            return word.toLowerCase();
+        } else {
+            return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+        }
+    });
+
+    return camelCased.join('');
+}
