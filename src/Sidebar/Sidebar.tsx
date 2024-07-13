@@ -197,6 +197,8 @@ export const Sidebar = ({
         return <div>Select an item to see details</div>
     }
 
+    // #region Form Fields
+
     const nameField = (value: string) => {
         return (
         <div className='text-smoky-black'>
@@ -207,7 +209,7 @@ export const Sidebar = ({
                 value={value || ''}
                 onChange={handleInputChange}
                 onBlur={handleInputBlur}
-                className='border border-black rounded-lg text-md pl-1 focus:ring-yinmn-blue focus:ring w-full' 
+                className='border border-alabaster rounded-lg text-md pl-1 focus:ring-yinmn-blue focus:ring w-full' 
             />
             </div>
         )
@@ -222,7 +224,7 @@ export const Sidebar = ({
                     value={value}
                     onChange={handleInputChange}
                     onBlur={handleInputBlur}
-                    className='border border-black rounded-lg text-md pl-1 focus:ring-yinmn-blue focus:ring w-full' 
+                    className='border border-alabaster rounded-lg text-md pl-1 focus:ring-yinmn-blue focus:ring w-full' 
                 />
             </div>
         )
@@ -238,7 +240,7 @@ export const Sidebar = ({
                     value={roadmapNames}
                     onChange={handleInputChange}
                     onBlur={handleInputBlur}
-                    className='border border-black rounded-lg text-md pl-1 focus:ring-yinmn-blue focus:ring w-full' 
+                    className='border border-alabaster rounded-lg text-md pl-1 focus:ring-yinmn-blue focus:ring w-full' 
                 >
                     {roadmaps?.map((option, index) => (
                         <option key={index} value={option.name}>
@@ -262,7 +264,7 @@ export const Sidebar = ({
                     value={toCamelCase(title)}
                     onChange={handleInputChange}
                     onBlur={handleInputBlur}
-                    className='border border-black rounded-lg text-md pl-1 focus:ring-yinmn-blue focus:ring w-full'
+                    className='border border-alabaster rounded-lg text-md pl-1 focus:ring-yinmn-blue focus:ring w-full'
                 >
                     {array?.map((option, index) => (
                         <option key={index} value={option.name}>
@@ -285,7 +287,7 @@ export const Sidebar = ({
                     value={formatDateNumericalYYYYMMDDWithDashes(date)}
                     onChange={handleInputChange}
                     onBlur={handleInputBlur}
-                    className='border border-black rounded-lg text-md pl-1 focus:ring-yinmn-blue focus:ring w-full'
+                    className='border border-alabaster rounded-lg text-md pl-1 focus:ring-yinmn-blue focus:ring w-full'
                 />
 
             </div>
@@ -301,14 +303,14 @@ export const Sidebar = ({
 
         )
     }
+    // #endregion
     switch (sidebarData.type) {
         case findIdForUnitType('Task', unitTypes):
             const taskData = data as Task;
-            
+       
 
             sidebarContent = (
-                <div className='p-4 flex flex-col gap-2'>
-                    <div className='font-bold text-xl'>TASK DETAILS</div>
+                <div className='flex flex-col gap-2'>
                   
 
                    {/* <div>Name</div>
@@ -421,7 +423,7 @@ export const Sidebar = ({
                     {/*<div className='text-xs pb-1'>Duration</div>
                     <p>{data?.id} </p>
                     */}
-                    {stringFieldDisplay('ID', data?.id.toString() )}
+                    {stringFieldDisplay('ID', taskData?.id.toString() )}
 
 
                 </div>
@@ -432,10 +434,9 @@ export const Sidebar = ({
 
             const milestoneData = data as Milestone;
             sidebarContent = (
-                <div className='p-4'>
-                    <div className='font-bold text-center'>MILESTONE DETAILS</div>
-                    <br />
-                    <label htmlFor="name">Name:</label>
+                <div className='flex flex-col gap-2'>
+                    {nameField(data.name)} 
+               {/*     <label htmlFor="name">Name:</label>
                     <input
                         id="name"
                         type='text'
@@ -443,10 +444,10 @@ export const Sidebar = ({
                         onChange={handleInputChange}
 
                         onBlur={handleInputBlur}
-                    />
+                    />*/}
                     
-
-                    <label htmlFor="description">Description:</label>
+                    {descriptionField(data.description)}
+                  {/*  <label htmlFor="description">Description:</label>
                     <textarea
                         id="description"
                         value={data?.description || ''}
@@ -454,9 +455,9 @@ export const Sidebar = ({
 
                         onBlur={handleInputBlur}
                     />
-                    
-
-                    <label htmlFor="date">Date: </label>
+                    */}
+                    {dateField(new Date(milestoneData.date), "Date") }
+                 {/*   <label htmlFor="date">Date: </label>
                     <input
                         id="date"
                         type="date"
@@ -464,9 +465,10 @@ export const Sidebar = ({
                         onChange={handleInputChange}
                         onBlur={handleInputBlur}
                     />
-                    
+                    */}
+                    {selectOptionsField("Task Status", taskStatuses as Unit[])}
 
-                    <div>Task Status:</div>
+                   {/* <div>Task Status:</div>
                     <select
                         id="taskStatus"
                         value={milestoneData?.taskStatus.name}
@@ -480,10 +482,10 @@ export const Sidebar = ({
                                 {option.name}
                             </option>
                         ))}
-                    </select>
-
-                        <hr/>
-                          <p>ID: {data?.id} </p>
+                    </select>*/}
+                    {stringFieldDisplay('ID', data.id.toString()) }
+              {/*          <hr/>
+                          <p>ID: {data?.id} </p>*/}
                         
                 </div>
             );
@@ -492,10 +494,9 @@ export const Sidebar = ({
         case findIdForUnitType('Tag', unitTypes):
             //const tagData = sidebarData as Tag; 
             sidebarContent = (
-                <div className='p-4'>
-                    <div className='font-bold text-center'>TAG DETAILS</div>
-                    <br />
-                    <label htmlFor="name">Name:</label>
+                <div className='flex flex-col gap-2'>
+               
+                    {/*<label htmlFor="name">Name:</label>
                     <input
                         id="name"
                         type='text'
@@ -504,18 +505,19 @@ export const Sidebar = ({
 
                         onBlur={handleInputBlur}
                     />
-                    
+                    */}
+                    {nameField(data.name)}
 
-                    <label htmlFor="description">Description:</label>
+                 {/*   <label htmlFor="description">Description:</label>
                     <textarea
                         id="description"
                         value={data?.description || ''}
                         onChange={handleInputChange}
 
                         onBlur={handleInputBlur}
-                    />
+                    />*/}
                     
-
+                    {descriptionField(data.description)}
                 </div>
             );
 
@@ -523,9 +525,8 @@ export const Sidebar = ({
         case findIdForUnitType('Assignee', unitTypes):
             //const assigneeData = sidebarData as Assignee;
            sidebarContent = (
-               <div className='p-4'>
-                   <div className='font-bold text-center'>TASK DETAILS</div>
-                   <br />
+               <div className='flex flex-col gap-2'>
+    {/*
                    <label htmlFor="name">Name:</label>
                    <input
                        id="name"
@@ -534,19 +535,20 @@ export const Sidebar = ({
                        onChange={handleInputChange}
 
                        onBlur={handleInputBlur}
-                   />
+                   />*/}
+                   {nameField(data.name)}
                    
 
-                   <label htmlFor="description">Description:</label>
+               {/*    <label htmlFor="description">Description:</label>
                    <textarea
                        id="description"
                        value={data?.description || ''}
                        onChange={handleInputChange}
 
                        onBlur={handleInputBlur}
-                   />
+                   />*/}
                    
-
+                   {descriptionField(data.description) }
                </div>
             );
 
@@ -556,7 +558,10 @@ export const Sidebar = ({
     return (
         <div className='bg-white rounded-xl'>
             {!hideContent &&
-                sidebarContent  
+                <div className='p-4 flex flex-col gap-2'>
+                    <div className='font-bold text-xl'>{unitTypes.find(type => type.id === sidebarData.type)?.name.toUpperCase()} DETAILS</div>
+                    {sidebarContent}
+                </div>
             }
         </div>
     );

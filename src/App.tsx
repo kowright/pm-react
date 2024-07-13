@@ -155,7 +155,7 @@ function App() {
 
     const updateTask = (updatedTask: Task) => {
         // Update task in API
-        console.log("sending backend: ", updatedTask)
+        console.log("sending backend: ", updatedTask);
         fetch(`/api/tasks/${updatedTask.id}`, {
             method: 'PUT',
             headers: {
@@ -165,17 +165,17 @@ function App() {
         })
         .then(res => res.json())
         .then(data => {
-            console.log(data.message)
-            if (data.message === undefined) {
+            console.log(data)
+            if (data === undefined) {
                 console.log("data returned from backend is null")
-                console.log("data error: ", data.error)
+                console.log("ERROR:", data.error)
                 return;
             }
-            console.log('Updated task:', data.task);
+            console.log('Updated task:', data);
             // Update local state with updated task
-            const updatedTasks: Task[] = tasks.map(task => (task.id === updatedTask.id ? data.task : task));
-           setSelectedItem(data.task)
-            console.log("updated new task to ", updatedTasks.find(task => task.id === data.task.id));
+            const updatedTasks: Task[] = tasks.map(task => (task.id === updatedTask.id ? data : task));
+           setSelectedItem(data)
+            console.log("updated new task to ", updatedTasks.find(task => task.id === data.id));
             setTasks(updatedTasks);
         })
         .catch(error => {
