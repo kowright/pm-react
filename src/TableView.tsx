@@ -2,9 +2,10 @@ import React from "react";
 import {
     Task, TaskStatus, Roadmap, Milestone, Assignee, Tag, formatDateNumericalMMDDYYYY, findIdForUnitType, UnitType,
     colorSets, ViewData, taskFilterOnTaskStatus, taskFilterOnRoadmap, taskSortByEarliestDate,
-    milestoneFilterOnTaskStatus, milestoneFilterOnRoadmap, milestoneSortByEarliestDate
+    milestoneFilterOnTaskStatus, milestoneFilterOnRoadmap, milestoneSortByEarliestDate, unitSortByNameAlphabetical
 } from './Interfaces';
-import { FilterButton } from './FilterButton'
+import { FilterButton } from './FilterButton';
+import { SortArea } from './SortArea/SortArea';
 
 interface TableViewProps {
  
@@ -21,28 +22,70 @@ export const TableView = ({
 
     const [tableDataType, setTableDataType] = React.useState("Task");
 
+    const [taskSortState, setTaskSortState] = React.useState<string[]>([]);
+    const [milestoneSortState, setMilestoneSortState] = React.useState<string[]>([]);
+    const [sortState, setSortStates] = React.useState({
+        taskSortState: taskSortState,
+        milestoneSortState: milestoneSortState
+    });
+
     let content: any = <div>hi</div>;
 
     const handleClick = (item: Task | Milestone | Tag | Assignee ) => {
-        console.log("Inside Timeline component - before invoking taskClick function " + item.name);
         unitClick(item); // Invoke the function with some example task data
     };
 
     let tableFormat: any;
     const formatHeaderLabel = (header: string): string => {
-        //  Capitalize first letter and replace underscores with spaces
         return header.charAt(0).toUpperCase() + header.slice(1).replace(/_/g, ' ');
     };
     let headers: string[];
 
-    const color = colorSets['blue']
+    const color = colorSets['blue'];
+
+    const handleSort = (sort: string) => {
+        if (tableDataType === 'Task') {
+            if (taskSortState.includes(sort)) {
+                setTaskSortState([]);
+                //this sort is already in
+            } else {
+                setTaskSortState([sort]);
+                //other sort is in or there is no sort yet
+            }
+        } else { // milestones
+            if (milestoneSortState.includes(sort)) {
+                setMilestoneSortState([]);
+            } else {
+                setMilestoneSortState([sort]);
+            }
+        }
+    };
+
+    React.useEffect(() => {
+        setSortStates({
+            taskSortState: taskSortState,
+            milestoneSortState: milestoneSortState
+        });
+    }, [milestoneSortState, taskSortState]);
+
+
     switch (tableDataType) {
         case "Task":
 
             //filtering
             let filteredTasks = taskFilterOnTaskStatus(taskData, filterStates.taskStatusFilterState);
             filteredTasks = taskFilterOnRoadmap(filteredTasks, filterStates.roadmapFilterState);
-   
+
+            //sorting
+            if (sortState.taskSortState.includes('EarliestStartDate')) {
+                filteredTasks = taskSortByEarliestDate(filteredTasks, true);
+            }
+            if (sortState.taskSortState.includes("EarliestEndDate")) {
+                filteredTasks = taskSortByEarliestDate(filteredTasks, false);
+            }
+            if (sortState.taskSortState.includes("Alphabetical")) {
+                unitSortByNameAlphabetical(filteredTasks)
+            }
 
             headers = taskData.length > 0 ? Object.keys(taskData[0]) : [];
 
@@ -90,7 +133,14 @@ export const TableView = ({
 
             let filteredMilestones = milestoneFilterOnTaskStatus(props.milestoneData, filterStates.taskStatusFilterState);
             filteredMilestones = milestoneFilterOnRoadmap(filteredMilestones, filterStates.roadmapFilterState);
-     
+
+            if (sortState.milestoneSortState.includes('EarliestStartDate')) {
+                filteredMilestones = milestoneSortByEarliestDate(filteredMilestones)
+            }
+            if (sortState.milestoneSortState.includes("Alphabetical")) {
+                unitSortByNameAlphabetical(filteredMilestones)
+            }
+
             content =
                 filteredMilestones.map((item, index) => (
                     <tr key={index} onClick={() => handleClick(item)} className={`cursor-pointer hover:bg-lime-500
@@ -171,6 +221,9 @@ export const TableView = ({
                 <FilterButton text='Milestone' onClick={() => setTableDataType("Milestone")} active={tableDataType === 'Milestone'} showX={false} />
            </div>
   
+            <br />
+            <SortArea unitOfSort={tableDataType} sortState={sortState} handleSort={handleSort} />
+
             <br />
 
             <table className="min-w-full text-white border-collapse border border-gray-200">

@@ -59,10 +59,10 @@ export const ListView = ({
         filteredMilestones = milestoneFilterOnRoadmap(filteredMilestones, filterStates.roadmapFilterState);
 
        //sorting
-        if (sortState.taskSortState.includes('EarliestStartDate')) {
+        if (sortState.milestoneSortState.includes('EarliestStartDate')) {
             filteredMilestones = milestoneSortByEarliestDate(filteredMilestones)
         }
-        if (sortState.taskSortState.includes("Alphabetical")) {
+        if (sortState.milestoneSortState.includes("Alphabetical")) {
             unitSortByNameAlphabetical(filteredMilestones)
         }
     }
@@ -70,13 +70,20 @@ export const ListView = ({
     const color = colorSets['blueWhite'];
 
     const handleSort = (sort: string) => {
-        if (taskSortState.includes(sort)) {
-
-            setTaskSortState(prev => prev.filter(stat => stat !== sort));
-        }
-        else {
-
-            setTaskSortState(prev => [...prev, sort]);
+        if (listDataType === 'Task') {
+            if (taskSortState.includes(sort)) {
+                setTaskSortState([]);
+                //this sort is already in
+            } else {
+                setTaskSortState([sort]);
+                //other sort is in or there is no sort yet
+            }
+        } else { // milestones
+            if (milestoneSortState.includes(sort)) {
+                setMilestoneSortState([]);
+            } else {
+                setMilestoneSortState([sort]);
+            }
         }
     };
 

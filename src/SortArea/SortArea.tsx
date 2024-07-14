@@ -24,8 +24,8 @@ export const SortArea = (props: SortAreaProps) => {
 
             {props.unitOfSort === 'Milestone' && (
                 <div className='flex gap-x-4 gap-y-2 flex-wrap'>
-                    <FilterButton text='Sort Alphabetically' active={props.sortState.taskSortState.includes("Alphabetical")} onClick={() => props.handleSort('Alphabetical')} />
-                    <FilterButton text='Sort By Date' active={props.sortState.taskSortState.includes("EarliestDate")} onClick={() => props.handleSort('EarliestDate')} />
+                    <FilterButton text='Sort Alphabetically' active={props.sortState.milestoneSortState.includes("Alphabetical")} onClick={() => props.handleSort('Alphabetical')} />
+                    <FilterButton text='Sort By Date' active={props.sortState.milestoneSortState.includes("EarliestDate")} onClick={() => props.handleSort('EarliestDate')} />
                 </div>
             )}
         </>
