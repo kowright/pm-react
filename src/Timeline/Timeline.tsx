@@ -294,9 +294,9 @@ export const Timeline = ({
 
     // #region Milestones
 
-    let filteredMilestones = filterStates.taskStatusFilterState && filterStates.taskStatusFilterState.length > 0
-        ? props.milestoneData.filter(task => filterStates.taskStatusFilterState.includes(task.taskStatus.name))
-        : props.milestoneData;
+     let filteredMilestones = milestoneFilterOnTaskStatus(props.milestoneData, filterStates.taskStatusFilterState);
+        filteredMilestones = milestoneFilterOnRoadmap(filteredMilestones, filterStates.roadmapFilterState);
+
 /*
     filteredMilestones = props.roadmapFilterState
         ? filteredMilestones.filter(ms => {
