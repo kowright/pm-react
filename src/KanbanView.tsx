@@ -2,9 +2,10 @@ import React, { useEffect, useState } from "react";
 import {
     Task, TaskStatus, Roadmap, Milestone, Assignee, Tag, formatDateNumericalMMDDYYYY, formatDateWords,
     findIdForUnitType, colorSets, ViewData, taskFilterOnTaskStatus, taskFilterOnRoadmap, taskSortByEarliestDate,
-    milestoneFilterOnTaskStatus, milestoneFilterOnRoadmap, milestoneSortByEarliestDate
+    milestoneFilterOnTaskStatus, milestoneFilterOnRoadmap, milestoneSortByEarliestDate, unitSortByNameAlphabetical,
 } from './Interfaces';
 import { FilterButton } from './FilterButton';
+import { SortArea } from './SortArea/SortArea';
 
 interface KanbanViewProps {
     milestoneData: Milestone[];
@@ -16,7 +17,14 @@ export const KanbanView = ({
         ...props
     }: KanbanViewProps) => {
 
-     const [kanbanDataType, setKanbanDataType] = React.useState("Task");
+    const [kanbanDataType, setKanbanDataType] = React.useState("Task");
+    const [taskSortState, setTaskSortState] = React.useState<string[]>([]);
+    const [milestoneSortState, setMilestoneSortState] = React.useState<string[]>([]);
+      const [sortState, setSortStates] = React.useState({
+        taskSortState: taskSortState,
+        milestoneSortState: milestoneSortState
+    });
+
 
      const handleClick = (task: Task | Milestone | Tag | Assignee) => {
          unitClick(task); 
@@ -27,6 +35,31 @@ export const KanbanView = ({
     let statusColumns;
      const color = colorSets['blueWhite'];
 
+        const handleSort = (sort: string) => {
+        if (kanbanDataType === 'Task') {
+            if (taskSortState.includes(sort)) {
+                setTaskSortState([]);
+                //this sort is already in
+            } else {
+                setTaskSortState([sort]);
+                //other sort is in or there is no sort yet
+            }
+        } else { // milestones
+            if (milestoneSortState.includes(sort)) {
+                setMilestoneSortState([]);
+            } else {
+                setMilestoneSortState([sort]);
+            }
+        }
+    };
+
+    React.useEffect(() => {
+        setSortStates({
+            taskSortState: taskSortState,
+            milestoneSortState: milestoneSortState
+        });
+    }, [milestoneSortState, taskSortState]);
+
     let tasksByTaskStatus: Record<string, Task[]>;
     let tasksByMilestoneStatus: Record <string, Milestone[]>;
 
@@ -34,6 +67,17 @@ export const KanbanView = ({
         //filtering
         filteredTasks = taskFilterOnTaskStatus(taskData, filterStates.taskStatusFilterState);
         filteredTasks = taskFilterOnRoadmap(filteredTasks, filterStates.roadmapFilterState);
+
+        //sorting
+        if (sortState.taskSortState.includes('EarliestStartDate')) {
+            filteredTasks = taskSortByEarliestDate(filteredTasks, true);
+        }
+        if (sortState.taskSortState.includes("EarliestEndDate")) {
+            filteredTasks = taskSortByEarliestDate(filteredTasks, false);
+        }
+        if (sortState.taskSortState.includes("Alphabetical")) {
+            unitSortByNameAlphabetical(filteredTasks)
+        }
 
        tasksByTaskStatus = filteredTasks.reduce((acc: Record<string, Task[]>, task: Task) => {
             const status = task.taskStatus.name;
@@ -66,9 +110,18 @@ export const KanbanView = ({
                 </div>
             )));
     } else {
+
         //filtering
         filteredMilestones = milestoneFilterOnTaskStatus(props.milestoneData, filterStates.taskStatusFilterState);
         filteredMilestones = milestoneFilterOnRoadmap(filteredMilestones, filterStates.roadmapFilterState);
+
+        //sorting
+        if (sortState.milestoneSortState.includes('EarliestStartDate')) {
+            filteredMilestones = milestoneSortByEarliestDate(filteredMilestones)
+        }
+        if (sortState.milestoneSortState.includes("Alphabetical")) {
+            unitSortByNameAlphabetical(filteredMilestones)
+        }
 
         tasksByMilestoneStatus = filteredMilestones.reduce((acc: Record<string, Milestone[]>, ms: Milestone) => {
             const status = ms.taskStatus.name;
@@ -110,6 +163,9 @@ export const KanbanView = ({
                 <FilterButton text='Task' onClick={() => setKanbanDataType("Task")} active={kanbanDataType === 'Task'} showX={false} />
                 <FilterButton text='Milestone' onClick={() => setKanbanDataType("Milestone")} active={kanbanDataType === 'Milestone'} showX={false} />
             </div>
+            <br/>
+            <SortArea unitOfSort={kanbanDataType} sortState={sortState} handleSort={handleSort} />
+
             <br/>
             <div className='flex gap-4'>
                 <div className='flex gap-4'>
