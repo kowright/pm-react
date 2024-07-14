@@ -329,7 +329,7 @@ function App() {
                         {/* if any view needs more data than view data, it can call its own API? */ }
                         {view === 'Timeline' && <TimelineView taskClick={handleUnitClick} taskData={tasks} milestoneData={milestones} updateItem={updateItem} unitTypeData={unitTypes} taskStatusFilterState={taskStatusFilterState} roadmapFilterState={roadmapFilterState} />}
                         {view === 'Table' && <TableView viewData={viewData} milestoneData={milestones} tagData={tags} assigneeData={assignees} />}
-                        {view === 'Kanban' && <KanbanView rowClick={handleUnitClick} taskData={tasks} selectedItem={selectedItem} taskStatusFilterState={taskStatusFilterState} roadmapFilterState={roadmapFilterState} />}
+                        {view === 'Kanban' && <KanbanView viewData={viewData} milestoneData={milestones } />}
                         {view === 'List' && <ListView viewData={viewData} milestoneData={milestones} tagData={tags} assigneeData={assignees}/>}
                         {view === 'Organization' && <div><br />Change settings! woooo</div> }
                        
