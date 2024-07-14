@@ -205,6 +205,16 @@ export const taskSortByEarliestDate = (taskData: Task[], useStartDate: boolean) 
     return filteredTasks;
 }
 
+export function unitSortByNameAlphabetical<T extends Unit[]>(items: T): T {
+    return items.sort((a, b) => {
+        const nameA = a.name.toLowerCase();
+        const nameB = b.name.toLowerCase();
+        if (nameA < nameB) return -1;
+        if (nameA > nameB) return 1;
+        return 0;
+    });
+}
+
 export const milestoneFilterOnTaskStatus = (milestoneData: Milestone[], taskStatusFilterState: string[]): Milestone[] => {
     const filteredMilestone = taskStatusFilterState && taskStatusFilterState.length > 0
         ? milestoneData.filter(ms => taskStatusFilterState.includes(ms.taskStatus.name))

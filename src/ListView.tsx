@@ -2,9 +2,11 @@ import React from "react";
 import {
     Task, TaskStatus, Roadmap, Milestone, Assignee, Tag, findIdForUnitType, UnitType, colorSets, FilterStates,
     UnitDataType, UnitDataTypeWithNull, ViewData, taskFilterOnTaskStatus, taskFilterOnRoadmap, taskSortByEarliestDate,
-    milestoneFilterOnTaskStatus, milestoneFilterOnRoadmap, milestoneSortByEarliestDate
+    milestoneFilterOnTaskStatus, milestoneFilterOnRoadmap, milestoneSortByEarliestDate, Unit, unitSortByNameAlphabetical
 } from './Interfaces';
-import { FilterButton } from './FilterButton'
+import { FilterButton } from './FilterButton';
+import { SortArea } from './SortArea/SortArea';
+
 
 interface ListViewProps {
     milestoneData: Milestone[];
@@ -20,6 +22,13 @@ export const ListView = ({
 
     const [listDataType, setListDataType] = React.useState("Task");
 
+    const [taskSortState, setTaskSortState] = React.useState<string[]>([]);
+    const [milestoneSortState, setMilestoneSortState] = React.useState<string[]>([]);
+    const [sortState, setSortStates] = React.useState({
+        taskSortState: taskSortState,
+        milestoneSortState: milestoneSortState
+    });
+
     const handleClick = (item: UnitDataType) => {
         unitClick(item);
     };
@@ -33,7 +42,16 @@ export const ListView = ({
         filteredTasks = taskFilterOnRoadmap(filteredTasks, filterStates.roadmapFilterState);
 
         //sorting
-        //filteredTasks = taskSortByEarliestDate(filteredTasks, true);
+        if (sortState.taskSortState.includes('EarliestStartDate')) {
+            filteredTasks = taskSortByEarliestDate(filteredTasks, true);
+        }
+        if (sortState.taskSortState.includes("EarliestEndDate")) {
+            filteredTasks = taskSortByEarliestDate(filteredTasks, false);
+        }
+        if (sortState.taskSortState.includes("Alphabetical")) {
+            unitSortByNameAlphabetical(filteredTasks)
+        }
+      
     }
     else {
         //filtering
@@ -41,10 +59,33 @@ export const ListView = ({
         filteredMilestones = milestoneFilterOnRoadmap(filteredMilestones, filterStates.roadmapFilterState);
 
        //sorting
-        //filteredMilestones = milestoneSortByEarliestDate(filteredMilestones)
+        if (sortState.taskSortState.includes('EarliestStartDate')) {
+            filteredMilestones = milestoneSortByEarliestDate(filteredMilestones)
+        }
+        if (sortState.taskSortState.includes("Alphabetical")) {
+            unitSortByNameAlphabetical(filteredMilestones)
+        }
     }
 
     const color = colorSets['blueWhite'];
+
+    const handleSort = (sort: string) => {
+        if (taskSortState.includes(sort)) {
+
+            setTaskSortState(prev => prev.filter(stat => stat !== sort));
+        }
+        else {
+
+            setTaskSortState(prev => [...prev, sort]);
+        }
+    };
+
+    React.useEffect(() => {
+        setSortStates({
+            taskSortState: taskSortState,
+            milestoneSortState: milestoneSortState
+        });
+    }, [milestoneSortState, taskSortState]);
 
     return (
         <div className=''>
@@ -54,6 +95,8 @@ export const ListView = ({
                 <FilterButton text='Milestone' onClick={() => setListDataType("Milestone")} active={listDataType === 'Milestone'} showX={false} />
             </div>
 
+             <br/>
+            <SortArea unitOfSort={listDataType} sortState={sortState} handleSort={handleSort} />
             <br />
 
             <div className='flex flex-col gap-4'>
