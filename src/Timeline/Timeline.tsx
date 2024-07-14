@@ -1,18 +1,24 @@
 import React from 'react';
-import { Milestone, Task, TaskStatus, Roadmap, Tag, Assignee, formatDateNumericalMMDD, addDaysToDate, findIdForUnitType, UnitType, colorSets } from '../Interfaces';
+import {
+    Milestone, Task, TaskStatus, Roadmap, Tag, Assignee, formatDateNumericalMMDD, addDaysToDate, findIdForUnitType, UnitType,
+    colorSets, ViewData, taskFilterOnTaskStatus, taskFilterOnRoadmap, taskSortByEarliestDate,
+    milestoneFilterOnTaskStatus, milestoneFilterOnRoadmap, milestoneSortByEarliestDate
+} from '../Interfaces';
 
 interface TimelineProps {
-    taskClick: (task: Task | Milestone) => void;
-    taskData: Task[];
+   // taskClick: (task: Task | Milestone) => void;
+   // taskData: Task[];
     milestoneData: Milestone[];
     updateItem: (task: Task | Milestone | Tag | Assignee) => void;
-    unitTypeData: UnitType[];
-    roadmapFilterState: string[];
-    taskStatusFilterState: string[];
+    //unitTypeData: UnitType[];
+   // roadmapFilterState: string[];
+    //taskStatusFilterState: string[];
     //add selected item
+    viewData: ViewData;
 }
 
 export const Timeline = ({
+    viewData: { filterStates, selectedItem, taskData, unitClick, unitTypeData},
     ...props
 }: TimelineProps) => {
     const day = 15; // Size of cell in pixels
@@ -20,7 +26,7 @@ export const Timeline = ({
     // Example of using the taskClick function
     const handleClick = (task: Task | Milestone) => {
        // console.log("Inside Timeline component - before invoking taskClick function " + task.name);
-        props.taskClick(task); // Invoke the function with some example task data
+        unitClick(task); // Invoke the function with some example task data
     };
 
     const [data, setData] = React.useState<{ message: Task[] } | null>(null);
@@ -30,7 +36,7 @@ export const Timeline = ({
     const [selectedStartDate, setSelectedStartDate] = React.useState('2024-06-01');
     const [selectedEndDate, setSelectedEndDate] = React.useState('2024-09-01');
 
-    const [draggedTask, setDraggedTask] = React.useState<Task>(props.taskData[0]);
+    const [draggedTask, setDraggedTask] = React.useState<Task>(taskData[0]);
     const [draggedMilestone, setDraggedMilestone] = React.useState<Milestone>(props.milestoneData[0]);
 
     const scrollContainerRef = React.useRef<HTMLDivElement>(null);
@@ -193,12 +199,12 @@ export const Timeline = ({
     const handleMouseDown = (item: Task | Milestone, event: React.MouseEvent<HTMLDivElement>) => {
         event.preventDefault();
 
-        if (item.type === findIdForUnitType('Task', props.unitTypeData)) {
+        if (item.type === findIdForUnitType('Task', unitTypeData)) {
             setDraggedTask(item as Task);
             setDragId(item.id);
 
         }
-        if (item.type === findIdForUnitType('Milestone', props.unitTypeData)) {
+        if (item.type === findIdForUnitType('Milestone', unitTypeData)) {
             setDraggedMilestone(item as Milestone);
             setMilestoneDragId(item.id);
         }
@@ -238,9 +244,9 @@ export const Timeline = ({
     // #endregion
 
     // #region Tasks
-    let filteredTasks = props.taskStatusFilterState && props.taskStatusFilterState.length > 0
-        ? props.taskData.filter(task => props.taskStatusFilterState.includes(task.taskStatus.name))
-        : props.taskData;
+  /*  let filteredTasks = taskStatusFilterState && taskStatusFilterState.length > 0
+        ? taskData.filter(task => taskStatusFilterState.includes(task.taskStatus.name))
+        : taskData;
 
 
     filteredTasks = props.roadmapFilterState
@@ -251,7 +257,9 @@ export const Timeline = ({
 
         })
         : filteredTasks;
-
+*/
+    let filteredTasks = taskFilterOnTaskStatus(taskData, filterStates.taskStatusFilterState);
+    filteredTasks = taskFilterOnRoadmap(filteredTasks, filterStates.roadmapFilterState);
     filteredTasks = filteredTasks.filter((task) => new Date(task.startDate) <= endDate);
 
     let tasks = filteredTasks.map((task, index) => {
@@ -275,7 +283,7 @@ export const Timeline = ({
 
         return (
             <div key={task.id} style={containerStyles}
-                className={`relative ${dragId === task.id ? 'bg-lime-800' : 'bg-gray-400'}`}
+                className={`relative ${selectedItem?.type === findIdForUnitType('Task', unitTypeData) && selectedItem?.id === task.id ? 'bg-tigers-eyes text-smoky-black' : 'bg-chinese-violet text-white'}`}
 
                 onClick={() => handleClick(task)} onMouseDown={(event => handleMouseDown(task, event))} onMouseUp={() => handleMouseUp()}> 
                 <p className={`text-white text-center`}>{task.name}</p>
@@ -286,10 +294,10 @@ export const Timeline = ({
 
     // #region Milestones
 
-    let filteredMilestones = props.taskStatusFilterState && props.taskStatusFilterState.length > 0
-        ? props.milestoneData.filter(task => props.taskStatusFilterState.includes(task.taskStatus.name))
+    let filteredMilestones = filterStates.taskStatusFilterState && filterStates.taskStatusFilterState.length > 0
+        ? props.milestoneData.filter(task => filterStates.taskStatusFilterState.includes(task.taskStatus.name))
         : props.milestoneData;
-
+/*
     filteredMilestones = props.roadmapFilterState
         ? filteredMilestones.filter(ms => {
             const milestoneRoadmapNames = ms.roadmaps.map(map => map.name);
@@ -297,7 +305,11 @@ export const Timeline = ({
             // return props.roadmapFilterState.some(name => milestoneRoadmapNames.includes(name)); //OR
 
         })
-        : filteredMilestones;
+        : filteredMilestones;*/
+
+   /* let filteredMilestones = milestoneFilterOnTaskStatus(props.milestoneData, filterStates.taskStatusFilterState);
+    console.log("filtered mielstones timeline", filterStates.roadmapFilterState)
+    filteredMilestones = milestoneFilterOnRoadmap(filteredMilestones, filterStates.roadmapFilterState);*/
 
     filteredMilestones = filteredMilestones.filter(milestone => new Date(milestone.date) <= endDate);
 
@@ -309,6 +321,9 @@ export const Timeline = ({
         let dateRange = Math.round((new Date(milestone.date).getTime() - startDate.getTime()) / (1000 * 3600 * 24));
         let left = `${day * 4 * dateRange}px`;
 
+        const backgroundColor = selectedItem?.type === findIdForUnitType('Milestone', unitTypeData) && selectedItem?.id === milestone.id
+            ? 'bg-tigers-eyes' : 'bg-imperial-red';
+    
         const containerStyles: React.CSSProperties = {
             position: 'absolute',
             left: left,
@@ -316,15 +331,15 @@ export const Timeline = ({
             overflow: 'hidden',
             width: width,
             height: height,
-            backgroundColor: '#F59E0B',
             borderRadius: '0.375rem',
+            backgroundColor: '#E54B4B',
             boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
             zIndex: 30
         };
 
         return (
             <div key={index} style={containerStyles} onClick={() => handleClick(milestone)} onMouseDown={(event => handleMouseDown(milestone, event))} onMouseUp={() => handleMouseUp()}>
-                <p className="text-white text-center">{milestone.name}</p>
+                <p className={`text-center`}>{milestone.name}</p>
             </div>
         );
     });

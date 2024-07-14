@@ -44,7 +44,7 @@ export const ListView = ({
         //filteredMilestones = milestoneSortByEarliestDate(filteredMilestones)
     }
 
-    const color = colorSets['blue'];
+    const color = colorSets['blueWhite'];
 
     return (
         <div className=''>
@@ -60,9 +60,9 @@ export const ListView = ({
 
                 {listDataType === 'Task' &&
                     filteredTasks.map((item, index) => (
-                        <button className={`w-full h-[40px] rounded-xl flex items-center p-4 ${color.focusRing} ${color.hover} focus:ring-offset-alabaster
-                        ${selectedItem?.type === findIdForUnitType('Task', unitTypeData) && selectedItem?.id === item.id ? 
-                            color.default : 'bg-white text-smoky-black'} `}
+                        <button key={index} className={`w-full h-[40px] rounded-xl flex items-center p-4 ${color.focusRing} ${color.hover} focus:ring-offset-alabaster
+                                    ${selectedItem?.type === findIdForUnitType('Task', unitTypeData) && selectedItem?.id === item.id ? color.selected: color.default}`}
+
                             onClick={() => handleClick(item)}>
                             <div className='w-auto'>{item.name}</div>
                             <div className='flex-1'>{item.description}</div>
@@ -83,7 +83,7 @@ export const ListView = ({
 
                 {listDataType === 'Milestone' &&
                     filteredMilestones.map((item, index) => (
-                        <button className={`w-full h-[40px] rounded-xl flex items-center p-4 ${color.focusRing} ${color.hover} focus:ring-offset-alabaster
+                        <button className={`w-full h-[40px] rounded-xl flex items-center p-4 ${color.focusRing} ${color.hover} 
                         ${selectedItem?.type === findIdForUnitType('Milestone', unitTypeData) && selectedItem?.id === item.id ?
                                 color.default : 'bg-white text-smoky-black'} `}
                             onClick={() => handleClick(item)}>

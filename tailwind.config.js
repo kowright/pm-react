@@ -16,7 +16,7 @@ module.exports = {
               'chinese-violet': '#6D597A',
               'tigers-eyes': '#BC6C25',
               'dark-moss-green': '#606C38',
-              'imeprial-red': '#E54B4B'
+              'imperial-red': '#E54B4B'
           }
       },
   },

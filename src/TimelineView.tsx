@@ -1,16 +1,16 @@
 import React from "react";
 import { Timeline } from './Timeline/Timeline';
-import { Task, Milestone, Roadmap, TaskStatus, Tag, Assignee, findIdForUnitType, UnitType } from './Interfaces';
+import { Task, Milestone, Roadmap, TaskStatus, Tag, Assignee, findIdForUnitType, UnitType, ViewData } from './Interfaces';
 
 export interface TimelineViewProps {
-    taskClick: (task: Task | Milestone) => void;
-    taskData: Task[];
+    //taskClick: (task: Task | Milestone) => void;
+    //taskData: Task[];
     milestoneData: Milestone[];
     updateItem: (task: Task | Milestone | Tag | Assignee) => void;
-    unitTypeData: UnitType[];
-    roadmapFilterState: string[];
-    taskStatusFilterState: string[];
-    //give selected Item
+    //unitTypeData: UnitType[];
+    //roadmapFilterState: string[];
+    //taskStatusFilterState: string[];
+    viewData: ViewData;
 }
 
 export const TimelineView = ({
@@ -20,7 +20,7 @@ export const TimelineView = ({
     return (
         <div>
             <br />
-            <Timeline taskClick={props.taskClick} taskData={props.taskData} milestoneData={props.milestoneData} updateItem={props.updateItem} unitTypeData={props.unitTypeData} taskStatusFilterState={props.taskStatusFilterState} roadmapFilterState={props.roadmapFilterState} />
+            <Timeline viewData={props.viewData} milestoneData={props.milestoneData} updateItem={props.updateItem} />
         </div>
     );
 };

@@ -327,7 +327,7 @@ function App() {
                     <div className='flex-1 max-w-full overflow-x-auto relative'>
 
                         {/* if any view needs more data than view data, it can call its own API? */ }
-                        {view === 'Timeline' && <TimelineView taskClick={handleUnitClick} taskData={tasks} milestoneData={milestones} updateItem={updateItem} unitTypeData={unitTypes} taskStatusFilterState={taskStatusFilterState} roadmapFilterState={roadmapFilterState} />}
+                        {view === 'Timeline' && <TimelineView milestoneData={milestones} updateItem={updateItem} viewData={viewData} />}
                         {view === 'Table' && <TableView viewData={viewData} milestoneData={milestones} tagData={tags} assigneeData={assignees} />}
                         {view === 'Kanban' && <KanbanView viewData={viewData} milestoneData={milestones } />}
                         {view === 'List' && <ListView viewData={viewData} milestoneData={milestones} tagData={tags} assigneeData={assignees}/>}

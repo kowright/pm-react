@@ -127,21 +127,27 @@ export interface ColorSet {
 export const colorSets: Record<string, ColorSet> = {
     blueLite: {
         default: 'bg-cerulean text-white',
-        hover: 'hover:bg-yinmn-blue text-white',
-        focusRing: 'focus:ring-offset-4 focus:ring-cerulean focus:ring text-white',
+        hover: 'hover:bg-yinmn-blue hover:text-white',
+        focusRing: 'focus:ring-offset-4 focus:ring-cerulean focus:ring focus:text-white',
         selected: 'bg-oxford-blue text-white',
     },
     blue: {
         default: 'bg-yinmn-blue text-white',
-        hover: 'hover:bg-cerulean text-white',
-        focusRing: 'focus:ring-offset-4 focus:ring-yinmn-blue focus:ring text-white',
+        hover: 'hover:bg-cerulean hover:text-white',
+        focusRing: 'focus:ring-offset-4 focus:ring-yinmn-blue focus:ring focus:text-white',
         selected: 'bg-oxford-blue text-white',
     },
     green: {
         default: 'bg-ash-gray text-white',
-        hover: 'hover:bg-sage text-white',
-        focusRing: 'focus:ring-offset-4 focus:ring-bg-dark-moss-green focus:ring text-white',
+        hover: 'hover:bg-sage hover:text-white',
+        focusRing: 'focus:ring-offset-4 focus:ring-bg-dark-moss-green focus:ring focus:text-white',
         selected: 'bg-dark-moss-green text-white',
+    },
+    blueWhite: {
+        default: 'bg-white text-smoky-black',
+        hover: 'hover:bg-cerulean hover:text-white',
+        focusRing: 'focus:ring-offset-4 focus:ring-yinmn-blue focus:ring focus:text-white',
+        selected: 'bg-yinmn-blue text-white',
     },
 };
 

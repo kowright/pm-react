@@ -25,7 +25,7 @@ export const KanbanView = ({
      let filteredTasks = taskData;
     let filteredMilestones = props.milestoneData;
     let statusColumns;
-     const color = colorSets['blue'];
+     const color = colorSets['blueWhite'];
 
     let tasksByTaskStatus: Record<string, Task[]>;
     let tasksByMilestoneStatus: Record <string, Milestone[]>;
@@ -46,8 +46,8 @@ export const KanbanView = ({
 
         statusColumns = Object.keys(tasksByTaskStatus).map(key =>
             tasksByTaskStatus[key]?.map((task, index) => (
-                <div key={task.id} onClick={() => handleClick(task)} className={`cursor-pointer relative ${color.focusRing} ${color.focusRing} rounded-xl flex flex-col justify-center w-[320px] gap-1 p-2
-               ${selectedItem?.id === task.id ? color.default : 'bg-white text-smoky-black'} `}>
+                <div key={task.id} onClick={() => handleClick(task)} className={`cursor-pointer relative ${color.focusRing} ${color.hover} rounded-xl flex flex-col justify-center w-[320px] gap-1 p-2
+               ${selectedItem?.id === task.id ? color.selected : color.default} `}>
                     <div className='absolute right-0 top-0 mt-2 mr-2'>
                         <img className='ml-2 w-[34px] rounded-full' src="https://www.hartz.com/wp-content/uploads/2022/04/small-dog-owners-1.jpg" alt="Doggo" />
                     </div>
@@ -81,8 +81,8 @@ export const KanbanView = ({
 
         statusColumns = Object.keys(tasksByMilestoneStatus).map(key =>
             tasksByMilestoneStatus[key]?.map((ms, index) => (
-                <div key={ms.id} onClick={() => handleClick(ms)} className={`cursor-pointer relative ${color.focusRing} ${color.focusRing} rounded-xl flex flex-col justify-center w-[320px] gap-1 p-2
-               ${selectedItem?.id === ms.id ? color.default : 'bg-white text-smoky-black'} `}>
+                <div key={ms.id} onClick={() => handleClick(ms)} className={`cursor-pointer relative ${color.focusRing} ${color.hover} rounded-xl flex flex-col justify-center w-[320px] gap-1 p-2
+               ${selectedItem?.id === ms.id ? color.selected : color.default} `}>
                     <div className='absolute right-0 top-0 mt-2 mr-2'>
                         <img className='ml-2 w-[34px] rounded-full' src="https://www.hartz.com/wp-content/uploads/2022/04/small-dog-owners-1.jpg" alt="Doggo" />
                     </div>
