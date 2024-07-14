@@ -3,8 +3,7 @@ import { Task, TaskStatus, Roadmap, Milestone, Assignee, Tag, formatDateNumerica
 import { FilterButton } from './FilterButton';
 
 interface KanbanViewProps {
-    roadmap: Roadmap | null; //group filter properties together
-    taskStatus: TaskStatus | null;
+    //give unitTypes
     rowClick: (task: Task | Milestone | Tag | Assignee) => void;
     taskData: Task[];
     selectedItem: Task | Milestone | Tag | Assignee | null;

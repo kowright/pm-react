@@ -4,7 +4,7 @@ import TableView from './TableView';
 import KanbanView from './KanbanView';
 import TimelineView from './TimelineView';
 import { Sidebar } from './Sidebar/Sidebar';
-import { Task, Roadmap, TaskStatus, Milestone, Tag, Assignee, UnitData, findIdForUnitType, UnitType } from './Interfaces';
+import { Task, Roadmap, TaskStatus, Milestone, Tag, Assignee, UnitDataTypeWithNull, findIdForUnitType, UnitType, FilterStates, UnitDataType, ViewData } from './Interfaces';
 import { FilterArea } from './FilterArea/FilterArea';
 import { NavBar } from './NavBar/NavBar';
 import { FilterButton } from './FilterButton';
@@ -29,7 +29,25 @@ function App() {
     const [assignees, setAssignees] = useState<Assignee[]>([]); // State to hold milestones
     const [unitTypes, setUnitTypes] = React.useState<UnitType[]>([]);
     const [roadmaps, setRoadmaps] = React.useState<Roadmap[]>([]);
+   /* const [unitAPIData, setUnitAPIData] = React.useState<UnitAPIData>({
+        taskData: [],
+        milestoneData: [],
+        tagData: [],
+        assigneeData: [],
+        unitTypesData: [],
+        roadmapData: []
+    });
 
+    React.useEffect(() => {
+        setUnitAPIData({
+            taskData: tasks,
+            milestoneData: milestones,
+            tagData: tags,
+            assigneeData: assignees,
+            roadmapData: roadmaps,
+            unitTypesData: unitTypes,
+        });
+    }, [assignees, milestones, roadmaps, tags, tasks, unitTypes]);*/
 
     const fetchTasks = () => {
         fetch("/api/tasks?roadmaps=true&tags=true")
@@ -84,6 +102,14 @@ function App() {
     const [selectedTaskStatus, setSelectedTaskStatus] = useState<TaskStatus | null>(null); //keep
     const [roadmapFilterState, setRoadmapFilterState] = React.useState<string[]>([]);
     const [taskStatusFilterState, setTaskStatusFilterState] = React.useState<string[]>([]);
+    const [filterStates, setFilterStates] = React.useState<FilterStates>({roadmapFilterState: roadmapFilterState, taskStatusFilterState: taskStatusFilterState})
+
+    React.useEffect(() => {
+        setFilterStates({
+            roadmapFilterState: roadmapFilterState,
+            taskStatusFilterState: taskStatusFilterState,
+        });
+    }, [roadmapFilterState, taskStatusFilterState]);
 
     const handleFilterByRoadmap = (roadmap: Roadmap) => { //keep
         
@@ -95,6 +121,7 @@ function App() {
         if (roadmapFilterState.includes(roadmap?.name)) {
             console.log("take out " + roadmap?.name)
             setRoadmapFilterState(prev => prev.filter(map => map !== roadmap?.name));
+
         }
         else {
             console.log("add " + roadmap?.name)
@@ -126,14 +153,31 @@ function App() {
         setView(viewName);
     };
 
-    const handleTaskClick = (item: Task | Milestone | Tag | Assignee) => {
-       // console.log("Selected Task: ", item.name);
+    const handleUnitClick = (item: UnitDataType) => {
         setSelectedItem(item);
     };
     // #endregion
 
+    const [viewData, setViewData] = React.useState<ViewData>({
+        taskData: tasks,
+        unitClick: handleUnitClick,
+        selectedItem: selectedItem,
+        unitTypeData: unitTypes,
+        filterStates: filterStates,
+    });
+
+    React.useEffect(() => {
+        setViewData({
+            taskData: tasks,
+            unitClick: handleUnitClick,
+            selectedItem: selectedItem,
+            unitTypeData: unitTypes,
+            filterStates: filterStates,
+        });
+    }, [filterStates, selectedItem, tasks, unitTypes]);
+
     // #region Unit Updates
-    const updateItem = (updatedItem: UnitData) => {
+    const updateItem = (updatedItem: UnitDataTypeWithNull) => {
         if (updatedItem == null) {
             return;
         }
@@ -283,10 +327,10 @@ function App() {
                     <div className='flex-1 max-w-full overflow-x-auto relative'>
 
                         
-                        {view === 'Timeline' && <TimelineView taskClick={handleTaskClick} roadmap={selectedRoadmap} taskStatus={selectedTaskStatus} taskData={tasks} milestoneData={milestones} updateItem={updateItem} unitTypeData={unitTypes} taskStatusFilterState={taskStatusFilterState} roadmapFilterState={roadmapFilterState} />}
-                        {view === 'Table' && <TableView rowClick={handleTaskClick} taskData={tasks} milestoneData={milestones} tagData={tags} assigneeData={assignees} roadmap={selectedRoadmap} taskStatus={selectedTaskStatus} selectedItem={selectedItem} unitTypeData={unitTypes} taskStatusFilterState={taskStatusFilterState} roadmapFilterState={roadmapFilterState} />}
-                        {view === 'Kanban' && <KanbanView rowClick={handleTaskClick} taskData={tasks} roadmap={selectedRoadmap} taskStatus={selectedTaskStatus} selectedItem={selectedItem} taskStatusFilterState={taskStatusFilterState} roadmapFilterState={roadmapFilterState} />}
-                        {view === 'List' && <ListView rowClick={handleTaskClick} taskData={tasks} milestoneData={milestones} tagData={tags} assigneeData={assignees} roadmap={selectedRoadmap} taskStatus={selectedTaskStatus} selectedItem={selectedItem} unitTypeData={unitTypes} roadmapFilterState={roadmapFilterState} taskStatusFilterState={taskStatusFilterState} />}
+                        {view === 'Timeline' && <TimelineView taskClick={handleUnitClick} taskData={tasks} milestoneData={milestones} updateItem={updateItem} unitTypeData={unitTypes} taskStatusFilterState={taskStatusFilterState} roadmapFilterState={roadmapFilterState} />}
+                        {view === 'Table' && <TableView rowClick={handleUnitClick} taskData={tasks} milestoneData={milestones} tagData={tags} assigneeData={assignees} selectedItem={selectedItem} unitTypeData={unitTypes} taskStatusFilterState={taskStatusFilterState} roadmapFilterState={roadmapFilterState} />}
+                        {view === 'Kanban' && <KanbanView rowClick={handleUnitClick} taskData={tasks} selectedItem={selectedItem} taskStatusFilterState={taskStatusFilterState} roadmapFilterState={roadmapFilterState} />}
+                        {view === 'List' && <ListView viewData={viewData} milestoneData={milestones} tagData={tags} assigneeData={assignees}  />}
                         {view === 'Organization' && <div><br />Change settings! woooo</div> }
                        
 
@@ -298,10 +342,6 @@ function App() {
             </div>
 
 
-
-
-
-
             <div className='w-[300px] h-full flex flex-col'>
                 <input
                     className="rounded-full px-4 py-2 my-2 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 shrink-0"
@@ -309,7 +349,7 @@ function App() {
                     placeholder="Search..."
                 />
 
-                <Sidebar sidebarData={selectedItem} updateItem={updateItem} />
+                <Sidebar sidebarData={selectedItem} updateItem={updateItem} assigneeData={assignees} roadmapData={roadmaps} unitTypeData={unitTypes} />
 
 
             </div>

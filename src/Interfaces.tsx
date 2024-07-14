@@ -1,4 +1,16 @@
-export type UnitData = Task | Milestone | Tag | Assignee | null;
+//SEPARATE THIS FILE
+
+export type UnitDataTypeWithNull = Task | Milestone | Tag | Assignee | null;
+export type UnitDataType = Task | Milestone | Tag | Assignee;
+
+export interface UnitAPIData {
+    taskData: Task[];
+    milestoneData: Milestone[];
+    tagData: Tag[];
+    assigneeData: Assignee[];
+    unitTypesData: UnitType[];
+    roadmapData: Roadmap[];
+}
 
 export interface Unit {
     name: string;
@@ -146,4 +158,66 @@ export function toCamelCase(input: string): string {
     });
 
     return camelCased.join('');
+}
+
+export type FilterStates = {
+    roadmapFilterState: string[];
+    taskStatusFilterState: string[];
+};
+
+export type ViewData = {
+    taskData: Task[];
+    unitClick: (unit: UnitDataType) => void;
+    selectedItem: UnitDataTypeWithNull;
+    unitTypeData: UnitType[];
+    filterStates: FilterStates;
+}
+
+export const taskFilterOnTaskStatus = (taskData: Task[], taskStatusFilterState: string[]): Task[] => {
+   const filteredTasks = taskStatusFilterState && taskStatusFilterState.length > 0
+        ? taskData.filter(task => taskStatusFilterState.includes(task.taskStatus.name))
+        : taskData;
+    return filteredTasks;
+}
+
+export const taskFilterOnRoadmap = (taskData: Task[], roadmapFilterState: string[]): Task[] => {
+    const filteredTasks = taskData.filter(task => {
+        const taskRoadmapNames = task.roadmaps.map(map => map.name);
+        return roadmapFilterState.every(name => taskRoadmapNames.includes(name)); //AND
+        // return props.roadmapFilterState.some(name => taskRoadmapNames.includes(name)); //OR
+    });
+    return filteredTasks;
+}
+
+export const taskSortByEarliestDate = (taskData: Task[], useStartDate: boolean) => {
+    const filteredTasks = taskData.sort((a, b) => {
+        const firstDate = useStartDate ? a.startDate : a.endDate;
+        const secondDate = useStartDate ? b.startDate : b.endDate;
+
+        return new Date(firstDate).getTime() - new Date(secondDate).getTime();
+    });
+    return filteredTasks;
+}
+
+export const milestoneFilterOnTaskStatus = (milestoneData: Milestone[], taskStatusFilterState: string[]): Milestone[] => {
+    const filteredMilestone = taskStatusFilterState && taskStatusFilterState.length > 0
+        ? milestoneData.filter(ms => taskStatusFilterState.includes(ms.taskStatus.name))
+        : milestoneData;
+    return filteredMilestone;
+}
+
+export const milestoneFilterOnRoadmap = (milestoneData: Milestone[], roadmapFilterState: string[]): Milestone[] => {
+    const filteredMilestones = milestoneData.filter(milestone => {
+        const milestoneRoadmapNames = milestone.roadmaps.map(map => map.name);
+        return roadmapFilterState.every(name => milestoneRoadmapNames.includes(name)); //AND
+        // return roadmapFilterState.some(name => milestoneRoadmapNames.includes(name)); //OR
+    });
+    return filteredMilestones;
+}
+
+export const milestoneSortByEarliestDate = (milestoneData: Milestone[]): Milestone[] => {
+    const filteredMilestones = milestoneData.sort((a, b) => {
+        return new Date(a.date).getTime() - new Date(b.date).getTime();
+    });
+    return filteredMilestones;
 }

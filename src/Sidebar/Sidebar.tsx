@@ -2,18 +2,16 @@ import React from 'react';
 import {
     Milestone, Task, Tag, Assignee, TaskStatus, Roadmap, UnitType, Unit,
     findIdForUnitType, formatDateNumericalMMDDYYYY, formatDateNumericalYYYYMMDDWithDashes,
-    UnitData, toCamelCase
+    UnitDataTypeWithNull, toCamelCase
 } from '../Interfaces';
 
 interface SidebarProps {
-    sidebarData: UnitData; //what can show in the sidebar; ADD EVERYTHING ELSE
-   /* updateTask: (updatedTask:Task) => void;
-    updateMilestone: (updatedMilestone: Milestone) => void;
-    updateTag: (updatedTag: Tag) => void;
-    updateAssignee: (updatedAssignee: Assignee) => void;*/
-    updateItem: (updatedItem: UnitData) => void;
+    sidebarData: UnitDataTypeWithNull; 
+    assigneeData: Assignee[];
+    roadmapData: Roadmap[];
+    unitTypeData: UnitType[];
+    updateItem: (updatedItem: UnitDataTypeWithNull) => void;
 }
-
 
 export const Sidebar = ({
     sidebarData = null,
@@ -25,28 +23,16 @@ export const Sidebar = ({
 
     sidebarContent = <div>nothing to show.</div>
 
-    const [data, setData] = React.useState< Task | Milestone | Tag | Assignee | null>(sidebarData)
+    const [data, setData] = React.useState<UnitDataTypeWithNull>(sidebarData)
 
-    //const [task, setTask] = React.useState(sidebarData)
-    const [assignees, setAssignees] = React.useState<Assignee[] | null>(null);
-    const [roadmaps, setRoadmaps] = React.useState<Roadmap[] | null>(null);
     const [taskStatuses, setTaskStatuses] = React.useState<TaskStatus[]>([]);
-    const [unitTypes, setUnitTypes] = React.useState<UnitType[]>([]);
 
 
     React.useEffect(() => {
         const fetchData = async () => {
             try {
-                const [taskStatusData, assigneesData, roadmapsData, unitTypeData] = await Promise.all([
-                    fetch("/api/taskstatus").then(res => res.json()),
-                    fetch("/api/assignees").then(res => res.json()),
-                    fetch("/api/roadmaps").then(res => res.json()),
-                    fetch("/api/unittypes").then(res => res.json())
-                ]);
+                const taskStatusData = await fetch("/api/taskstatus").then(res => res.json());
                 setTaskStatuses(taskStatusData);
-                setAssignees(assigneesData);
-                setRoadmaps(roadmapsData);
-                setUnitTypes(unitTypeData)
             } catch (error) {
                 console.error('Error fetching data:', error);
             }
@@ -55,15 +41,16 @@ export const Sidebar = ({
         fetchData();
     }, []);
 
+
     React.useEffect(() => {
-        setData(sidebarData); // Update data state with the latest sidebarData
+        setData(sidebarData);
     }, [sidebarData]);
 
 
     const handleInputBlur = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
 
         const editedValue = event.target.value;
-        const propertyName = event.target.id; // Assuming id is the property name to update
+        const propertyName = event.target.id; 
         console.log("property name handle input blur ", propertyName);
         if (!data) {
             return; 
@@ -72,7 +59,7 @@ export const Sidebar = ({
         let updatedItem: Task | Milestone | Tag | Assignee;
 
         switch (data?.type) {
-            case findIdForUnitType('Task', unitTypes):
+            case findIdForUnitType('Task', props.unitTypeData):
 
                 console.log("handle input blur task ", sidebarData)
 
@@ -90,12 +77,12 @@ export const Sidebar = ({
 
                 let selectedRoadmaps;
                 if (propertyName === 'roadmap') {
-                    selectedRoadmaps = roadmaps?.filter(roadmap => selectedRoadmapNames.includes(roadmap.name));
+                    selectedRoadmaps = props.roadmapData?.filter(roadmap => selectedRoadmapNames.includes(roadmap.name));
                 } else {
                     selectedRoadmaps = (sidebarData as Task).roadmaps
                 }
 
-                const selectedAssignee = propertyName === 'assignee' ? assignees?.find(assignee => assignee.name === editedValue) : (sidebarData as Task).assignee;
+                const selectedAssignee = propertyName === 'assignee' ? props.assigneeData?.find(assignee => assignee.name === editedValue) : (sidebarData as Task).assignee;
 
                 updatedItem = {
                     ...(sidebarData as Task),
@@ -108,7 +95,7 @@ export const Sidebar = ({
                
                 console.log("updated item in sidebar",updatedItem)
                 break;
-            case findIdForUnitType('Milestone', unitTypes):
+            case findIdForUnitType('Milestone', props.unitTypeData):
                 updatedItem = {
                     ...(sidebarData as Milestone),
                     [propertyName]: propertyName === 'date' ? new Date(editedValue) : editedValue,
@@ -122,13 +109,13 @@ export const Sidebar = ({
                 */
                 console.log("edited ", (updatedItem as Milestone).taskStatus)
                 break;
-            case findIdForUnitType('Tag', unitTypes):
+            case findIdForUnitType('Tag', props.unitTypeData):
                 updatedItem = {
                     ...(sidebarData as Tag),
                     [propertyName]: editedValue
                 };
                 break;
-            case findIdForUnitType('Assignee', unitTypes):
+            case findIdForUnitType('Assignee', props.unitTypeData):
                 updatedItem = {
                     ...(sidebarData as Assignee),
                     [propertyName]: editedValue
@@ -161,7 +148,7 @@ export const Sidebar = ({
         // Special handling for assignee dropdown
         if (id === 'assignee') {
             const assigneeName = value;
-            const selectedAssignee = assignees?.find(assignee => assignee.name === assigneeName);
+            const selectedAssignee = props.assigneeData?.find(assignee => assignee.name === assigneeName);
 
             if (selectedAssignee) {
                 setData(prevData => ({
@@ -175,7 +162,7 @@ export const Sidebar = ({
             const selectElement = event.target as HTMLSelectElement;
             const selectedOptions = Array.from(selectElement.selectedOptions).map(option => option.value);
 
-            const selectedRoadmapObjects = roadmaps?.filter(roadmap => selectedOptions.includes(roadmap.name));
+            const selectedRoadmapObjects = props.roadmapData?.filter(roadmap => selectedOptions.includes(roadmap.name));
 
             if (selectedRoadmapObjects) {
                 setData(prevData => ({
@@ -242,7 +229,7 @@ export const Sidebar = ({
                     onBlur={handleInputBlur}
                     className='border border-alabaster rounded-lg text-md pl-1 focus:ring-yinmn-blue focus:ring w-full' 
                 >
-                    {roadmaps?.map((option, index) => (
+                    {props.roadmapData?.map((option, index) => (
                         <option key={index} value={option.name}>
                             {option.name}
                         </option>
@@ -305,7 +292,7 @@ export const Sidebar = ({
     }
     // #endregion
     switch (sidebarData.type) {
-        case findIdForUnitType('Task', unitTypes):
+        case findIdForUnitType('Task', props.unitTypeData):
             const taskData = data as Task;
        
 
@@ -370,7 +357,7 @@ export const Sidebar = ({
                         ))}
                     </select>*/}
 
-                    {selectOptionsField('Assignee', assignees as Unit[])}
+                    {selectOptionsField('Assignee', props.assigneeData as Unit[])}
 
                    {/*
                                            <div>Start Date: </div>
@@ -430,7 +417,7 @@ export const Sidebar = ({
             );
             break;
 
-        case findIdForUnitType('Milestone', unitTypes):
+        case findIdForUnitType('Milestone', props.unitTypeData):
 
             const milestoneData = data as Milestone;
             sidebarContent = (
@@ -491,7 +478,7 @@ export const Sidebar = ({
             );
 
             break;
-        case findIdForUnitType('Tag', unitTypes):
+        case findIdForUnitType('Tag', props.unitTypeData):
             //const tagData = sidebarData as Tag; 
             sidebarContent = (
                 <div className='flex flex-col gap-2'>
@@ -522,7 +509,7 @@ export const Sidebar = ({
             );
 
             break;
-        case findIdForUnitType('Assignee', unitTypes):
+        case findIdForUnitType('Assignee', props.unitTypeData):
             //const assigneeData = sidebarData as Assignee;
            sidebarContent = (
                <div className='flex flex-col gap-2'>
@@ -559,7 +546,7 @@ export const Sidebar = ({
         <div className='bg-white rounded-xl'>
             {!hideContent &&
                 <div className='p-4 flex flex-col gap-2'>
-                    <div className='font-bold text-xl'>{unitTypes.find(type => type.id === sidebarData.type)?.name.toUpperCase()} DETAILS</div>
+                    <div className='font-bold text-xl'>{props.unitTypeData.find(type => type.id === sidebarData.type)?.name.toUpperCase()} DETAILS</div>
                     {sidebarContent}
                 </div>
             }

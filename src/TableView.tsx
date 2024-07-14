@@ -3,8 +3,7 @@ import { Task, TaskStatus, Roadmap, Milestone, Assignee, Tag, formatDateNumerica
 import { FilterButton } from './FilterButton'
 
 interface TableViewProps {
-    roadmap: Roadmap | null; //group filter properties together
-    taskStatus: TaskStatus | null;
+ 
     taskData: Task[];
     milestoneData: Milestone[];
     tagData: Tag[];
@@ -46,11 +45,7 @@ export const TableView = ({
             if (!props.taskData) {
                 return <p>No tasks found.</p>
             }
-            console.log("props task data", props.taskData)
-            if (props.roadmap) {
-                console.log("task " + props.roadmap.name)
-            }
-
+    
            let filteredTasks = props.taskStatusFilterState && props.taskStatusFilterState.length > 0
                 ? props.taskData.filter(task => props.taskStatusFilterState.includes(task.taskStatus.name))
                 : props.taskData;
@@ -113,14 +108,16 @@ export const TableView = ({
                     <th key={index} className="border border-gray-300 px-4 py-2">{formatHeaderLabel(header)}</th>
                 ));
 
-            let filteredMilestones = props.taskStatus
-                ? props.milestoneData.filter(milestone => milestone.taskStatus.name === props.taskStatus!.name)
+            let filteredMilestones = props.taskStatusFilterState && props.taskStatusFilterState.length > 0
+                ? props.milestoneData.filter(task => props.taskStatusFilterState.includes(task.taskStatus.name))
                 : props.milestoneData;
 
-            filteredMilestones = props.roadmap
+            filteredMilestones = props.roadmapFilterState
                 ? filteredMilestones.filter(ms => {
-                    const roadmaps = ms.roadmaps.map(map => map.name);
-                    return roadmaps.includes(props.roadmap!.name);
+                    const milestoneRoadmapNames = ms.roadmaps.map(map => map.name);
+                    return props.roadmapFilterState.every(name => milestoneRoadmapNames.includes(name)); //AND
+                    // return props.roadmapFilterState.some(name => milestoneRoadmapNames.includes(name)); //OR
+
                 })
                 : filteredMilestones;
      

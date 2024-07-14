@@ -3,14 +3,13 @@ import { Milestone, Task, TaskStatus, Roadmap, Tag, Assignee, formatDateNumerica
 
 interface TimelineProps {
     taskClick: (task: Task | Milestone) => void;
-    roadmap: Roadmap | null; //group filter properties together
-    taskStatus: TaskStatus | null;
     taskData: Task[];
     milestoneData: Milestone[];
     updateItem: (task: Task | Milestone | Tag | Assignee) => void;
     unitTypeData: UnitType[];
     roadmapFilterState: string[];
     taskStatusFilterState: string[];
+    //add selected item
 }
 
 export const Timeline = ({
@@ -287,14 +286,16 @@ export const Timeline = ({
 
     // #region Milestones
 
-    let filteredMilestones = props.taskStatus
-        ? props.milestoneData.filter(milestone => milestone.taskStatus.name === props.taskStatus!.name)
+    let filteredMilestones = props.taskStatusFilterState && props.taskStatusFilterState.length > 0
+        ? props.milestoneData.filter(task => props.taskStatusFilterState.includes(task.taskStatus.name))
         : props.milestoneData;
 
-    filteredMilestones = props.roadmap
+    filteredMilestones = props.roadmapFilterState
         ? filteredMilestones.filter(ms => {
-            const roadmaps = ms.roadmaps.map(map => map.name);
-            return roadmaps.includes(props.roadmap!.name);
+            const milestoneRoadmapNames = ms.roadmaps.map(map => map.name);
+            return props.roadmapFilterState.every(name => milestoneRoadmapNames.includes(name)); //AND
+            // return props.roadmapFilterState.some(name => milestoneRoadmapNames.includes(name)); //OR
+
         })
         : filteredMilestones;
 
