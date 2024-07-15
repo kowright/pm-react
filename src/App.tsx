@@ -9,9 +9,11 @@ import { FilterArea } from './FilterArea/FilterArea';
 import { NavBar } from './NavBar/NavBar';
 import { FilterButton } from './FilterButton';
 import { ListView } from './ListView';
+import { OrganizationView } from './OrganizationView';
+
 function App() {
     const [view, setView] = React.useState<string>('List'); 
-    const [selectedItem, setSelectedItem] = useState<Task | Milestone | Tag | Assignee | null>(null); 
+    const [selectedItem, setSelectedItem] = React.useState<Task | Milestone | Tag | Assignee | null>(null); 
 
     React.useEffect(() => {
         fetchTasks();
@@ -149,11 +151,12 @@ function App() {
     };
 
     const handleClick = (viewName: string) => {
-        console.log("clicked " + viewName)
         setView(viewName);
+        handleUnitClick(null);
+
     };
 
-    const handleUnitClick = (item: UnitDataType) => {
+    const handleUnitClick = (item: UnitDataTypeWithNull) => {
         setSelectedItem(item);
     };
     // #endregion
@@ -331,7 +334,7 @@ function App() {
                         {view === 'Table' && <TableView viewData={viewData} milestoneData={milestones} tagData={tags} assigneeData={assignees} />}
                         {view === 'Kanban' && <KanbanView viewData={viewData} milestoneData={milestones } />}
                         {view === 'List' && <ListView viewData={viewData} milestoneData={milestones} tagData={tags} assigneeData={assignees}/>}
-                        {view === 'Organization' && <div><br />Change settings! woooo</div> }
+                        {view === 'Organization' && <OrganizationView unitTypeData={unitTypes} tagData={tags} assigneeData={assignees} roadmapData={roadmaps} unitClick={handleUnitClick} selectedItem={selectedItem} /> }
                        
 
                     </div>

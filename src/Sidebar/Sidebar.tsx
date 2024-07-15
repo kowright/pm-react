@@ -482,64 +482,44 @@ export const Sidebar = ({
             //const tagData = sidebarData as Tag; 
             sidebarContent = (
                 <div className='flex flex-col gap-2'>
-               
-                    {/*<label htmlFor="name">Name:</label>
-                    <input
-                        id="name"
-                        type='text'
-                        value={data?.name || ''}
-                        onChange={handleInputChange}
-
-                        onBlur={handleInputBlur}
-                    />
-                    */}
                     {nameField(data.name)}
-
-                 {/*   <label htmlFor="description">Description:</label>
-                    <textarea
-                        id="description"
-                        value={data?.description || ''}
-                        onChange={handleInputChange}
-
-                        onBlur={handleInputBlur}
-                    />*/}
-                    
                     {descriptionField(data.description)}
+                    {stringFieldDisplay('ID', data.id.toString()) }
                 </div>
             );
 
             break;
         case findIdForUnitType('Assignee', props.unitTypeData):
             //const assigneeData = sidebarData as Assignee;
-           sidebarContent = (
-               <div className='flex flex-col gap-2'>
-    {/*
-                   <label htmlFor="name">Name:</label>
-                   <input
-                       id="name"
-                       type='text'
-                       value={data?.name || ''}
-                       onChange={handleInputChange}
+            sidebarContent = (
+                <div className='flex flex-col gap-2'>
+                    {nameField(data.name)}
+                    {descriptionField(data.description)}
+                    {stringFieldDisplay('ID', data.id.toString())}
+                </div>
+            );
+            break;
 
-                       onBlur={handleInputBlur}
-                   />*/}
-                   {nameField(data.name)}
-                   
-
-               {/*    <label htmlFor="description">Description:</label>
-                   <textarea
-                       id="description"
-                       value={data?.description || ''}
-                       onChange={handleInputChange}
-
-                       onBlur={handleInputBlur}
-                   />*/}
-                   
-                   {descriptionField(data.description) }
-               </div>
+        case findIdForUnitType('Roadmap', props.unitTypeData):
+            sidebarContent = (
+                <div className='flex flex-col gap-2'>
+                    {nameField(data.name)}
+                    {descriptionField(data.description)}
+                    {stringFieldDisplay('ID', data.id.toString())}
+                </div>
             );
 
             break;
+
+        case findIdForUnitType('TaskStatus', props.unitTypeData):
+            //const assigneeData = sidebarData as Assignee;
+            sidebarContent = (
+                <div className='flex flex-col gap-2'>
+                    {nameField(data.name)}
+                    {descriptionField(data.description)}
+                    {stringFieldDisplay('ID', data.id.toString())}
+                </div>
+            );
     }
 
     return (
