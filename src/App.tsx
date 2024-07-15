@@ -10,10 +10,12 @@ import { NavBar } from './NavBar/NavBar';
 import { FilterButton } from './FilterButton';
 import { ListView } from './ListView';
 import { OrganizationView } from './OrganizationView';
+import { AddPopup } from './AddPopup';
 
 function App() {
     const [view, setView] = React.useState<string>('List'); 
     const [selectedItem, setSelectedItem] = React.useState<Task | Milestone | Tag | Assignee | null>(null); 
+    const [showPopup, setShowPopup] = React.useState(false);
 
     React.useEffect(() => {
         fetchTasks();
@@ -179,6 +181,11 @@ function App() {
         });
     }, [filterStates, selectedItem, tasks, unitTypes]);
 
+    const handleAddButtonClick = () => {
+        setShowPopup(true);
+    };
+
+
     // #region Unit Updates
     const updateItem = (updatedItem: UnitDataTypeWithNull) => {
         if (updatedItem == null) {
@@ -324,7 +331,8 @@ function App() {
 
 
                         <div className='w-[100px] flex justify-end items-start'>
-                            <FilterButton text="Add" onClick={() => console.log("hi")} />
+                            <FilterButton text="Add" onClick={handleAddButtonClick} />
+                            {showPopup && <AddPopup setPopupVisibility={() => setShowPopup(false)} popupUnitType='' unitTypeData={unitTypes} roadmapData={roadmaps} assigneeData={assignees} tagData={tags} />}
                         </div>
                     </div>
                     <div className='flex-1 max-w-full overflow-x-auto relative'>
