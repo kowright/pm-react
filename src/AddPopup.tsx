@@ -29,9 +29,22 @@ export const AddPopup = ({
         endDate: '',
         roadmaps: [], //array of num
         assignee: 0 //default No Assignee
-
     });
-    let content: JSX.Element = <div>No forms to complete I am so sorry for this inconvinence, I will fire myself!.</div>
+    const [milestoneformData, setMilestoneFormData] = React.useState({
+        name: '',
+        description: '',
+        tags: [], //array of num
+        taskStatus: 1, //default Backlog
+        date: '',
+        roadmaps: [], //array of num
+        assignee: 0 //default No Assignee
+    });
+    const [genericformData, setGenericFormData] = React.useState({
+        name: '',
+        description: '',
+    });
+
+    let content: JSX.Element = <div></div>
 
     const [taskStatusData, setTaskStatuses] = React.useState<TaskStatus[]>([]);
 
@@ -51,35 +64,118 @@ export const AddPopup = ({
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault(); // Prevent default form submission
 
-        console.log("Form submitted", formData);
-        try {
-            const response = await fetch('/api/tasks', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(formData),
-            });
+        console.log("Form submitted");
 
-            if (!response.ok) {
-                // Check if response is not successful (HTTP status code outside of 200-299 range)
-                throw new Error(`HTTP error! Status: ${response.status}`);
+        if (unitTypeView === 'Task') {
+            try {
+                const response = await fetch('/api/tasks', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData),
+                });
+
+                if (!response.ok) {
+                    // Check if response is not successful (HTTP status code outside of 200-299 range)
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+
+                // Assuming the API returns JSON data
+                const data = await response.json();
+
+                // Handle the response data as needed
+                console.log('API response:', data);
+
+                props.setPopupVisibility();
+                window.location.reload();
+
+
+            } catch (error) {
+                // Handle fetch errors and API errors here
+                console.error('Error fetching data:', error);
             }
-
-            // Assuming the API returns JSON data
-            const data = await response.json();
-
-            // Handle the response data as needed
-            console.log('API response:', data);
-
-            props.setPopupVisibility();
-            window.location.reload();
-
-
-        } catch (error) {
-            // Handle fetch errors and API errors here
-            console.error('Error fetching data:', error);
         }
+        else if (unitTypeView === 'Milestone') {
+            try {
+                const response = await fetch('/api/milestones', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(milestoneformData),
+                });
+
+                if (!response.ok) {
+                    // Check if response is not successful (HTTP status code outside of 200-299 range)
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+
+                // Assuming the API returns JSON data
+                const data = await response.json();
+
+                // Handle the response data as needed
+                console.log('API response:', data);
+
+                props.setPopupVisibility();
+                 window.location.reload();
+
+
+            } catch (error) {
+                // Handle fetch errors and API errors here
+                console.error('Error fetching data:', error);
+            }
+        }
+        else {
+            let url = '/api/';
+            if (unitTypeView === 'Tag') {
+                url+= 'tags'
+            }
+            else if (unitTypeView === 'Assignee'){
+                url += 'assignees'
+
+            }
+            else if (unitTypeView === 'Roadmap') {
+                url += 'roadmaps'
+
+            }
+            else if (unitTypeView === 'Task Status') {
+                url += 'taskstatus'
+
+            }
+            console.log("url", url)
+            console.log(genericformData)
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(genericformData),
+                });
+
+                if (!response.ok) {
+                    // Check if response is not successful (HTTP status code outside of 200-299 range)
+                    console.log("res", response)
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+
+                // Assuming the API returns JSON data
+                const data = await response.json();
+
+                // Handle the response data as needed
+                console.log('API response:', data);
+
+                props.setPopupVisibility();
+                 window.location.reload();
+
+
+            } catch (error) {
+                // Handle fetch errors and API errors here
+                console.error('Error fetching data:', error);
+            }
+        }
+       
     };
 
     const handleChange = async (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -118,11 +214,41 @@ export const AddPopup = ({
                     [name]: value
                 }));
             }
-
-          
-
         }
-   
+        else if (unitTypeView === 'Milestone') {
+
+            if (name === 'taskStatus' || name === 'assignee') {
+                setMilestoneFormData(prevState => ({
+                    ...prevState,
+                    [name]: parseInt(value, 10)
+                }));
+            }
+            else if (name === 'roadmaps' || name === 'tags') {
+                const { options } = e.target as HTMLSelectElement;
+
+                const selectedValues = Array.from(options)
+                    .filter(option => option.selected)
+                    .map(option => parseInt(option.value, 10));
+
+                setMilestoneFormData(prevState => ({
+                    ...prevState,
+                    [name]: selectedValues
+                }));
+            }
+            else {
+                setMilestoneFormData(prevState => ({
+                    ...prevState,
+                    [name]: value
+                }));
+            }
+        }
+        else {
+            setGenericFormData(prevState => ({
+                ...prevState,
+                [name]: value
+            }));
+        }
+
     };
 
     // #region Fields
@@ -230,7 +356,7 @@ export const AddPopup = ({
     }
 
     if (unitTypeView === 'Task') {
-        content = 
+        content =
             <div>
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div>
@@ -250,41 +376,43 @@ export const AddPopup = ({
                 </form>
             </div>
     }
-    if (unitTypeView === 'Milestone') {
+    else if (unitTypeView === 'Milestone') {
         content =
             <div>
-                <p>Milestone STUFF</p>
-                {nameField()}
+                <form onSubmit={handleSubmit} className="space-y-4">
+                    <div>
+                        {nameField()}
+                        {descriptionField()}
+                        {dateField('Date')}
+                        {multipleSelectField('Tags', props.tagData)}
+                        {selectOptionsField('Task Status', taskStatusData)}
+                        {selectOptionsField('Assignee', props.assigneeData)}
+                        {multipleSelectField('Roadmaps', props.roadmapData)}
+                    </div>
+                    <div className='flex justify-between'>
+                        <button className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded" onClick={() => props.setPopupVisibility()}>Close</button>
+                        <button type="submit" className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">Save</button>
+                    </div>
+                </form>
             </div>
     }
-    if (unitTypeView === 'Tag') {
+    else if (unitTypeView !== '') { 
         content =
             <div>
-                <p>TAG STUFF</p>
-                {nameField()}
+                <form onSubmit={handleSubmit} className="space-y-4">
+                <div>
+                    {nameField()}
+                    {descriptionField()}
+                </div>
+
+                <div className='flex justify-between'>
+                    <button className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded" onClick={() => props.setPopupVisibility()}>Close</button>
+                    <button type="submit" className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">Save</button>
+                </div>
+                </form>
             </div>
     }
-    if (unitTypeView === 'Assignee') {
-        content =
-            <div>
-                <p>ASSIGNEE STUFF</p>
-                {nameField()}
-            </div>
-    }
-    if (unitTypeView === 'Roadmap') {
-        content =
-            <div>
-                <p>ROADMAP STUFF</p>
-                {nameField()}
-            </div>
-    }
-    if (unitTypeView === 'Task Status') {
-        content =
-            <div>
-                <p>TASK STATUS STUFF</p>
-                {nameField()}
-            </div>
-    }
+
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center overflow-auto bg-gray-800 bg-opacity-50">

@@ -55,7 +55,7 @@ export const OrganizationView = ({
     }
     if (unitTypeView === 'Assignee') {
         content =
-            <div className='flex gap-4'>
+            <div className='flex gap-4 flex-wrap'>
                 {props.assigneeData.map(as => (
                     <FilterButton text={as.name} onClick={() => props.unitClick(as)} active={unitTypeView === 'Assignee' && props.selectedItem?.id === as.id} />
                 ))}
@@ -64,7 +64,7 @@ export const OrganizationView = ({
     }
     if (unitTypeView === 'Roadmap') {
         content =
-            <div className='flex gap-4'>
+            <div className='flex gap-4 flex-wrap'>
                 {props.roadmapData.map(map => (
                     <FilterButton text={map.name} onClick={() => props.unitClick(map)} active={unitTypeView === 'Roadmap' && props.selectedItem?.id === map.id } />
                 ))}
@@ -73,7 +73,7 @@ export const OrganizationView = ({
     }
     if (unitTypeView === 'Task Status') {
         content =
-            <div className='flex gap-4'>
+            <div className='flex gap-4 flex-wrap'>
                 {taskStatusData.map(status => (
                     <FilterButton text={status.name} onClick={() => props.unitClick(status)} active={unitTypeView === 'Task Status' && props.selectedItem?.id === status.id} />
                 ))}
@@ -84,7 +84,7 @@ export const OrganizationView = ({
     return (
         <div className='flex flex-col'>
             <br/>
-            <div className='flex gap-4'>
+            <div className='flex gap-4 flex-wrap'>
                 {unitButtons}
             </div>
             <br />
