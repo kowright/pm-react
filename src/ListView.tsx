@@ -110,7 +110,7 @@ export const ListView = ({
 
                 {listDataType === 'Task' &&
                     filteredTasks.map((item, index) => (
-                        <button key={index} className={`w-full h-[40px] rounded-xl flex items-center p-4 ${color.focusRing} ${color.hover} focus:ring-offset-alabaster
+                        <button key={item.id} className={`w-full h-[40px] rounded-xl flex items-center p-4 ${color.focusRing} ${color.hover} focus:ring-offset-alabaster
                                     ${selectedItem?.type === findIdForUnitType('Task', unitTypeData) && selectedItem?.id === item.id ? color.selected: color.default}`}
 
                             onClick={() => handleClick(item)}>
@@ -118,10 +118,10 @@ export const ListView = ({
                             <div className='flex-1'>{item.description}</div>
                             <div className='w-auto flex justify-end gap-x-2'>
                                 {item.tags.map(tag =>
-                                    <FilterButton text={tag.name} onClick={() => console.log("eng")} />
+                                    <FilterButton key={tag.id} text={tag.name} onClick={() => console.log("eng")} />
                                 )}
                                 {item.roadmaps.map(map =>
-                                    <FilterButton text={map.name} onClick={() => console.log("eng")} />
+                                    <FilterButton key={map.id} text={map.name} onClick={() => console.log("eng")} />
                                 )}
                                 <FilterButton text={item.taskStatus.name} onClick={() => console.log("eng")} />
 
@@ -133,7 +133,7 @@ export const ListView = ({
 
                 {listDataType === 'Milestone' &&
                     filteredMilestones.map((item, index) => (
-                        <button className={`w-full h-[40px] rounded-xl flex items-center p-4 ${color.focusRing} ${color.hover} 
+                        <button key={item.id} className={`w-full h-[40px] rounded-xl flex items-center p-4 ${color.focusRing} ${color.hover} 
                         ${selectedItem?.type === findIdForUnitType('Milestone', unitTypeData) && selectedItem?.id === item.id ?
                                 color.default : 'bg-white text-smoky-black'} `}
                             onClick={() => handleClick(item)}>
@@ -141,10 +141,10 @@ export const ListView = ({
                             <div className='flex-1'>{item.description}</div>
                             <div className='w-auto flex justify-end gap-x-2'>
                                 {item.tags.map(tag =>
-                                    <FilterButton text={tag.name} onClick={() => console.log("eng")} />
+                                    <FilterButton key={tag.id} text={tag.name} onClick={() => console.log("eng")} />
                                 )}
                                 {item.roadmaps.map(map =>
-                                    <FilterButton text={map.name} onClick={() => console.log("eng")} />
+                                    <FilterButton key={map.id} text={map.name} onClick={() => console.log("eng")} />
                                 )}
                                 <FilterButton text={item.taskStatus.name} onClick={() => console.log("eng")} />
 

@@ -63,9 +63,7 @@ export const FilterArea = ({
     };*/
 
 
-    let taskStatusButtons = taskStatusData?.map(status =>
-        <FilterButton text={status.name} key={status.id} onClick={() => props.handleFilterByTaskStatus(status)} ></FilterButton>
-    );
+
 
 /*    const PMButtonNull = (active: boolean, text: string) => {
         return (
@@ -82,7 +80,7 @@ export const FilterArea = ({
         const color = colorSets['green'];
 
         return (
-            <button
+            <button key={item.id}
                 className={`h-[25px] w-fit bg-ash-gray rounded-lg flex justify-center items-center shrink-0 p-2 ${color.hover} ${color.focusRing} focus:ring-offset-alabaster
             ${isRoadmap ? props.roadmapFilterState.includes(item.name) ? color.selected : color.default : props.taskStatusFilterState.includes(item.name) ? color.selected : color.default}`}
                 onClick={() => {
