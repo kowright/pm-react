@@ -1,7 +1,7 @@
 import React from "react";
 import {
     Milestone, Roadmap, Task, TaskStatus, formatDateNumericalMMDDYYYY, colorSets,
-    UnitType, toCamelCase, formatDateNumericalYYYYMMDDWithDashes, Assignee, Tag
+    UnitType, toCamelCase, formatDateNumericalYYYYMMDDWithDashes, Assignee, Tag, UnitDataTypeWithNull
 } from './Interfaces';
 import { FilterButton } from './FilterButton';
 
@@ -13,6 +13,8 @@ export interface AddPopupProps {
     roadmapData: Roadmap[];
     assigneeData: Assignee[];
     tagData: Tag[];
+    createItem: (formData: any, type: string) => void;
+
 }
 
 export const AddPopup = ({
@@ -64,10 +66,10 @@ export const AddPopup = ({
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault(); // Prevent default form submission
 
-        console.log("Form submitted");
+        console.log("Form submitted", formData);
 
         if (unitTypeView === 'Task') {
-            try {
+           /* try {
                 const response = await fetch('/api/tasks', {
                     method: 'POST',
                     headers: {
@@ -94,10 +96,12 @@ export const AddPopup = ({
             } catch (error) {
                 // Handle fetch errors and API errors here
                 console.error('Error fetching data:', error);
-            }
+            }*/
+
+            props.createItem(formData, unitTypeView)
         }
         else if (unitTypeView === 'Milestone') {
-            try {
+         /*   try {
                 const response = await fetch('/api/milestones', {
                     method: 'POST',
                     headers: {
@@ -124,8 +128,10 @@ export const AddPopup = ({
             } catch (error) {
                 // Handle fetch errors and API errors here
                 console.error('Error fetching data:', error);
-            }
+            }*/
+            props.createItem(milestoneformData, unitTypeView);
         }
+
         else {
             let url = '/api/';
             if (unitTypeView === 'Tag') {

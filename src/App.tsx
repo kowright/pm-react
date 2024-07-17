@@ -513,10 +513,194 @@ function App() {
                 console.error('Error deleting task status:', error);
             });
     };
-// #endregion
+    // #endregion
+
+    // #region Unit Create
+    const createItem = (formData:any, type: string) => {
+        if (formData == null) {
+            return;
+        }
+
+        if (type === 'Task') {
+            createTask(formData)
+        }
+        else if (type === 'Milestone') {
+            createMilestone(formData);
+        }
+        /*
+        else if (createdItem.type === findIdForUnitType('Tag', unitTypes)) {
+            createTag(createdItem as Tag)
+        }
+        else if (createdItem.type === findIdForUnitType('Assignee', unitTypes)) {
+            createAssignee(createdItem as Assignee)
+        }
+        else if (createdItem.type === findIdForUnitType('TaskStatus', unitTypes)) {
+            createTaskStatus(createdItem as TaskStatus)
+        }*/
+    }
+
+
+    const createTask = async (formData: any) => {
+         try {
+          const response = await fetch('/api/tasks', {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/json',
+              },
+              body: JSON.stringify(formData),
+          });
+
+          if (!response.ok) {
+              // Check if response is not successful (HTTP status code outside of 200-299 range)
+              throw new Error(`HTTP error! Status: ${response.status}`);
+          }
+
+          // Assuming the API returns JSON data
+             const data = await response.json();
+             
+             const newTask = data as Task;
+             console.log("new task", newTask)
+
+        
+
+             setShowPopup(false)
+
+             setTasks(prevTasks => [...prevTasks, newTask]);
+
+
+
+      } catch (error) {
+          // Handle fetch errors and API errors here
+          console.error('Error fetching data:', error);
+      }
+    };
+
+    const createMilestone = async (formData: any) => {
+        // Create milestone in API
+        console.log("sending backend ", formData)
+        try {
+            const response = await fetch('/api/milestones', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData),
+            });
+
+            if (!response.ok) {
+                // Check if response is not successful (HTTP status code outside of 200-299 range)
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+
+            // Assuming the API returns JSON data
+            const data = await response.json();
+
+            // Handle the response data as needed
+            console.log('API response:', data);
+
+            setShowPopup(false)
+
+            const newMs = data as Milestone;
+            console.log("new task", newMs)
+
+            setMilestones(prev => [...prev, newMs]);
+
+
+        } catch (error) {
+            // Handle fetch errors and API errors here
+            console.error('Error fetching data:', error);
+        }
+    };
+
+    const createTag = (createdTag: Tag) => {
+        // Create task in API
+        fetch(`/api/tags/${createdTag.id}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(createdTag),
+        })
+            .then(res => res.json())
+            .then(data => {
+                const indexToCreate = tags.findIndex(tag => tag.id === createdTag.id);
+                console.log("deleting task index " + indexToCreate)
+                if (indexToCreate !== -1) {
+                    const updatedTags = [...tags.slice(0, indexToCreate), ...tags.slice(indexToCreate + 1)];
+
+                    setTags(updatedTags);
+                }
+                setSelectedItem(null)
+
+
+            })
+            .catch(error => {
+                console.error('Error deleting tag:', error);
+            });
+    }
+
+    const createAssignee = (createdAssignee: Assignee) => {
+        // Create task in API
+        fetch(`/api/assignees/${createdAssignee.id}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(createdAssignee),
+        })
+            .then(res => res.json())
+            .then(data => {
+                const indexToCreate = assignees.findIndex(as => as.id === createdAssignee.id);
+                console.log("deleting task index " + indexToCreate)
+                if (indexToCreate !== -1) {
+                    // Create a new array without the created task
+                    const updatedAssignees = [...assignees.slice(0, indexToCreate), ...assignees.slice(indexToCreate + 1)];
+
+                    setAssignees(updatedAssignees);
+                }
+                setSelectedItem(null)
+
+
+            })
+            .catch(error => {
+                console.error('Error deleting assignee:', error);
+            });
+    };
+
+    const createTaskStatus = (createdTaskStatus: TaskStatus) => {
+        // Create task in API
+        fetch(`/api/taskstatus/${createdTaskStatus.id}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(createdTaskStatus),
+        })
+            .then(res => res.json())
+            .then(data => {
+                console.log("created ts id", createdTaskStatus.id)
+                console.log("all ts ", taskStatuses)
+
+                const indexToCreate = taskStatuses.findIndex(ts => ts.id === createdTaskStatus.id);
+                console.log("create ts index", indexToCreate)
+
+                if (indexToCreate !== -1) {
+                    // Create a new array without the created task
+                    const updatedTaskStatus = [...taskStatuses.slice(0, indexToCreate), ...taskStatuses.slice(indexToCreate + 1)];
+                    console.log("create ts", updatedTaskStatus)
+                    setTaskStatuses(updatedTaskStatus);
+                }
+                setSelectedItem(null)
+
+            })
+            .catch(error => {
+                console.error('Error deleting task status:', error);
+            });
+    };
+    // #endregion
 
     return (
-        <div className="flex h-full w-full bg-alabaster gap-16">
+        <div className="flex h-screen w-full bg-alabaster gap-16">
             <NavBar handleNavItemClick={handleClick} view={view} />
 
 
@@ -538,7 +722,7 @@ function App() {
 
                         <div className='w-[100px] flex justify-end items-start'>
                             <FilterButton text="Add" onClick={handleAddButtonClick} />
-                            {showPopup && <AddPopup setPopupVisibility={() => setShowPopup(false)} popupUnitType='' unitTypeData={unitTypes} roadmapData={roadmaps} assigneeData={assignees} tagData={tags} />}
+                            {showPopup && <AddPopup setPopupVisibility={() => setShowPopup(false)} popupUnitType='' unitTypeData={unitTypes} roadmapData={roadmaps} assigneeData={assignees} tagData={tags} createItem={createItem} />}
                         </div>
                     </div>
                     <div className='flex-1 max-w-full overflow-x-auto relative'>
