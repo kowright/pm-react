@@ -101,10 +101,10 @@ export const KanbanView = ({
                     <div className='text-sm'>{formatDateWords(new Date(task.startDate))} - {formatDateWords(new Date(task.endDate))}</div>
                     <div className='w-auto flex justify-start gap-x-2'>
                         {task.tags.map(tag =>
-                            <FilterButton text={tag.name} />
+                            <FilterButton text={tag.name} colorByType='Tag' />
                         )}
                         {task.roadmaps.map(map =>
-                            <FilterButton text={map.name} />
+                            <FilterButton text={map.name} colorByType='Roadmap' />
                         )}
                     </div>
                 </div>
@@ -145,10 +145,10 @@ export const KanbanView = ({
                     <div className='text-sm'>{formatDateWords(new Date(ms.date))}</div>
                     <div className='w-auto flex justify-start gap-x-2'>
                         {ms.tags.map(tag =>
-                            <FilterButton text={tag.name} />
+                            <FilterButton text={tag.name} colorByType='Tag' />
                         )}
                         {ms.roadmaps.map(map =>
-                            <FilterButton text={map.name} />
+                            <FilterButton text={map.name} colorByType='Roadmap' />
                         )}
                     </div>
                 </div>

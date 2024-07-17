@@ -10,6 +10,7 @@ interface SidebarProps {
     assigneeData: Assignee[];
     roadmapData: Roadmap[];
     unitTypeData: UnitType[];
+    tagData: Tag[];
     updateItem: (updatedItem: UnitDataTypeWithNull) => void;
 }
 
@@ -73,13 +74,21 @@ export const Sidebar = ({
                 const selectElement = event.target as HTMLSelectElement;
 
                 const selectedOptions = selectElement.selectedOptions;
-                const selectedRoadmapNames = selectedOptions ? Array.from(selectedOptions).map(option => option.value) : [];
 
+                const selectedRoadmapNames = selectedOptions ? Array.from(selectedOptions).map(option => option.value) : [];
                 let selectedRoadmaps;
                 if (propertyName === 'roadmap') {
                     selectedRoadmaps = props.roadmapData?.filter(roadmap => selectedRoadmapNames.includes(roadmap.name));
                 } else {
                     selectedRoadmaps = (sidebarData as Task).roadmaps
+                }
+
+                const selectedTagNames = selectedOptions ? Array.from(selectedOptions).map(option => option.value) : [];
+                let selectedTags: any;
+                if (propertyName === 'tag') {
+                    selectedTags = props.tagData?.filter(tag => selectedTagNames.includes(tag.name));
+                } else {
+                    selectedTags = (sidebarData as Task).tags
                 }
 
                 const selectedAssignee = propertyName === 'assignee' ? props.assigneeData?.find(assignee => assignee.name === editedValue) : (sidebarData as Task).assignee;
@@ -90,37 +99,71 @@ export const Sidebar = ({
                         ? new Date(editedValue) : editedValue,
                     taskStatus: taskStatusToAssign,
                     roadmaps: selectedRoadmaps, 
-                    assignee: selectedAssignee 
+                    assignee: selectedAssignee, 
+                    tags: selectedTags
                 };
                
                 console.log("updated item in sidebar",updatedItem)
                 break;
             case findIdForUnitType('Milestone', props.unitTypeData):
+
+                let taskStatusToAssignM;
+                if (propertyName === 'taskStatus') {
+                    taskStatusToAssignM = taskStatuses?.find(status => editedValue === status.name);
+                } else {
+                    taskStatusToAssignM = (sidebarData as Task).taskStatus
+                }
+
+                const selectElementM = event.target as HTMLSelectElement;
+
+                const selectedOptionsM = selectElementM.selectedOptions;
+
+                const selectedRoadmapNamesM = selectedOptionsM ? Array.from(selectedOptionsM).map(option => option.value) : [];
+                let selectedRoadmapsM;
+                if (propertyName === 'roadmap') {
+                    selectedRoadmapsM = props.roadmapData?.filter(roadmap => selectedRoadmapNamesM.includes(roadmap.name));
+                } else {
+                    selectedRoadmapsM = (sidebarData as Task).roadmaps
+                }
+
+                const selectedTagNamesM = selectedOptionsM ? Array.from(selectedOptionsM).map(option => option.value) : [];
+                let selectedTagsM: any;
+                if (propertyName === 'tag') {
+                    selectedTagsM = props.tagData?.filter(tag => selectedTagNamesM.includes(tag.name));
+                } else {
+                    selectedTagsM = (sidebarData as Task).tags
+                }
+
+                const selectedAssigneeM = propertyName === 'assignee' ? props.assigneeData?.find(assignee => assignee.name === editedValue) : (sidebarData as Task).assignee;
+
                 updatedItem = {
-                    ...(sidebarData as Milestone),
-                    [propertyName]: propertyName === 'date' ? new Date(editedValue) : editedValue,
-                    
-                      
+                    ...(sidebarData as Task),
+                    [propertyName]: propertyName === 'startDate' || propertyName === 'endDate'
+                        ? new Date(editedValue) : editedValue,
+                    taskStatus: taskStatusToAssignM,
+                    roadmaps: selectedRoadmapsM,
+                    assignee: selectedAssigneeM,
+                    tags: selectedTagsM
                 };
 
-              /*  if (propertyName === 'taskStatus') {
-                    (updatedItem as Milestone).taskStatus.name = editedValue;
-                }
-                */
-                console.log("edited ", (updatedItem as Milestone).taskStatus)
+                
+                console.log("updated item in sidebar", updatedItem)
                 break;
+
             case findIdForUnitType('Tag', props.unitTypeData):
                 updatedItem = {
                     ...(sidebarData as Tag),
                     [propertyName]: editedValue
                 };
                 break;
+
             case findIdForUnitType('Assignee', props.unitTypeData):
                 updatedItem = {
                     ...(sidebarData as Assignee),
                     [propertyName]: editedValue
                 };
                 break;
+
             default:
                 throw new Error(`Unhandled sidebarData type: ${(sidebarData as any).type}`);
         }
@@ -172,7 +215,23 @@ export const Sidebar = ({
                 console.log("handle input change roadmap", data);
             }
         
-        } else {
+        }
+        else if (id === 'tag') {
+            const selectElement = event.target as HTMLSelectElement;
+            const selectedOptions = Array.from(selectElement.selectedOptions).map(option => option.value);
+
+            const selectedTagObjects = props.tagData?.filter(tag => selectedOptions.includes(tag.name));
+
+            if (selectedTagObjects) {
+                setData(prevData => ({
+                    ...(prevData as Task | Milestone | Tag | Assignee),
+                    tags: selectedTagObjects
+                }));
+                console.log("handle input change tag", data);
+            }
+        }
+
+        else {
             setData(prevData => ({
                 ...(prevData as Task | Milestone | Tag | Assignee),
                 [id]: value
@@ -217,19 +276,19 @@ export const Sidebar = ({
         )
     };
 
-    const roadmapField = (roadmapNames: string[]) => {
+    const multipleSelectOptionsField = (title: string, roadmapNames: string[], array: any[]) => {
         return (
             <div className='text-smoky-black'>
                 <div className='text-xs pb-1'>Roadmap</div>
                 <select
                     multiple
-                    id="roadmap"
+                    id={title}
                     value={roadmapNames}
                     onChange={handleInputChange}
                     onBlur={handleInputBlur}
                     className='border border-alabaster rounded-lg text-md pl-1 focus:ring-yinmn-blue focus:ring w-full' 
                 >
-                    {props.roadmapData?.map((option, index) => (
+                    {array?.map((option, index) => (
                         <option key={index} value={option.name}>
                             {option.name}
                         </option>
@@ -339,9 +398,10 @@ export const Sidebar = ({
                         ))}
                     </select>*/}
 
-                    {roadmapField(taskData?.roadmaps?.map(roadmap => roadmap.name)) }
+                    {multipleSelectOptionsField('roadmap', taskData?.roadmaps?.map(roadmap => roadmap.name), props.roadmapData) }
                     
-                    
+                    {multipleSelectOptionsField('tag', taskData?.tags?.map(tag => tag.name), props.tagData)}
+
                 {/*    <div>Assignee</div>
                     <select
                         id="assignee"
@@ -443,7 +503,10 @@ export const Sidebar = ({
                         onBlur={handleInputBlur}
                     />
                     */}
-                    {dateField(new Date(milestoneData.date), "Date") }
+                    {dateField(new Date(milestoneData.date), "Date")}
+                    {multipleSelectOptionsField('roadmap', milestoneData?.roadmaps?.map(roadmap => roadmap.name), props.roadmapData)}
+
+                    {multipleSelectOptionsField('tag', milestoneData?.tags?.map(tag => tag.name), props.tagData)}
                  {/*   <label htmlFor="date">Date: </label>
                     <input
                         id="date"

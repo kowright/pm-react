@@ -2,7 +2,7 @@ import React from "react";
 import {
     Task, TaskStatus, Roadmap, Milestone, Assignee, Tag, findIdForUnitType, UnitType, colorSets, FilterStates,
     UnitDataType, UnitDataTypeWithNull, ViewData, taskFilterOnTaskStatus, taskFilterOnRoadmap, taskSortByEarliestDate,
-    milestoneFilterOnTaskStatus, milestoneFilterOnRoadmap, milestoneSortByEarliestDate, Unit, unitSortByNameAlphabetical
+    milestoneFilterOnTaskStatus, milestoneFilterOnRoadmap, milestoneSortByEarliestDate, Unit, unitSortByNameAlphabetical, findUnitTypefromId
 } from './Interfaces';
 import { FilterButton } from './FilterButton';
 import { SortArea } from './SortArea/SortArea';
@@ -118,12 +118,12 @@ export const ListView = ({
                             <div className='flex-1'>{item.description}</div>
                             <div className='w-auto flex justify-end gap-x-2'>
                                 {item.tags.map(tag =>
-                                    <FilterButton key={tag.id} text={tag.name} onClick={() => console.log("eng")} />
+                                    <FilterButton key={tag.id} text={tag.name} colorByType='Tag'/>
                                 )}
                                 {item.roadmaps.map(map =>
-                                    <FilterButton key={map.id} text={map.name} onClick={() => console.log("eng")} />
+                                    <FilterButton key={map.id} text={map.name} colorByType='Roadmap'/>
                                 )}
-                                <FilterButton text={item.taskStatus.name} onClick={() => console.log("eng")} />
+                                <FilterButton text={item.taskStatus.name} colorByType='Task Status' />
 
 
                             </div>
@@ -141,12 +141,12 @@ export const ListView = ({
                             <div className='flex-1'>{item.description}</div>
                             <div className='w-auto flex justify-end gap-x-2'>
                                 {item.tags.map(tag =>
-                                    <FilterButton key={tag.id} text={tag.name} onClick={() => console.log("eng")} />
+                                    <FilterButton key={tag.id} text={tag.name} colorByType='Tag' />
                                 )}
                                 {item.roadmaps.map(map =>
-                                    <FilterButton key={map.id} text={map.name} onClick={() => console.log("eng")} />
+                                    <FilterButton key={map.id} text={map.name} colorByType='Roadmap' />
                                 )}
-                                <FilterButton text={item.taskStatus.name} onClick={() => console.log("eng")} />
+                                <FilterButton text={item.taskStatus.name} colorByType='Task Status' />
 
 
                             </div>

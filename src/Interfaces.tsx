@@ -117,6 +117,15 @@ export function findIdForUnitType(type: string, unitTypes: UnitType[]) {
     return unitTypes.find(item => item.name === type)?.id
 }
 
+export function findUnitTypefromId(id: number, unitTypes: UnitType[]) {
+    console.log('num', id)
+    const name = unitTypes.find(item => item.id === id)?.name
+    console.log('type' + name)
+    return name
+   
+
+}
+
 export interface ColorSet {
     default: string;
     hover: string;
@@ -149,6 +158,37 @@ export const colorSets: Record<string, ColorSet> = {
         focusRing: 'focus:ring-offset-4 focus:ring-yinmn-blue focus:ring focus:text-white',
         selected: 'bg-yinmn-blue text-white',
     },
+    purple: {
+        default: 'bg-chinese-violet text-white',
+        hover: 'hover:bg-mountbatten-pink hover:text-smoky-black',
+        focusRing: 'focus:ring-offset-4 focus:ring-chinese-violet focus:ring focus:text-smoky-black',
+        selected: 'bg-english-violet text-white',
+    },
+    orange: {
+        default: 'bg-tigers-eyes text-smoky-black',
+        hover: 'hover:bg-persian-orange hover:text-smoky-black',
+        focusRing: 'focus:ring-offset-4 focus:ring-tigers-eyes focus:ring focus:text-smoky-black',
+        selected: 'bg-burnt-orange text-white',
+    },
+    red: {
+        default: 'bg-imperial-red text-smoky-black',
+        hover: 'hover:bg-light-coral hover:text-smoky-black',
+        focusRing: 'focus:ring-offset-4 focus:ring-imperial-red focus:ring focus:text-smoky-black',
+        selected: 'bg-persian-red text-white',
+    },
+    yellow: {
+        default: 'bg-vanilla text-smoky-black',
+        hover: 'hover:bg-light-cream hover:text-smoky-black',
+        focusRing: 'focus:ring-offset-4 focus:ring-vanilla focus:ring focus:text-smoky-black',
+        selected: 'bg-straw text-white',
+    },
+    pink: {
+        default: 'bg-sky-magenta text-smoky-black',
+        hover: 'hover:bg-light-coral hover:text-smoky-black',
+        focusRing: 'focus:ring-offset-4 focus:ring-amaranth-pink focus:ring focus:text-smoky-black',
+        selected: 'bg-chinese-rose text-white',
+    }
+
 };
 
 

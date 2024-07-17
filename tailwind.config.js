@@ -28,7 +28,7 @@ module.exports = {
               'straw': '#D5D689',
               'sky-magenta': '#CE84AD',
               'amaranth-pink': '#E59EBD',
-              'chinese-rose': '#E54B4B'
+              'chinese-rose': '#AB5479'
           }
       },
   },
