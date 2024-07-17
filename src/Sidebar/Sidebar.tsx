@@ -2,7 +2,7 @@ import React from 'react';
 import {
     Milestone, Task, Tag, Assignee, TaskStatus, Roadmap, UnitType, Unit,
     findIdForUnitType, formatDateNumericalMMDDYYYY, formatDateNumericalYYYYMMDDWithDashes,
-    UnitDataTypeWithNull, toCamelCase
+    UnitDataTypeWithNull, toCamelCase, colorSets
 } from '../Interfaces';
 
 interface SidebarProps {
@@ -12,6 +12,8 @@ interface SidebarProps {
     unitTypeData: UnitType[];
     tagData: Tag[];
     updateItem: (updatedItem: UnitDataTypeWithNull) => void;
+    deleteItem: (deletedItem: UnitDataTypeWithNull) => void;
+
 }
 
 export const Sidebar = ({
@@ -28,6 +30,7 @@ export const Sidebar = ({
 
     const [taskStatuses, setTaskStatuses] = React.useState<TaskStatus[]>([]);
 
+    const buttonColorSet = colorSets['blue']
 
     React.useEffect(() => {
         const fetchData = async () => {
@@ -359,6 +362,8 @@ export const Sidebar = ({
         )
     }
     // #endregion
+
+    // #region Create Unit Forms
     switch (sidebarData.type) {
         case findIdForUnitType('Task', props.unitTypeData):
             const taskData = data as Task;
@@ -594,12 +599,17 @@ export const Sidebar = ({
             );
     }
 
+    // #endregion
+
     return (
         <div className='bg-white rounded-xl'>
             {!hideContent &&
                 <div className='p-4 flex flex-col gap-2'>
                     <div className='font-bold text-xl'>{props.unitTypeData.find(type => type.id === sidebarData.type)?.name.toUpperCase()} DETAILS</div>
                     {sidebarContent}
+                    <br/>
+                    <button className={`px-4 py-2 rounded ${buttonColorSet.default} ${buttonColorSet.hover}`} onClick={() => props.deleteItem(sidebarData)}>Delete</button>
+
                 </div>
             }
         </div>

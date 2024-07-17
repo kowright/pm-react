@@ -10,6 +10,7 @@ export interface OrganizationViewProps {
     tagData: Tag[];
     assigneeData: Assignee[];
     roadmapData: Roadmap[];
+    taskStatusData: TaskStatus[];
     unitClick: (unit: UnitDataTypeWithNull) => void;
     selectedItem: UnitDataTypeWithNull;
 }
@@ -19,10 +20,10 @@ export const OrganizationView = ({
     ...props
 }: OrganizationViewProps) => {
 
-    const [taskStatusData, setTaskStatusData] = React.useState<TaskStatus[]>([]);
+    //const [taskStatusData, setTaskStatusData] = React.useState<TaskStatus[]>([]);
     const [unitTypeView, setUnitTypeView] = React.useState<string>('');
 
-    React.useEffect(() => {
+/*    React.useEffect(() => {
         fetch("/api/taskstatus")
             .then((res) => res.json())
             .then((data) => {
@@ -30,7 +31,7 @@ export const OrganizationView = ({
             })
             .catch((error) => console.error('Error fetching data:', error));
     }, []);
-
+*/
     function handleUnitClick(unitName: string) {
         setUnitTypeView(unitName);
         props.unitClick(null); //reset sidebar
@@ -71,7 +72,7 @@ export const OrganizationView = ({
             </div>
     }
     if (unitTypeView === 'Task Status') {
-        const sortedTaskStatusData = taskStatusData.slice().sort((a, b) => a.id - b.id);
+        const sortedTaskStatusData = props.taskStatusData.slice().sort((a, b) => a.id - b.id);
 
         content =
             <div className='flex gap-4 flex-wrap'>

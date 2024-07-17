@@ -4,7 +4,8 @@ import { FilterButton } from '../FilterButton';
 interface FilterAreaProps {
     selectedRoadmap: Roadmap | null;
     selectedTaskStatus: TaskStatus | null;
-
+    roadmapData: Roadmap[];
+    taskStatusData: TaskStatus[];
     handleFilterByRoadmap: (roadmap: Roadmap) => void;
     handleFilterByTaskStatus: (taskStatus: TaskStatus) => void;
     roadmapFilterState: string[];
@@ -16,12 +17,12 @@ export const FilterArea = ({
     ...props
 }: FilterAreaProps) => {
 
-    const [roadmapData, setRoadmapData] = React.useState< Roadmap[]  | null>(null);
+/*    const [roadmapData, setRoadmapData] = React.useState< Roadmap[]  | null>(null);
     const [taskStatusData, setTaskStatusData] = React.useState< TaskStatus[]  | null>(null);
-
+*/
     //const [roadmapFilterState, setRoadmapFilterState] = React.useState<string[]>([]);
 
-    React.useEffect(() => {
+  /*  React.useEffect(() => {
         fetch("/api/taskstatus")
             .then((res) => res.json())
             .then((data) => {
@@ -29,9 +30,9 @@ export const FilterArea = ({
                 setTaskStatusData(data);
             })
             .catch((error) => console.error('Error fetching data:', error));
-    }, []);
+    }, []);*/
 
-    React.useEffect(() => {
+   /* React.useEffect(() => {
         fetch("/api/roadmaps")
             .then((res) => res.json())
             .then((data) => {
@@ -40,9 +41,9 @@ export const FilterArea = ({
                 //setRoadmapFilterState((data as Roadmap[])?.map(map => map.name));
             })
             .catch((error) => console.error('Error fetching data:', error));
-    }, []);
+    }, []);*/
 
-    if (!taskStatusData || !roadmapData) {
+    if (!props.taskStatusData || !props.roadmapData) {
         return <div> oh no dude</div>
     };
 
@@ -93,10 +94,10 @@ export const FilterArea = ({
         );
     };
 
-    let pmRoadmapButtons = roadmapData.map(roadmap =>
+    let pmRoadmapButtons = props.roadmapData.map(roadmap =>
         PMButton(roadmap)
     );
-    let pmTaskStatusButtons = taskStatusData?.map(status =>
+    let pmTaskStatusButtons = props.taskStatusData?.map(status =>
         PMButton(status)
     );
 

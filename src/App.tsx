@@ -24,6 +24,7 @@ function App() {
         fetchAssignees();
         fetchUnitTypes();
         fetchRoadmaps();
+        fetchTaskStatus();
     }, []);
 
     // #region Fetch Units
@@ -345,6 +346,175 @@ function App() {
 
     // #endregion
 
+    // #region Unit Delete
+    const deleteItem = (deletedItem: UnitDataTypeWithNull) => {
+        if (deletedItem == null) {
+            return;
+        }
+
+        if (deletedItem.type === findIdForUnitType('Task', unitTypes)) {
+            deleteTask(deletedItem as Task)
+        }
+        else if (deletedItem.type === findIdForUnitType('Milestone', unitTypes)) {
+            deleteMilestone(deletedItem as Milestone)
+        }
+        else if (deletedItem.type === findIdForUnitType('Tag', unitTypes)) {
+            deleteTag(deletedItem as Tag)
+        }
+        else if (deletedItem.type === findIdForUnitType('Assignee', unitTypes)) {
+            deleteAssignee(deletedItem as Assignee)
+        }
+        else if (deletedItem.type === findIdForUnitType('TaskStatus', unitTypes)) {
+            deleteTaskStatus(deletedItem as TaskStatus)
+        }
+    }
+
+
+    const deleteTask = (deletedTask: Task) => {
+        // Delete task in API
+        console.log("delettask")
+        console.log("sending backend: ", deletedTask);
+        fetch(`/api/tasks/${deletedTask.id}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+      
+        })
+            .then(res => res.json())
+            .then(data => {
+              
+
+                const indexToDelete = tasks.findIndex(task => task.id === deletedTask.id);
+                console.log("deleting task index " + indexToDelete)
+                if (indexToDelete !== -1) {
+                    // Create a new array without the deleted task
+                    const updatedTasks = [...tasks.slice(0, indexToDelete), ...tasks.slice(indexToDelete + 1)];
+
+                    setTasks(updatedTasks);
+                }
+                setSelectedItem(null)
+             
+            })
+            .catch(error => {
+                console.error('Error deleting task:', error);
+            });
+    };
+
+    const deleteMilestone = (deletedMilestone: Milestone) => {
+        // Delete milestone in API
+        console.log("sending backend ", deletedMilestone)
+        fetch(`/api/milestones/${deletedMilestone.id}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(deletedMilestone),
+        })
+            .then(res => res.json())
+            .then(data => {
+                const indexToDelete = milestones.findIndex(ms => ms.id === deletedMilestone.id);
+                console.log("deleting task index " + indexToDelete)
+                if (indexToDelete !== -1) {
+                    // Create a new array without the deleted task
+                    const updatedMilestones = [...milestones.slice(0, indexToDelete), ...milestones.slice(indexToDelete + 1)];
+
+                    setMilestones(updatedMilestones);
+                }
+                setSelectedItem(null)
+            })
+            .catch(error => {
+                console.error('Error deleting milestone:', error);
+            });
+    };
+
+    const deleteTag = (deletedTag: Tag) => {
+        // Delete task in API
+        fetch(`/api/tags/${deletedTag.id}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(deletedTag),
+        })
+            .then(res => res.json())
+            .then(data => {
+                const indexToDelete = tags.findIndex(tag => tag.id === deletedTag.id);
+                console.log("deleting task index " + indexToDelete)
+                if (indexToDelete !== -1) {
+                    const updatedTags = [...tags.slice(0, indexToDelete), ...tags.slice(indexToDelete + 1)];
+
+                    setTags(updatedTags);
+                }
+                setSelectedItem(null)
+
+
+            })
+            .catch(error => {
+                console.error('Error deleting tag:', error);
+            });
+    }
+
+    const deleteAssignee = (deletedAssignee: Assignee) => {
+        // Delete task in API
+        fetch(`/api/assignees/${deletedAssignee.id}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(deletedAssignee),
+        })
+            .then(res => res.json())
+            .then(data => {
+                const indexToDelete = assignees.findIndex(as => as.id === deletedAssignee.id);
+                console.log("deleting task index " + indexToDelete)
+                if (indexToDelete !== -1) {
+                    // Create a new array without the deleted task
+                    const updatedAssignees = [...assignees.slice(0, indexToDelete), ...assignees.slice(indexToDelete + 1)];
+
+                    setAssignees(updatedAssignees);
+                }
+                setSelectedItem(null)
+
+
+            })
+            .catch(error => {
+                console.error('Error deleting assignee:', error);
+            });
+    };
+
+    const deleteTaskStatus = (deletedTaskStatus: TaskStatus) => {
+        // Delete task in API
+        fetch(`/api/taskstatus/${deletedTaskStatus.id}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(deletedTaskStatus),
+        })
+            .then(res => res.json())
+            .then(data => {
+                console.log("deleted ts id", deletedTaskStatus.id)
+                console.log("all ts ", taskStatuses)
+
+                const indexToDelete = taskStatuses.findIndex(ts => ts.id === deletedTaskStatus.id);
+                console.log("delete ts index", indexToDelete)
+
+                if (indexToDelete !== -1) {
+                    // Create a new array without the deleted task
+                    const updatedTaskStatus = [...taskStatuses.slice(0, indexToDelete), ...taskStatuses.slice(indexToDelete + 1)];
+                    console.log("delete ts", updatedTaskStatus)
+                    setTaskStatuses(updatedTaskStatus);
+                }
+                setSelectedItem(null)
+
+            })
+            .catch(error => {
+                console.error('Error deleting task status:', error);
+            });
+    };
+// #endregion
+
     return (
         <div className="flex h-full w-full bg-alabaster gap-16">
             <NavBar handleNavItemClick={handleClick} view={view} />
@@ -360,7 +530,7 @@ function App() {
                         <div className='flex-1 h-full flex-wrap'>
                             <FilterArea selectedRoadmap={selectedRoadmap} selectedTaskStatus={selectedTaskStatus}
                                 handleFilterByTaskStatus={handleFilterByTaskStatus} handleFilterByRoadmap={handleFilterByRoadmap}
-                                roadmapFilterState={roadmapFilterState} taskStatusFilterState={taskStatusFilterState} />
+                                roadmapFilterState={roadmapFilterState} taskStatusFilterState={taskStatusFilterState} roadmapData={roadmaps} taskStatusData={taskStatuses } />
 
                         </div>
 
@@ -378,7 +548,7 @@ function App() {
                         {view === 'Table' && <TableView viewData={viewData} milestoneData={milestones} tagData={tags} assigneeData={assignees} />}
                         {view === 'Kanban' && <KanbanView viewData={viewData} milestoneData={milestones } />}
                         {view === 'List' && <ListView viewData={viewData} milestoneData={milestones} tagData={tags} assigneeData={assignees}/>}
-                        {view === 'Organization' && <OrganizationView unitTypeData={unitTypes} tagData={tags} assigneeData={assignees} roadmapData={roadmaps} unitClick={handleUnitClick} selectedItem={selectedItem} /> }
+                        {view === 'Organization' && <OrganizationView unitTypeData={unitTypes} tagData={tags} assigneeData={assignees} roadmapData={roadmaps} unitClick={handleUnitClick} selectedItem={selectedItem} taskStatusData={taskStatuses}  /> }
                        
 
                     </div>
@@ -396,7 +566,7 @@ function App() {
                     placeholder="Search..."
                 />
 
-                <Sidebar sidebarData={selectedItem} updateItem={updateItem} assigneeData={assignees} roadmapData={roadmaps} unitTypeData={unitTypes} tagData={tags} />
+                <Sidebar sidebarData={selectedItem} updateItem={updateItem} assigneeData={assignees} roadmapData={roadmaps} unitTypeData={unitTypes} tagData={tags} deleteItem={deleteItem}  />
 
 
             </div>
