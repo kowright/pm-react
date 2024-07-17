@@ -33,6 +33,8 @@ function App() {
     const [assignees, setAssignees] = useState<Assignee[]>([]); // State to hold milestones
     const [unitTypes, setUnitTypes] = React.useState<UnitType[]>([]);
     const [roadmaps, setRoadmaps] = React.useState<Roadmap[]>([]);
+    const [taskStatuses, setTaskStatuses] = React.useState<TaskStatus[]>([]);
+
    /* const [unitAPIData, setUnitAPIData] = React.useState<UnitAPIData>({
         taskData: [],
         milestoneData: [],
@@ -98,6 +100,13 @@ function App() {
             .then((res) => res.json())
             .then((data) => setUnitTypes(data))
             .catch((error) => console.error('Error fetching unit types:', error));
+    };
+
+    const fetchTaskStatus = () => {
+        fetch("/api/taskstatus")
+            .then((res) => res.json())
+            .then((data) => setTaskStatuses(data))
+            .catch((error) => console.error('Error fetching task statuses:', error));
     }
     // #endregion
 
@@ -204,6 +213,9 @@ function App() {
         else if (updatedItem.type === findIdForUnitType('Assignee', unitTypes)) {
             updateAssignee(updatedItem as Assignee)
         }
+        else if (updatedItem.type === findIdForUnitType('TaskStatus', unitTypes)) {
+            updateTaskStatus(updatedItem as TaskStatus)
+        }
     }
 
 
@@ -283,7 +295,7 @@ function App() {
             });
     };
 
-    const updateAssignee = (updatedAssignee: Tag) => {
+    const updateAssignee = (updatedAssignee: Assignee) => {
         // Update task in API
         fetch(`/api/assignees/${updatedAssignee.id}`, {
             method: 'PUT',
@@ -304,6 +316,30 @@ function App() {
             })
             .catch(error => {
                 console.error('Error updating assignee:', error);
+            });
+    };
+
+    const updateTaskStatus = (updatedTaskStatus: TaskStatus) => {
+        // Update task in API
+        fetch(`/api/taskstatus/${updatedTaskStatus.id}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(updatedTaskStatus),
+        })
+            .then(res => res.json())
+            .then(data => {
+                console.log('Updated item:', data);
+                // Update local state with updated task
+                const updatedTaskStatuses: TaskStatus[] = taskStatuses.map(status => (status.id === updatedTaskStatus.id ? data : status));
+
+                setAssignees(updatedTaskStatuses);
+
+
+            })
+            .catch(error => {
+                console.error('Error updating task status:', error);
             });
     };
 

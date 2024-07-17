@@ -150,18 +150,27 @@ export const Sidebar = ({
                 console.log("updated item in sidebar", updatedItem)
                 break;
 
-            case findIdForUnitType('Tag', props.unitTypeData):
-                updatedItem = {
-                    ...(sidebarData as Tag),
-                    [propertyName]: editedValue
-                };
-                break;
+       
 
             case findIdForUnitType('Assignee', props.unitTypeData):
                 updatedItem = {
                     ...(sidebarData as Assignee),
                     [propertyName]: editedValue
                 };
+                break;
+            case findIdForUnitType('Tag', props.unitTypeData):
+                updatedItem = {
+                    ...(sidebarData as Tag),
+                    [propertyName]: editedValue
+                };
+                break;
+            case findIdForUnitType('TaskStatus', props.unitTypeData):
+                updatedItem = {
+                    ...(sidebarData as TaskStatus),
+                    [propertyName]: editedValue
+                };
+                console.log("taskStatus update", updatedItem)
+      
                 break;
 
             default:

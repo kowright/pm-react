@@ -71,9 +71,11 @@ export const OrganizationView = ({
             </div>
     }
     if (unitTypeView === 'Task Status') {
+        const sortedTaskStatusData = taskStatusData.slice().sort((a, b) => a.id - b.id);
+
         content =
             <div className='flex gap-4 flex-wrap'>
-                {taskStatusData.map(status => (
+                {sortedTaskStatusData.map(status => (
                     <FilterButton text={status.name} onClick={() => props.unitClick(status)} active={unitTypeView === 'Task Status' && props.selectedItem?.id === status.id} colorByType='Task Status' />
                 ))}
 
