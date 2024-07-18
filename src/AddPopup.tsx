@@ -130,12 +130,10 @@ export const AddPopup = ({
                 console.error('Error fetching data:', error);
             }*/
             props.createItem(milestoneformData, unitTypeView);
-        }
-
-        else {
-            let url = '/api/';
+        } else {
+         /*   let url = '/api/';
             if (unitTypeView === 'Tag') {
-                url+= 'tags'
+
             }
             else if (unitTypeView === 'Assignee'){
                 url += 'assignees'
@@ -179,8 +177,13 @@ export const AddPopup = ({
             } catch (error) {
                 // Handle fetch errors and API errors here
                 console.error('Error fetching data:', error);
-            }
+            }*/
+            console.log("add popup generic create item")
+            props.createItem(genericformData, unitTypeView);
+
         }
+
+        console.log("add popup handle submit end")
        
     };
 

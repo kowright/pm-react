@@ -516,10 +516,12 @@ function App() {
     // #endregion
 
     // #region Unit Create
-    const createItem = (formData:any, type: string) => {
+    const createItem = (formData: any, type: string) => {
+        console.log("create item routing on " + type)
         if (formData == null) {
             return;
         }
+        console.log("create item routing form data not null")
 
         if (type === 'Task') {
             createTask(formData)
@@ -527,16 +529,27 @@ function App() {
         else if (type === 'Milestone') {
             createMilestone(formData);
         }
-        /*
-        else if (createdItem.type === findIdForUnitType('Tag', unitTypes)) {
-            createTag(createdItem as Tag)
+        else if (type === 'Tag') {
+            console.log("tag create item")
+
+            createTag(formData);
         }
-        else if (createdItem.type === findIdForUnitType('Assignee', unitTypes)) {
-            createAssignee(createdItem as Assignee)
+        else if (type === 'Assignee') {
+            console.log("assignee create item")
+
+            createAssignee(formData);
         }
-        else if (createdItem.type === findIdForUnitType('TaskStatus', unitTypes)) {
-            createTaskStatus(createdItem as TaskStatus)
-        }*/
+        else if (type === 'Task Status') {
+
+            console.log("task status create item")
+            createTaskStatus(formData);
+        }
+        else if (type === 'Roadmap') {
+
+            console.log("roadmap create item")
+            createRoadmap(formData);
+        }
+
     }
 
 
@@ -612,90 +625,134 @@ function App() {
         }
     };
 
-    const createTag = (createdTag: Tag) => {
+    const createTag = async (formData:any) => {
         // Create task in API
-        fetch(`/api/tags/${createdTag.id}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(createdTag),
-        })
-            .then(res => res.json())
-            .then(data => {
-                const indexToCreate = tags.findIndex(tag => tag.id === createdTag.id);
-                console.log("deleting task index " + indexToCreate)
-                if (indexToCreate !== -1) {
-                    const updatedTags = [...tags.slice(0, indexToCreate), ...tags.slice(indexToCreate + 1)];
-
-                    setTags(updatedTags);
-                }
-                setSelectedItem(null)
-
-
-            })
-            .catch(error => {
-                console.error('Error deleting tag:', error);
+        console.log("create tag")
+        try {
+            const response = await fetch('/api/tags', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData),
             });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}} & ${await response.json() }`);
+            }
+
+            // Assuming the API returns JSON data
+            const data = await response.json();
+
+            setShowPopup(false)
+
+            const newTag = data as Tag;
+            console.log("new tags", newTag)
+            console.log("tag format", tags[0])
+
+            setTags(prev => [...prev, newTag]);
+
+
+        } catch (error) {
+            // Handle fetch errors and API errors here
+            console.error('Error fetching data:', error);
+        }
     }
 
-    const createAssignee = (createdAssignee: Assignee) => {
+    const createAssignee = async (formData: any) => {
         // Create task in API
-        fetch(`/api/assignees/${createdAssignee.id}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(createdAssignee),
-        })
-            .then(res => res.json())
-            .then(data => {
-                const indexToCreate = assignees.findIndex(as => as.id === createdAssignee.id);
-                console.log("deleting task index " + indexToCreate)
-                if (indexToCreate !== -1) {
-                    // Create a new array without the created task
-                    const updatedAssignees = [...assignees.slice(0, indexToCreate), ...assignees.slice(indexToCreate + 1)];
-
-                    setAssignees(updatedAssignees);
-                }
-                setSelectedItem(null)
-
-
-            })
-            .catch(error => {
-                console.error('Error deleting assignee:', error);
+        try {
+            const response = await fetch('/api/assignees', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData),
             });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+
+            // Assuming the API returns JSON data
+            const data = await response.json();
+
+            setShowPopup(false)
+
+            const newAssignee = data as Assignee;
+            console.log("new assignee", newAssignee)
+
+            setAssignees(prev => [...prev, newAssignee]);
+
+
+        } catch (error) {
+            // Handle fetch errors and API errors here
+            console.error('Error fetching data:', error);
+        }
     };
 
-    const createTaskStatus = (createdTaskStatus: TaskStatus) => {
+    const createTaskStatus = async (formData: any) => {
         // Create task in API
-        fetch(`/api/taskstatus/${createdTaskStatus.id}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(createdTaskStatus),
-        })
-            .then(res => res.json())
-            .then(data => {
-                console.log("created ts id", createdTaskStatus.id)
-                console.log("all ts ", taskStatuses)
-
-                const indexToCreate = taskStatuses.findIndex(ts => ts.id === createdTaskStatus.id);
-                console.log("create ts index", indexToCreate)
-
-                if (indexToCreate !== -1) {
-                    // Create a new array without the created task
-                    const updatedTaskStatus = [...taskStatuses.slice(0, indexToCreate), ...taskStatuses.slice(indexToCreate + 1)];
-                    console.log("create ts", updatedTaskStatus)
-                    setTaskStatuses(updatedTaskStatus);
-                }
-                setSelectedItem(null)
-
-            })
-            .catch(error => {
-                console.error('Error deleting task status:', error);
+        try {
+            const response = await fetch('/api/taskstatus', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData),
             });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+
+            // Assuming the API returns JSON data
+            const data = await response.json();
+
+            setShowPopup(false)
+
+            const newTaskStatus = data as TaskStatus;
+            console.log("new task status", newTaskStatus)
+
+            setTaskStatuses(prev => [...prev, newTaskStatus]);
+
+
+        } catch (error) {
+            // Handle fetch errors and API errors here
+            console.error('Error fetching data:', error);
+        }
+    };
+
+    const createRoadmap = async (formData: any) => {
+        // Create task in API
+        try {
+            const response = await fetch('/api/roadmaps', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData),
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+
+            // Assuming the API returns JSON data
+            const data = await response.json();
+
+            setShowPopup(false)
+
+            const newRoadmap = data as Roadmap;
+            console.log("new roadmap", newRoadmap)
+
+            setRoadmaps(prev => [...prev, newRoadmap]);
+
+
+        } catch (error) {
+            // Handle fetch errors and API errors here
+            console.error('Error fetching data:', error);
+        }
     };
     // #endregion
 

@@ -47,7 +47,7 @@ export const OrganizationView = ({
 
     if (unitTypeView === 'Tag') {
         content =
-            <div className='flex gap-4'>
+            <div className='flex gap-4 flex-wrap'>
                 {props.tagData.map(tag => (
                     <FilterButton text={tag.name} onClick={() => props.unitClick(tag)} active={unitTypeView === 'Tag' && props.selectedItem?.id === tag.id} colorByType={findUnitTypefromId(tag.type, props.unitTypeData)} />
                 ))}
