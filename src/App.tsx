@@ -393,6 +393,9 @@ function App() {
         else if (deletedItem.type === findIdForUnitType('TaskStatus', unitTypes)) {
             deleteTaskStatus(deletedItem as TaskStatus)
         }
+        else if (deletedItem.type === findIdForUnitType('Roadmap', unitTypes)) {
+            deleteRoadmap(deletedItem as Roadmap)
+        }
     }
 
 
@@ -537,6 +540,34 @@ function App() {
             })
             .catch(error => {
                 console.error('Error deleting task status:', error);
+            });
+    };
+
+    const deleteRoadmap = (deletedRoadmap: Roadmap) => {
+        // Delete task in API
+        fetch(`/api/taskstatus/${deletedRoadmap.id}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(deletedRoadmap),
+        })
+            .then(res => res.json())
+            .then(data => {
+                console.log("deleted ts id", deletedRoadmap.id)
+
+                const indexToDelete = roadmaps.findIndex(map => map.id === deletedRoadmap.id);
+
+                if (indexToDelete !== -1) {
+                    const updatedRoadmaps = [...roadmaps.slice(0, indexToDelete), ...roadmaps.slice(indexToDelete + 1)];
+                    console.log("delete ts", deletedRoadmap)
+                    setRoadmaps(updatedRoadmaps);
+                }
+                setSelectedItem(null)
+
+            })
+            .catch(error => {
+                console.error('Error deleting roadmap:', error);
             });
     };
     // #endregion
