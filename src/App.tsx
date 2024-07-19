@@ -217,8 +217,10 @@ function App() {
         else if (updatedItem.type === findIdForUnitType('TaskStatus', unitTypes)) {
             updateTaskStatus(updatedItem as TaskStatus)
         }
+        else if (updatedItem.type === findIdForUnitType('Roadmap', unitTypes)) {
+            updateRoadmap(updatedItem as Roadmap)
+        }
     }
-
 
     const updateTask = (updatedTask: Task) => {
         // Update task in API
@@ -296,6 +298,30 @@ function App() {
             });
     };
 
+    const updateRoadmap = (updatedRoadmap: Roadmap) => {
+        // Update task in API
+        fetch(`/api/roadmaps/${updatedRoadmap.id}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(updatedRoadmap),
+        })
+            .then(res => res.json())
+            .then(data => {
+                console.log('Updated roadmap:', data);
+
+                const updatedRoadmaps: Roadmap[] = roadmaps.map(map => (map.id === updatedRoadmap.id ? data : map));
+                console.log('updated raodmaps array', updatedRoadmaps)
+                setRoadmaps(updatedRoadmaps);
+
+
+            })
+            .catch(error => {
+                console.error('Error updating roadmap:', error);
+            });
+    };
+
     const updateAssignee = (updatedAssignee: Assignee) => {
         // Update task in API
         fetch(`/api/assignees/${updatedAssignee.id}`, {
@@ -308,7 +334,7 @@ function App() {
             .then(res => res.json())
             .then(data => {
                 console.log('Updated item:', data);
-                // Update local state with updated task
+
                 const updatedTags: Assignee[] = assignees.map(assignee => (assignee.id === updatedAssignee.id ? data : assignee));
                 
                 setAssignees(updatedTags);
@@ -335,7 +361,7 @@ function App() {
                 // Update local state with updated task
                 const updatedTaskStatuses: TaskStatus[] = taskStatuses.map(status => (status.id === updatedTaskStatus.id ? data : status));
 
-                setAssignees(updatedTaskStatuses);
+                setTaskStatuses(updatedTaskStatuses);
 
 
             })

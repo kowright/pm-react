@@ -176,6 +176,14 @@ export const Sidebar = ({
       
                 break;
 
+            case findIdForUnitType('Roadmap', props.unitTypeData):
+                updatedItem = {
+                    ...(sidebarData as Roadmap),
+                    [propertyName]: editedValue
+                };
+                console.log("roadmap update", updatedItem)
+
+                break;
             default:
                 throw new Error(`Unhandled sidebarData type: ${(sidebarData as any).type}`);
         }
