@@ -17,12 +17,12 @@ export const ErrorPopup = ({
  console.log("error", props.content)
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center overflow-auto bg-gray-800 bg-opacity-50">
-            <div className="bg-white p-6 rounded-lg shadow-lg h-40 mx-auto flex flex-col justify-between">
+            <p className="bg-white p-6 rounded-lg shadow-lg h-40 mx-auto h-fit flex flex-col justify-between">
                 <div>
                     <h2 className="text-xl font-bold mb-4 flex text-red text-center">ERROR</h2>
                     {props.content}
                 </div>
-            </div>
+            </p>
         </div>
     );
 };

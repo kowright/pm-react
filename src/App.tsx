@@ -394,10 +394,33 @@ function App() {
         setListType(listType);
         setSelectedItem(null);
     };
+
     const deleteItem = (deletedItem: UnitDataTypeWithNull) => {
         if (deletedItem == null) {
             return;
         }
+
+        handleShowErrorPopup(
+            <div>
+                <p>Are you sure that you want to delete <span className='text-red-600 font-bold'>{deletedItem.name}</span></p>
+
+                <br />
+                <br />
+                <div className='flex justify-between'>
+                    <button className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded" onClick={() => handleGoBack()}>Go Back</button>
+
+                    <button className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded" onClick={() => handleDeleteItem(deletedItem)}>Yes, Delete It</button>
+                </div>
+            </div>
+        ); 
+    };
+
+    const handleDeleteItem = (deletedItem: UnitDataTypeWithNull) => {
+        if (deletedItem == null) {
+            return;
+        }
+        setShowErrorPopup(false);
+
 
         if (deletedItem.type === findIdForUnitType('Task', unitTypes)) {
             deleteTask(deletedItem as Task)
@@ -954,7 +977,9 @@ function App() {
 
             </div>
 
-            {showErrorPopup && <ErrorPopup setPopupVisibility={() => setShowErrorPopup(false)} content={errorPopupContent} /> }
+            <div className='flex justify-center items-center'>
+                {showErrorPopup && <ErrorPopup setPopupVisibility={() => setShowErrorPopup(false)} content={errorPopupContent} />}
+            </div>
         </div>
 
 
