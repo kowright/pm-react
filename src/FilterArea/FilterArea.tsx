@@ -1,11 +1,12 @@
 import React from 'react';
-import { Milestone, Roadmap, TaskStatus, Unit, colorSets } from '../Interfaces';
+import { Milestone, Roadmap, TaskStatus, Unit, colorSets, Tag } from '../Interfaces';
 import { FilterButton } from '../FilterButton';
 interface FilterAreaProps {
     selectedRoadmap: Roadmap | null;
     selectedTaskStatus: TaskStatus | null;
     roadmapData: Roadmap[];
     taskStatusData: TaskStatus[];
+    tagData: Tag[];
     handleFilterByRoadmap: (roadmap: Roadmap) => void;
     handleFilterByTaskStatus: (taskStatus: TaskStatus) => void;
     roadmapFilterState: string[];

@@ -32,7 +32,7 @@ export const Sidebar = ({
 
     const buttonColorSet = colorSets['blue']
 
-    React.useEffect(() => {
+    React.useEffect(() => { //TODO can get from APP
         const fetchData = async () => {
             try {
                 const taskStatusData = await fetch("/api/taskstatus").then(res => res.json());
@@ -55,7 +55,7 @@ export const Sidebar = ({
 
         const editedValue = event.target.value;
         const propertyName = event.target.id; 
-        console.log("property name handle input blur ", propertyName);
+        console.log("property name handle input blur " +  propertyName + ' = ' + editedValue );
         if (!data) {
             return; 
         }
@@ -199,15 +199,14 @@ export const Sidebar = ({
     if (sidebarData === null) {
         return <div>Select an item to see details</div>
     }
-    else {
-        console.log("sidebar data is not null- continue")
-    }
+ 
 
     hideContent = false;
 
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         const { id, value } = event.target;
 
+        console.log("sidebar input change on " + id + " = " + value)
         // Special handling for assignee dropdown
         if (id === 'assignee') {
             const assigneeName = value;
@@ -219,6 +218,18 @@ export const Sidebar = ({
                     assignee: selectedAssignee
                 }));
                 console.log("handle input change assignee", data)
+            }
+        }
+        else if (id === 'taskStatus') {
+            const statusName = value;
+            const selectedStatus= taskStatuses?.find(s => s.name === statusName);
+
+            if (selectedStatus) {
+                setData(prevData => ({
+                    ...(prevData as Task | Milestone | Tag | Assignee),
+                    taskStatus: selectedStatus
+                }));
+                console.log("handle input change task status", data)
             }
         }
         else if (id === 'roadmap') {
@@ -296,10 +307,11 @@ export const Sidebar = ({
         )
     };
 
+    //TODO capitalize title in div
     const multipleSelectOptionsField = (title: string, roadmapNames: string[], array: any[]) => {
         return (
             <div className='text-smoky-black'>
-                <div className='text-xs pb-1'>Roadmap</div>
+                <div className='text-xs pb-1'>{title}</div> 
                 <select
                     multiple
                     id={title}
@@ -321,13 +333,13 @@ export const Sidebar = ({
         )
     };
 
-    const selectOptionsField = (title: string, array: Unit[]) => {
+    const selectOptionsField = (title: string, value: string, array: Unit[]) => {
         return (
             <div className='text-smoky-black'>
                 <div className='text-xs pb-1'>{title}</div>
                 <select
-                    id="taskStatus"
-                    value={toCamelCase(title)}
+                    id={toCamelCase(title)}//TODO should be based off Title {toCamelCase(title)
+                    value={value || ''}
                     onChange={handleInputChange}
                     onBlur={handleInputBlur}
                     className='border border-alabaster rounded-lg text-md pl-1 focus:ring-yinmn-blue focus:ring w-full'
@@ -376,7 +388,7 @@ export const Sidebar = ({
         case findIdForUnitType('Task', props.unitTypeData):
             const taskData = data as Task;
        
-
+           
             sidebarContent = (
                 <div className='flex flex-col gap-2'>
                   
@@ -439,7 +451,7 @@ export const Sidebar = ({
                         ))}
                     </select>*/}
 
-                    {selectOptionsField('Assignee', props.assigneeData as Unit[])}
+                    {selectOptionsField('Assignee', taskData.assignee.name, props.assigneeData as Unit[])}
 
                    {/*
                                            <div>Start Date: </div>
@@ -483,7 +495,7 @@ export const Sidebar = ({
                             </option>
                         ))}
                     </select>*/}
-                    {selectOptionsField('Task Status', taskStatuses as Unit[])}
+                    {selectOptionsField('Task Status', taskData.taskStatus.name, taskStatuses as Unit[])}
 
                     {/*<div className='text-xs pb-1'>Duration</div>
                     <p> {taskData?.duration === 1 ? taskData?.duration + " day" : taskData?.duration + " days"} </p>*/}
@@ -502,9 +514,10 @@ export const Sidebar = ({
         case findIdForUnitType('Milestone', props.unitTypeData):
 
             const milestoneData = data as Milestone;
+            console.log("ms data", milestoneData)
             sidebarContent = (
                 <div className='flex flex-col gap-2'>
-                    {nameField(data.name)} 
+                    {nameField(data?.name)} 
                {/*     <label htmlFor="name">Name:</label>
                     <input
                         id="name"
@@ -515,7 +528,7 @@ export const Sidebar = ({
                         onBlur={handleInputBlur}
                     />*/}
                     
-                    {descriptionField(data.description)}
+                    {descriptionField(data?.description)}
                   {/*  <label htmlFor="description">Description:</label>
                     <textarea
                         id="description"
@@ -538,7 +551,7 @@ export const Sidebar = ({
                         onBlur={handleInputBlur}
                     />
                     */}
-                    {selectOptionsField("Task Status", taskStatuses as Unit[])}
+                    {selectOptionsField("Task Status", milestoneData.taskStatus.name, taskStatuses as Unit[])}
 
                    {/* <div>Task Status:</div>
                     <select

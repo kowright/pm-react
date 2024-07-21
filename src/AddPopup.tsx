@@ -63,6 +63,14 @@ export const AddPopup = ({
         fetchData();
     }, []);
 
+    React.useEffect(() => {
+        if (new Date(formData.startDate) > new Date(formData.endDate)) {
+            console.log("BAD DATES")
+            alert("Start Date: " + formData.startDate + " must be on or before End Date: " + formData.endDate);
+            return;
+        }
+    }, [formData])
+
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault(); // Prevent default form submission
 
@@ -191,13 +199,9 @@ export const AddPopup = ({
         const { name, value} = e.target;
         console.log('handle change target', e.target)
         console.log("handle change val", value)
-
+        console.log("on " + unitTypeView);
         if (unitTypeView === 'Task') {
-            if (new Date(formData.startDate) > new Date(formData.endDate)) {
-                alert("Start Date must be on or before End Date");
-                return;
-            }
-
+           
             if (name === 'taskStatus' || name === 'assignee') {
                 setFormData(prevState => ({
                     ...prevState,
@@ -223,6 +227,9 @@ export const AddPopup = ({
                     [name]: value
                 }));
             }
+
+        
+
         }
         else if (unitTypeView === 'Milestone') {
 

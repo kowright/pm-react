@@ -13,14 +13,16 @@ interface ListViewProps {
     tagData: Tag[];
     assigneeData: Assignee[];
     viewData: ViewData;
+    listType: string;
 }
 
 export const ListView = ({
-    viewData: { filterStates, selectedItem, taskData, unitClick, unitTypeData},
+    viewData: { filterStates, selectedItem, taskData, unitClick, unitTypeData },
+    listType = 'Task',
     ...props
 }: ListViewProps) => {
 
-    const [listDataType, setListDataType] = React.useState("Task");
+    const [listDataType, setListDataType] = React.useState(listType);
 
     const [taskSortState, setTaskSortState] = React.useState<string[]>([]);
     const [milestoneSortState, setMilestoneSortState] = React.useState<string[]>([]);

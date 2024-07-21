@@ -4,18 +4,22 @@ import TableView from './TableView';
 import KanbanView from './KanbanView';
 import TimelineView from './TimelineView';
 import { Sidebar } from './Sidebar/Sidebar';
-import { Task, Roadmap, TaskStatus, Milestone, Tag, Assignee, UnitDataTypeWithNull, findIdForUnitType, UnitType, FilterStates, UnitDataType, ViewData } from './Interfaces';
+import { Task, Roadmap, TaskStatus, Milestone, Tag, Assignee, UnitDataTypeWithNull, findIdForUnitType, UnitType, FilterStates, UnitDataType, ViewData, taskFilterOnTaskStatus } from './Interfaces';
 import { FilterArea } from './FilterArea/FilterArea';
 import { NavBar } from './NavBar/NavBar';
 import { FilterButton } from './FilterButton';
 import { ListView } from './ListView';
 import { OrganizationView } from './OrganizationView';
 import { AddPopup } from './AddPopup';
+import { ErrorPopup } from './ErrorPopup';
 
 function App() {
     const [view, setView] = React.useState<string>('List'); 
     const [selectedItem, setSelectedItem] = React.useState<Task | Milestone | Tag | Assignee | null>(null); 
     const [showPopup, setShowPopup] = React.useState(false);
+    const [showErrorPopup, setShowErrorPopup] = React.useState(false);
+    const [errorPopupContent, setErrorPopupContent] = useState(<div>WHAT</div>); 
+    const [listType, setListType] = React.useState('Task');
 
     React.useEffect(() => {
         fetchTasks();
@@ -373,6 +377,23 @@ function App() {
     // #endregion
 
     // #region Unit Delete
+
+    const handleShowErrorPopup = (content: JSX.Element) => {
+        setErrorPopupContent(content);
+        setShowErrorPopup(true);
+    };
+
+    const handleGoBack = () => {
+        setShowErrorPopup(false);
+    };
+
+    const handleGoFixIt = (listType: string, taskStatusFilterName: string) => {
+        setShowErrorPopup(false);
+        setView('List');
+        setTaskStatusFilterState([taskStatusFilterName]);
+        setListType(listType);
+        setSelectedItem(null);
+    };
     const deleteItem = (deletedItem: UnitDataTypeWithNull) => {
         if (deletedItem == null) {
             return;
@@ -513,7 +534,9 @@ function App() {
     };
 
     const deleteTaskStatus = (deletedTaskStatus: TaskStatus) => {
-        // Delete task in API
+
+        console.log("deleting ts", deletedTaskStatus)
+
         fetch(`/api/taskstatus/${deletedTaskStatus.id}`, {
             method: 'DELETE',
             headers: {
@@ -523,6 +546,68 @@ function App() {
         })
             .then(res => res.json())
             .then(data => {
+                console.log("data", data)
+                if (data.error) {
+                    console.log("error can be handled")
+                    if (data.table === 'milestone') {
+                        const allMilestonesUsingStatus = milestones.filter(ms => ms.taskStatus.id === deletedTaskStatus.id);
+                        const changeToViewName = 'Milestone';
+
+                        handleShowErrorPopup(
+                            <div>
+                                <p><span className='text-red-600 font-bold'>[{deletedTaskStatus.name}] </span>is still being used by one or more {data.table}s.</p>
+                                <p>Please remove this status from all milestones before deleting.</p>
+                                <p>These are the items that still have the status:</p>
+                                <br />
+                                <br />
+                                {allMilestonesUsingStatus.map(ms => 
+                                    
+                                    <div>
+                                        <p>{ms.name}</p>
+                                        <br />
+                                    </div>
+                                )}
+
+                                <div className='flex justify-between'>
+                                    <button className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded" onClick={() => handleGoBack()}>Go Back</button>
+
+                                    <button className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded" onClick={() => handleGoFixIt(changeToViewName ,deletedTaskStatus.name)}>Go Fix It</button>
+                                </div>
+                            </div>
+                        );
+                    }
+
+                    if (data.table === 'task') {
+                        const allTasksUsingStatus = tasks.filter(task => task.taskStatus.id === deletedTaskStatus.id);
+                        const changeToViewName = 'Task';
+
+                        handleShowErrorPopup(
+                            <div>
+                                <p><span className='text-red-600 font-bold'>[{deletedTaskStatus.name}] </span>is still being used by one or more {data.table}s.</p>
+                                <p>Please remove this status from all tasks before deleting.</p>
+                                <p>These are the items that still have the status:</p>
+                                <br />
+                                <br />
+                                {allTasksUsingStatus.map(ms =>
+
+                                    <div>
+                                        <p>{ms.name}</p>
+                                        <br />
+                                    </div>
+                                )}
+
+                                <div className='flex justify-between'>
+                                    <button className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded" onClick={() => handleGoBack()}>Go Back</button>
+
+                                    <button className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded" onClick={() => handleGoFixIt(changeToViewName, deletedTaskStatus.name)}>Go Fix It</button>
+                                </div>
+                            </div>
+                        );
+                    }
+
+                    return;
+                }
+
                 console.log("deleted ts id", deletedTaskStatus.id)
                 console.log("all ts ", taskStatuses)
 
@@ -545,7 +630,7 @@ function App() {
 
     const deleteRoadmap = (deletedRoadmap: Roadmap) => {
         // Delete task in API
-        fetch(`/api/taskstatus/${deletedRoadmap.id}`, {
+        fetch(`/api/roadmaps/${deletedRoadmap.id}`, {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',
@@ -828,8 +913,8 @@ function App() {
                         <div className='flex-1 h-full flex-wrap'>
                             <FilterArea selectedRoadmap={selectedRoadmap} selectedTaskStatus={selectedTaskStatus}
                                 handleFilterByTaskStatus={handleFilterByTaskStatus} handleFilterByRoadmap={handleFilterByRoadmap}
-                                roadmapFilterState={roadmapFilterState} taskStatusFilterState={taskStatusFilterState} roadmapData={roadmaps} taskStatusData={taskStatuses } />
-
+                                roadmapFilterState={roadmapFilterState} taskStatusFilterState={taskStatusFilterState} roadmapData={roadmaps} taskStatusData={taskStatuses} tagData={tags} />
+                               
                         </div>
 
 
@@ -845,7 +930,7 @@ function App() {
                         {view === 'Timeline' && <TimelineView milestoneData={milestones} updateItem={updateItem} viewData={viewData} />}
                         {view === 'Table' && <TableView viewData={viewData} milestoneData={milestones} tagData={tags} assigneeData={assignees} />}
                         {view === 'Kanban' && <KanbanView viewData={viewData} milestoneData={milestones } />}
-                        {view === 'List' && <ListView viewData={viewData} milestoneData={milestones} tagData={tags} assigneeData={assignees}/>}
+                        {view === 'List' && <ListView viewData={viewData} milestoneData={milestones} tagData={tags} assigneeData={assignees} listType={listType} />}
                         {view === 'Organization' && <OrganizationView unitTypeData={unitTypes} tagData={tags} assigneeData={assignees} roadmapData={roadmaps} unitClick={handleUnitClick} selectedItem={selectedItem} taskStatusData={taskStatuses}  /> }
                        
 
@@ -868,6 +953,8 @@ function App() {
 
 
             </div>
+
+            {showErrorPopup && <ErrorPopup setPopupVisibility={() => setShowErrorPopup(false)} content={errorPopupContent} /> }
         </div>
 
 
