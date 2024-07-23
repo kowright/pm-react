@@ -609,8 +609,9 @@ export const Sidebar = ({
 
             break;
 
-        case findIdForUnitType('TaskStatus', props.unitTypeData):
+        case findIdForUnitType('Task Status', props.unitTypeData):
             //const assigneeData = sidebarData as Assignee;
+            console.log("sidebar data task status", data)
             sidebarContent = (
                 <div className='flex flex-col gap-2'>
                     {nameField(data.name)}
@@ -618,6 +619,10 @@ export const Sidebar = ({
                     {stringFieldDisplay('ID', data.id.toString())}
                 </div>
             );
+            break;
+        default:
+            console.log("couldn't find a type to show details in sidebar!")
+
     }
 
     // #endregion

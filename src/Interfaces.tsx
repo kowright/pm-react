@@ -118,12 +118,8 @@ export function findIdForUnitType(type: string, unitTypes: UnitType[]) {
 }
 
 export function findUnitTypefromId(id: number, unitTypes: UnitType[]) {
-    console.log('find unit type from this id: ', id)
     const name = unitTypes.find(item => item.id === id)?.name
-    console.log('find unit type found: ' + name)
-    return name
-   
-
+    return name;
 }
 
 export interface ColorSet {

@@ -14,11 +14,11 @@ import { AddPopup } from './AddPopup';
 import { ErrorPopup } from './ErrorPopup';
 
 function App() {
-    const [view, setView] = React.useState<string>('List'); 
-    const [selectedItem, setSelectedItem] = React.useState<Task | Milestone | Tag | Assignee | null>(null); 
+    const [view, setView] = React.useState<string>('List');
+    const [selectedItem, setSelectedItem] = React.useState<Task | Milestone | Tag | Assignee | null>(null);
     const [showPopup, setShowPopup] = React.useState(false);
     const [showErrorPopup, setShowErrorPopup] = React.useState(false);
-    const [errorPopupContent, setErrorPopupContent] = useState(<div>WHAT</div>); 
+    const [errorPopupContent, setErrorPopupContent] = useState(<div>WHAT</div>);
     const [listType, setListType] = React.useState('Task');
 
     React.useEffect(() => {
@@ -40,25 +40,25 @@ function App() {
     const [roadmaps, setRoadmaps] = React.useState<Roadmap[]>([]);
     const [taskStatuses, setTaskStatuses] = React.useState<TaskStatus[]>([]);
 
-   /* const [unitAPIData, setUnitAPIData] = React.useState<UnitAPIData>({
-        taskData: [],
-        milestoneData: [],
-        tagData: [],
-        assigneeData: [],
-        unitTypesData: [],
-        roadmapData: []
-    });
-
-    React.useEffect(() => {
-        setUnitAPIData({
-            taskData: tasks,
-            milestoneData: milestones,
-            tagData: tags,
-            assigneeData: assignees,
-            roadmapData: roadmaps,
-            unitTypesData: unitTypes,
-        });
-    }, [assignees, milestones, roadmaps, tags, tasks, unitTypes]);*/
+    /* const [unitAPIData, setUnitAPIData] = React.useState<UnitAPIData>({
+         taskData: [],
+         milestoneData: [],
+         tagData: [],
+         assigneeData: [],
+         unitTypesData: [],
+         roadmapData: []
+     });
+ 
+     React.useEffect(() => {
+         setUnitAPIData({
+             taskData: tasks,
+             milestoneData: milestones,
+             tagData: tags,
+             assigneeData: assignees,
+             roadmapData: roadmaps,
+             unitTypesData: unitTypes,
+         });
+     }, [assignees, milestones, roadmaps, tags, tasks, unitTypes]);*/
 
     const fetchTasks = () => {
         fetch("/api/tasks?roadmaps=true&tags=true")
@@ -72,7 +72,8 @@ function App() {
             .then((res) => res.json())
             .then((data) => {
                 console.log("data", data)
-                setMilestones(data) })
+                setMilestones(data)
+            })
             .catch((error) => console.error('Error fetching milestones:', error));
     };
 
@@ -133,7 +134,7 @@ function App() {
     }, [roadmapFilterState, taskStatusFilterState, tagFilterState]);
 
     const handleFilterByRoadmap = (roadmap: Roadmap) => { //keep
-        
+
         //setSelectedRoadmap(roadmap);
         if (roadmap === null) {
             return;
@@ -250,24 +251,24 @@ function App() {
             },
             body: JSON.stringify(updatedTask),
         })
-        .then(res => res.json())
-        .then(data => {
-            console.log(data)
-            if (data === undefined) {
-                console.log("data returned from backend is null")
-                console.log("ERROR:", data.error)
-                return;
-            }
-            console.log('Updated task:', data);
-            // Update local state with updated task
-            const updatedTasks: Task[] = tasks.map(task => (task.id === updatedTask.id ? data : task));
-           setSelectedItem(data)
-            console.log("updated new task to ", updatedTasks.find(task => task.id === data.id));
-            setTasks(updatedTasks);
-        })
-        .catch(error => {
-            console.error('Error updating task:', error);
-        });
+            .then(res => res.json())
+            .then(data => {
+                console.log(data)
+                if (data === undefined) {
+                    console.log("data returned from backend is null")
+                    console.log("ERROR:", data.error)
+                    return;
+                }
+                console.log('Updated task:', data);
+                // Update local state with updated task
+                const updatedTasks: Task[] = tasks.map(task => (task.id === updatedTask.id ? data : task));
+                setSelectedItem(data)
+                console.log("updated new task to ", updatedTasks.find(task => task.id === data.id));
+                setTasks(updatedTasks);
+            })
+            .catch(error => {
+                console.error('Error updating task:', error);
+            });
     };
 
     const updateMilestone = (updatedMilestone: Milestone) => {
@@ -306,7 +307,7 @@ function App() {
                 console.log('Updated item:', data);
                 // Update local state with updated task
                 const updatedTags: Tag[] = tags.map(tag => (tag.id === updatedTag.id ? data : tag));
- 
+
                 setTags(updatedTags);
 
 
@@ -354,7 +355,7 @@ function App() {
                 console.log('Updated item:', data);
 
                 const updatedTags: Assignee[] = assignees.map(assignee => (assignee.id === updatedAssignee.id ? data : assignee));
-                
+
                 setAssignees(updatedTags);
 
 
@@ -401,12 +402,29 @@ function App() {
         setShowErrorPopup(false);
     };
 
-    const handleGoFixIt = (listType: string, taskStatusFilterName: string) => {
+    const handleGoFixIt = (listType: string, filterName: string, data: UnitDataType) => {
+
         setShowErrorPopup(false);
         setView('List');
-        setTaskStatusFilterState([taskStatusFilterName]);
         setListType(listType);
         setSelectedItem(null);
+
+        if (data.type === findIdForUnitType('Tag', unitTypes)) {
+            setTagFilterState([filterName]);
+        }
+        else if (data.type === findIdForUnitType('Assignee', unitTypes)) {
+            //maybe none? 
+        }
+        else if (data.type === findIdForUnitType('Task Status', unitTypes)) {
+            setTaskStatusFilterState([filterName]);
+        }
+        else if (data.type === findIdForUnitType('Roadmap', unitTypes)) {
+            setRoadmapFilterState([filterName]);
+        }
+        else {
+            console.log("handle go fix it cannot deal with this data.type")
+        }
+
     };
 
     const deleteItem = (deletedItem: UnitDataTypeWithNull) => {
@@ -426,7 +444,7 @@ function App() {
                     <button className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded" onClick={() => handleDeleteItem(deletedItem)}>Yes, Delete It</button>
                 </div>
             </div>
-        ); 
+        );
     };
 
     const handleDeleteItem = (deletedItem: UnitDataTypeWithNull) => {
@@ -448,11 +466,14 @@ function App() {
         else if (deletedItem.type === findIdForUnitType('Assignee', unitTypes)) {
             deleteAssignee(deletedItem as Assignee)
         }
-        else if (deletedItem.type === findIdForUnitType('TaskStatus', unitTypes)) {
+        else if (deletedItem.type === findIdForUnitType('Task Status', unitTypes)) {
             deleteTaskStatus(deletedItem as TaskStatus)
         }
         else if (deletedItem.type === findIdForUnitType('Roadmap', unitTypes)) {
             deleteRoadmap(deletedItem as Roadmap)
+        }
+        else {
+            console.log("couldn't handle delete item what was selected")
         }
     }
 
@@ -466,11 +487,11 @@ function App() {
             headers: {
                 'Content-Type': 'application/json',
             },
-      
+
         })
             .then(res => res.json())
             .then(data => {
-              
+
 
                 const indexToDelete = tasks.findIndex(task => task.id === deletedTask.id);
                 console.log("deleting task index " + indexToDelete)
@@ -481,7 +502,7 @@ function App() {
                     setTasks(updatedTasks);
                 }
                 setSelectedItem(null)
-             
+
             })
             .catch(error => {
                 console.error('Error deleting task:', error);
@@ -515,8 +536,87 @@ function App() {
             });
     };
 
-    const deleteTag = (deletedTag: Tag) => {
+    const deleteTag = (deletedTag: Tag, allowAutoDelete: boolean = false) => {
         // Delete task in API
+        if (!allowAutoDelete) {
+
+            const allTasksWithTag = tasks.filter(task =>
+                task.tags.some(tag => tag.id === deletedTag.id)
+            );
+            if (allTasksWithTag.length > 0) {
+                console.log("got some stuff to delete", allTasksWithTag);
+            }
+
+            const changeToViewName = 'Task';
+
+            handleShowErrorPopup(
+                <div>
+                    <p><span className='text-red-600 font-bold'>[{deletedTag.name}] </span>is still being used by one or more tasks.</p>
+                    <p>Please remove this status from all tasks before deleting (Go fix it).</p>
+                    <p>Or allow an automatic removal of the tag from all tasks (Remove tag from everything).</p>
+                    <p>These are the items that still have the status:</p>
+                    <br />
+                    <br />
+                    {allTasksWithTag.map(i =>
+
+                        <div>
+                            <p>{i.name}</p>
+                            <br />
+                        </div>
+                    )}
+
+                    <div className='flex justify-between gap-4'>
+                        <button className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded" onClick={() => handleGoBack()}>Go Back</button>
+
+                        <button className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded" onClick={() => handleGoFixIt(changeToViewName, deletedTag.name, deletedTag)}>Go Fix It</button>
+
+                        <button className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded" onClick={() => { setShowErrorPopup(false); deleteTag(deletedTag, true) }}>Remove Tag From Everything</button>
+
+                    </div>
+                </div>
+            );
+            return;
+        }
+        if (!allowAutoDelete) {
+
+            const allMilestonesWithTag = milestones.filter(ms =>
+                ms.tags.some(tag => tag.id === deletedTag.id)
+            );
+            if (allMilestonesWithTag.length > 0) {
+                console.log("got some stuff to delete", allMilestonesWithTag);
+            }
+
+            const changeToViewName = 'Milestone';
+
+            handleShowErrorPopup(
+                <div>
+                    <p><span className='text-red-600 font-bold'>[{deletedTag.name}] </span>is still being used by one or more milestones.</p>
+                    <p>Please remove this status from all milestones before deleting (Go fix it).</p>
+                    <p>Or allow an automatic removal of the tag from all milestones (Remove tag from everything).</p>
+                    <p>These are the items that still have the status:</p>
+                    <br />
+                    <br />
+                    {allMilestonesWithTag.map(i =>
+
+                        <div>
+                            <p>{i.name}</p>
+                            <br />
+                        </div>
+                    )}
+
+                    <div className='flex justify-between gap-4'>
+                        <button className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded" onClick={() => handleGoBack()}>Go Back</button>
+
+                        <button className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded" onClick={() => handleGoFixIt(changeToViewName, deletedTag.name, deletedTag)}>Go Fix It</button>
+
+                        <button className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded" onClick={() => { setShowErrorPopup(false); deleteTag(deletedTag, true) }}>Remove Tag From Everything</button>
+
+                    </div>
+                </div>
+            );
+            return;
+        }
+
         fetch(`/api/tags/${deletedTag.id}`, {
             method: 'DELETE',
             headers: {
@@ -542,7 +642,46 @@ function App() {
             });
     }
 
-    const deleteAssignee = (deletedAssignee: Assignee) => {
+    const deleteAssignee = (deletedAssignee: Assignee, allowAutoDelete: boolean = false) => {
+
+        if (!allowAutoDelete) {
+
+            const allTasksWithAssignee = tasks.filter(task =>
+                task.assignee.id === deletedAssignee.id);
+
+            if (allTasksWithAssignee.length > 0) {
+                console.log("got some stuff to delete", allTasksWithAssignee);
+            }
+
+            handleShowErrorPopup(
+                <div>
+                    <p><span className='text-red-600 font-bold'>[{deletedAssignee.name}] </span>is still being used by one or more tasks.</p>
+                    <p>Allow an automatic removal of the assignee from all tasks (Remove from everything).</p>
+                    <p>These are the items that still have the roadmap:</p>
+                    <br />
+                    <br />
+                    {allTasksWithAssignee.map(i =>
+
+                        <div>
+                            <p>{i.name}</p>
+                            <br />
+                        </div>
+                    )}
+
+                    <div className='flex justify-between gap-4'>
+                        <button className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded" onClick={() => handleGoBack()}>Go Back</button>
+
+                        <button className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded" onClick={() => { setShowErrorPopup(false); deleteAssignee(deletedAssignee, true) }}>Remove From Everything</button>
+
+                    </div>
+                </div>
+            );
+
+            return;
+        }
+
+
+
         // Delete task in API
         fetch(`/api/assignees/${deletedAssignee.id}`, {
             method: 'DELETE',
@@ -570,10 +709,90 @@ function App() {
             });
     };
 
-    const deleteTaskStatus = (deletedTaskStatus: TaskStatus) => {
+    const deleteTaskStatus = (deletedTaskStatus: TaskStatus, allowAutoDelete: boolean = false) => { 
 
         console.log("deleting ts", deletedTaskStatus)
 
+     
+
+        if (!allowAutoDelete) {
+
+            const allMilestonesUsingStatus = milestones.filter(ms => ms.taskStatus.id === deletedTaskStatus.id);
+
+            if (allMilestonesUsingStatus.length > 0) {
+                console.log("got some milestones to delete", allMilestonesUsingStatus);
+
+
+                const changeToViewName = 'Milestone';
+
+                handleShowErrorPopup(
+                    <div>
+                        <p><span className='text-red-600 font-bold'>[{deletedTaskStatus.name}] </span>is still being used by one or more milestones.</p>
+                        <p>Please remove this status from all milestones before deleting (Go fix it).</p>
+                        <p>Or allow an automatic removal of the status from all milestones and they'll be set to Backlog (Remove tag from everything).</p>
+                        <p>These are the items that still have the status:</p>
+                        <br />
+                        <br />
+                        {allMilestonesUsingStatus.map(ms =>
+
+                            <div>
+                                <p>{ms.name}</p>
+                                <br />
+                            </div>
+                        )}
+
+                        <div className='flex justify-between'>
+                            <button className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded" onClick={() => handleGoBack()}>Go Back</button>
+
+                            <button className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded" onClick={() => handleGoFixIt(changeToViewName, deletedTaskStatus.name, deletedTaskStatus)}>Go Fix It</button>
+
+                            <button className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded" onClick={() => { setShowErrorPopup(false); deleteTaskStatus(deletedTaskStatus, true) }}>Remove From Everything</button>
+
+                        </div>
+                    </div>
+                );
+
+            }
+
+            const allTasksUsingStatus = tasks.filter(task => task.taskStatus.id === deletedTaskStatus.id);
+
+            if (allTasksUsingStatus.length > 0) {
+                console.log("got some stuff to delete", allTasksUsingStatus);
+           
+
+                const changeToViewName = 'Task';
+
+                handleShowErrorPopup(
+                    <div>
+                        <p><span className='text-red-600 font-bold'>[{deletedTaskStatus.name}] </span>is still being used by one or more tasks.</p>
+                        <p>Please remove this status from all tasks before deleting.</p>
+                        <p>Or allow an automatic removal of the status from all tasks and they'll be set to Backlog (Remove tag from everything).</p>
+                        <p>These are the items that still have the status:</p>
+                        <br />
+                        <br />
+                        {allTasksUsingStatus.map(ms =>
+
+                            <div>
+                                <p>{ms.name}</p>
+                                <br />
+                            </div>
+                        )}
+
+                        <div className='flex justify-between'>
+                            <button className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded" onClick={() => handleGoBack()}>Go Back</button>
+
+                            <button className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded" onClick={() => handleGoFixIt(changeToViewName, deletedTaskStatus.name, deletedTaskStatus)}>Go Fix It</button>
+
+                            <button className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded" onClick={() => { setShowErrorPopup(false); deleteTaskStatus(deletedTaskStatus, true) }}>Remove From Everything</button>
+
+                        </div>
+                    </div>
+                );
+            }
+
+            return;
+    }
+        
         fetch(`/api/taskstatus/${deletedTaskStatus.id}`, {
             method: 'DELETE',
             headers: {
@@ -584,66 +803,7 @@ function App() {
             .then(res => res.json())
             .then(data => {
                 console.log("data", data)
-                if (data.error) {
-                    console.log("error can be handled")
-                    if (data.table === 'milestone') {
-                        const allMilestonesUsingStatus = milestones.filter(ms => ms.taskStatus.id === deletedTaskStatus.id);
-                        const changeToViewName = 'Milestone';
-
-                        handleShowErrorPopup(
-                            <div>
-                                <p><span className='text-red-600 font-bold'>[{deletedTaskStatus.name}] </span>is still being used by one or more {data.table}s.</p>
-                                <p>Please remove this status from all milestones before deleting.</p>
-                                <p>These are the items that still have the status:</p>
-                                <br />
-                                <br />
-                                {allMilestonesUsingStatus.map(ms => 
-                                    
-                                    <div>
-                                        <p>{ms.name}</p>
-                                        <br />
-                                    </div>
-                                )}
-
-                                <div className='flex justify-between'>
-                                    <button className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded" onClick={() => handleGoBack()}>Go Back</button>
-
-                                    <button className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded" onClick={() => handleGoFixIt(changeToViewName ,deletedTaskStatus.name)}>Go Fix It</button>
-                                </div>
-                            </div>
-                        );
-                    }
-
-                    if (data.table === 'task') {
-                        const allTasksUsingStatus = tasks.filter(task => task.taskStatus.id === deletedTaskStatus.id);
-                        const changeToViewName = 'Task';
-
-                        handleShowErrorPopup(
-                            <div>
-                                <p><span className='text-red-600 font-bold'>[{deletedTaskStatus.name}] </span>is still being used by one or more {data.table}s.</p>
-                                <p>Please remove this status from all tasks before deleting.</p>
-                                <p>These are the items that still have the status:</p>
-                                <br />
-                                <br />
-                                {allTasksUsingStatus.map(ms =>
-
-                                    <div>
-                                        <p>{ms.name}</p>
-                                        <br />
-                                    </div>
-                                )}
-
-                                <div className='flex justify-between'>
-                                    <button className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded" onClick={() => handleGoBack()}>Go Back</button>
-
-                                    <button className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded" onClick={() => handleGoFixIt(changeToViewName, deletedTaskStatus.name)}>Go Fix It</button>
-                                </div>
-                            </div>
-                        );
-                    }
-
-                    return;
-                }
+           
 
                 console.log("deleted ts id", deletedTaskStatus.id)
                 console.log("all ts ", taskStatuses)
@@ -663,10 +823,91 @@ function App() {
             .catch(error => {
                 console.error('Error deleting task status:', error);
             });
-    };
+    }
 
-    const deleteRoadmap = (deletedRoadmap: Roadmap) => {
-        // Delete task in API
+    const deleteRoadmap = (deletedRoadmap: Roadmap, allowAutoDelete: boolean = false) => {
+
+        if (!allowAutoDelete) {
+
+            const allTasksWithRoadmap = tasks.filter(task =>
+                task.roadmaps.some(map => map.id === deletedRoadmap.id)
+            );
+            if (allTasksWithRoadmap.length > 0) {
+                console.log("got some stuff to delete", allTasksWithRoadmap);
+            }
+
+            const changeToViewName = 'Task';
+
+            handleShowErrorPopup(
+                <div>
+                    <p><span className='text-red-600 font-bold'>[{deletedRoadmap.name}] </span>is still being used by one or more tasks.</p>
+                    <p>Please remove this roadmap from all tasks before deleting (Go fix it).</p>
+                    <p>Or allow an automatic removal of the roadmap from all tasks (Remove tag from everything).</p>
+                    <p>These are the items that still have the roadmap:</p>
+                    <br />
+                    <br />
+                    {allTasksWithRoadmap.map(i =>
+
+                        <div>
+                            <p>{i.name}</p>
+                            <br />
+                        </div>
+                    )}
+
+                    <div className='flex justify-between gap-4'>
+                        <button className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded" onClick={() => handleGoBack()}>Go Back</button>
+
+                        <button className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded" onClick={() => handleGoFixIt(changeToViewName, deletedRoadmap.name, deletedRoadmap)}>Go Fix It</button>
+
+                        <button className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded" onClick={() => { setShowErrorPopup(false); deleteRoadmap(deletedRoadmap, true) }}>Remove Tag From Everything</button>
+
+                    </div>
+                </div>
+            );
+            return;
+        }
+        if (!allowAutoDelete) {
+
+            const allMilestonesWithRoadmap = milestones.filter(ms =>
+                ms.roadmaps.some(map => map.id === deletedRoadmap.id)
+            );
+            if (allMilestonesWithRoadmap.length > 0) {
+                console.log("got some stuff to delete", allMilestonesWithRoadmap);
+            }
+
+            const changeToViewName = 'Milestone';
+
+            handleShowErrorPopup(
+                <div>
+                    <p><span className='text-red-600 font-bold'>[{deletedRoadmap.name}] </span>is still being used by one or more milestones.</p>
+                    <p>Please remove this roadmap from all milestones before deleting (Go fix it).</p>
+                    <p>Or allow an automatic removal of the roadmap from all milestones (Remove tag from everything).</p>
+                    <p>These are the items that still have the status:</p>
+                    <br />
+                    <br />
+                    {allMilestonesWithRoadmap.map(i =>
+
+                        <div>
+                            <p>{i.name}</p>
+                            <br />
+                        </div>
+                    )}
+
+                    <div className='flex justify-between gap-4'>
+                        <button className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded" onClick={() => handleGoBack()}>Go Back</button>
+
+                        <button className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded" onClick={() => handleGoFixIt(changeToViewName, deletedRoadmap.name, deletedRoadmap)}>Go Fix It</button>
+
+                        <button className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded" onClick={() => { setShowErrorPopup(false); deleteRoadmap(deletedRoadmap, true) }}>Remove Tag From Everything</button>
+
+                    </div>
+                </div>
+            );
+            return;
+        }
+
+
+
         fetch(`/api/roadmaps/${deletedRoadmap.id}`, {
             method: 'DELETE',
             headers: {

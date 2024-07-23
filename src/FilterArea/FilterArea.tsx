@@ -117,7 +117,6 @@ export const FilterArea = ({
         PMButton(roadmap)
     );
     let pmTaskStatusButtons = props.taskStatusData?.map(status => {
-        console.log("filter area task status button initial info", status)
         return PMButton(status);
     }
       
