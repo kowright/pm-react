@@ -1217,10 +1217,10 @@ function App() {
                 <div className='h-full flex flex-col'>
                     <div className='h-auto flex'>
                         <div className='flex-1 h-full flex-wrap'>
-                            <FilterArea selectedRoadmap={selectedRoadmap} selectedTaskStatus={selectedTaskStatus}
+                            { view !== "Organization" && <FilterArea selectedRoadmap={selectedRoadmap} selectedTaskStatus={selectedTaskStatus}
                                 handleFilterByTaskStatus={handleFilterByTaskStatus} handleFilterByRoadmap={handleFilterByRoadmap} handleFilterByTag={handleFilterByTag}
                                 roadmapFilterState={roadmapFilterState} taskStatusFilterState={taskStatusFilterState} tagFilterState={tagFilterState} roadmapData={roadmaps} taskStatusData={taskStatuses} tagData={tags} unitTypeData={unitTypes} />
-                               
+                              } 
                         </div>
 
 
