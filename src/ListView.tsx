@@ -2,7 +2,7 @@ import React from "react";
 import {
     Task, TaskStatus, Roadmap, Milestone, Assignee, Tag, findIdForUnitType, UnitType, colorSets, FilterStates,
     UnitDataType, UnitDataTypeWithNull, ViewData, taskFilterOnTaskStatus, taskFilterOnRoadmap, taskSortByEarliestDate,
-    milestoneFilterOnTaskStatus, milestoneFilterOnRoadmap, milestoneSortByEarliestDate, Unit, unitSortByNameAlphabetical, findUnitTypefromId
+    milestoneFilterOnTaskStatus, milestoneFilterOnRoadmap, milestoneSortByEarliestDate, Unit, unitSortByNameAlphabetical, findUnitTypefromId, taskFilterOnTag, milestoneFilterOnTag
 } from './Interfaces';
 import { FilterButton } from './FilterButton';
 import { SortArea } from './SortArea/SortArea';
@@ -42,6 +42,7 @@ export const ListView = ({
         //filtering
         filteredTasks = taskFilterOnTaskStatus(taskData, filterStates.taskStatusFilterState);
         filteredTasks = taskFilterOnRoadmap(filteredTasks, filterStates.roadmapFilterState);
+        filteredTasks = taskFilterOnTag(filteredTasks, filterStates.tagFilterState);
 
         //sorting
         if (sortState.taskSortState.includes('EarliestStartDate')) {
@@ -59,6 +60,7 @@ export const ListView = ({
         //filtering
         filteredMilestones = milestoneFilterOnTaskStatus(props.milestoneData, filterStates.taskStatusFilterState);
         filteredMilestones = milestoneFilterOnRoadmap(filteredMilestones, filterStates.roadmapFilterState);
+        filteredMilestones = milestoneFilterOnTag(filteredMilestones, filterStates.tagFilterState);
 
        //sorting
         if (sortState.milestoneSortState.includes('EarliestStartDate')) {

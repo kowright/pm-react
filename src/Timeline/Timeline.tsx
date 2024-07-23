@@ -2,7 +2,7 @@ import React from 'react';
 import {
     Milestone, Task, TaskStatus, Roadmap, Tag, Assignee, formatDateNumericalMMDD, addDaysToDate, findIdForUnitType, UnitType,
     colorSets, ViewData, taskFilterOnTaskStatus, taskFilterOnRoadmap, taskSortByEarliestDate,
-    milestoneFilterOnTaskStatus, milestoneFilterOnRoadmap, milestoneSortByEarliestDate
+    milestoneFilterOnTaskStatus, milestoneFilterOnRoadmap, milestoneSortByEarliestDate, milestoneFilterOnTag, taskFilterOnTag
 } from '../Interfaces';
 
 interface TimelineProps {
@@ -260,6 +260,7 @@ export const Timeline = ({
 */
     let filteredTasks = taskFilterOnTaskStatus(taskData, filterStates.taskStatusFilterState);
     filteredTasks = taskFilterOnRoadmap(filteredTasks, filterStates.roadmapFilterState);
+    filteredTasks = taskFilterOnTag(filteredTasks, filterStates.tagFilterState);
     filteredTasks = filteredTasks.filter((task) => new Date(task.startDate) <= endDate);
 
     let tasks = filteredTasks.map((task, index) => {
@@ -295,7 +296,9 @@ export const Timeline = ({
     // #region Milestones
 
      let filteredMilestones = milestoneFilterOnTaskStatus(props.milestoneData, filterStates.taskStatusFilterState);
-        filteredMilestones = milestoneFilterOnRoadmap(filteredMilestones, filterStates.roadmapFilterState);
+    filteredMilestones = milestoneFilterOnRoadmap(filteredMilestones, filterStates.roadmapFilterState);
+    filteredMilestones = milestoneFilterOnTag(filteredMilestones, filterStates.tagFilterState);
+
 
 /*
     filteredMilestones = props.roadmapFilterState

@@ -116,18 +116,21 @@ function App() {
     // #endregion
 
     // #region Filter Area Necessities
-    const [selectedRoadmap, setSelectedRoadmap] = useState<Roadmap | null>(null); //keep
-    const [selectedTaskStatus, setSelectedTaskStatus] = useState<TaskStatus | null>(null); //keep
+    const [selectedRoadmap, setSelectedRoadmap] = useState<Roadmap | null>(null); //keep?
+    const [selectedTaskStatus, setSelectedTaskStatus] = useState<TaskStatus | null>(null); //keep?
+
     const [roadmapFilterState, setRoadmapFilterState] = React.useState<string[]>([]);
     const [taskStatusFilterState, setTaskStatusFilterState] = React.useState<string[]>([]);
-    const [filterStates, setFilterStates] = React.useState<FilterStates>({roadmapFilterState: roadmapFilterState, taskStatusFilterState: taskStatusFilterState})
+    const [tagFilterState, setTagFilterState] = React.useState<string[]>([]);
+    const [filterStates, setFilterStates] = React.useState<FilterStates>({ roadmapFilterState: roadmapFilterState, taskStatusFilterState: taskStatusFilterState, tagFilterState: tagFilterState })
 
     React.useEffect(() => {
         setFilterStates({
             roadmapFilterState: roadmapFilterState,
             taskStatusFilterState: taskStatusFilterState,
+            tagFilterState: tagFilterState,
         });
-    }, [roadmapFilterState, taskStatusFilterState]);
+    }, [roadmapFilterState, taskStatusFilterState, tagFilterState]);
 
     const handleFilterByRoadmap = (roadmap: Roadmap) => { //keep
         
@@ -145,8 +148,6 @@ function App() {
             console.log("add " + roadmap?.name)
             setRoadmapFilterState(prev => [...prev, roadmap?.name]);
         }
-
-
     };
 
     const handleFilterByTaskStatus = (status: TaskStatus) => { //keep
@@ -162,8 +163,21 @@ function App() {
 
             setTaskStatusFilterState(prev => [...prev, status.name]);
         }
+    };
 
+    const handleFilterByTag = (tag: Tag) => { //keep
+        // setSelectedTaskStatus(status);
+        console.log("clicked " + tag.name)
+        if (tagFilterState.includes(tag.name)) {
+            console.log("take out " + tag.name)
 
+            setTagFilterState(prev => prev.filter(stat => stat !== tag.name));
+        }
+        else {
+            console.log("add " + tag.name)
+
+            setTagFilterState(prev => [...prev, tag.name]);
+        }
     };
 
     const handleClick = (viewName: string) => {
@@ -935,8 +949,8 @@ function App() {
                     <div className='h-auto flex'>
                         <div className='flex-1 h-full flex-wrap'>
                             <FilterArea selectedRoadmap={selectedRoadmap} selectedTaskStatus={selectedTaskStatus}
-                                handleFilterByTaskStatus={handleFilterByTaskStatus} handleFilterByRoadmap={handleFilterByRoadmap}
-                                roadmapFilterState={roadmapFilterState} taskStatusFilterState={taskStatusFilterState} roadmapData={roadmaps} taskStatusData={taskStatuses} tagData={tags} />
+                                handleFilterByTaskStatus={handleFilterByTaskStatus} handleFilterByRoadmap={handleFilterByRoadmap} handleFilterByTag={handleFilterByTag}
+                                roadmapFilterState={roadmapFilterState} taskStatusFilterState={taskStatusFilterState} tagFilterState={tagFilterState} roadmapData={roadmaps} taskStatusData={taskStatuses} tagData={tags} unitTypeData={unitTypes} />
                                
                         </div>
 

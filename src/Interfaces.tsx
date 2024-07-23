@@ -118,9 +118,9 @@ export function findIdForUnitType(type: string, unitTypes: UnitType[]) {
 }
 
 export function findUnitTypefromId(id: number, unitTypes: UnitType[]) {
-    console.log('num', id)
+    console.log('find unit type from this id: ', id)
     const name = unitTypes.find(item => item.id === id)?.name
-    console.log('type' + name)
+    console.log('find unit type found: ' + name)
     return name
    
 
@@ -209,6 +209,7 @@ export function toCamelCase(input: string): string {
 export type FilterStates = {
     roadmapFilterState: string[];
     taskStatusFilterState: string[];
+    tagFilterState: string[];
 };
 
 export type ViewData = {
@@ -230,6 +231,15 @@ export const taskFilterOnRoadmap = (taskData: Task[], roadmapFilterState: string
     const filteredTasks = taskData.filter(task => {
         const taskRoadmapNames = task.roadmaps.map(map => map.name);
         return roadmapFilterState.every(name => taskRoadmapNames.includes(name)); //AND
+        // return props.roadmapFilterState.some(name => taskRoadmapNames.includes(name)); //OR
+    });
+    return filteredTasks;
+}
+
+export const taskFilterOnTag = (taskData: Task[], tagFilterState: string[]): Task[] => {
+    const filteredTasks = taskData.filter(task => {
+        const taskTagNames = task.tags.map(tag => tag.name);
+        return tagFilterState.every(name => taskTagNames.includes(name)); //AND
         // return props.roadmapFilterState.some(name => taskRoadmapNames.includes(name)); //OR
     });
     return filteredTasks;
@@ -266,6 +276,15 @@ export const milestoneFilterOnRoadmap = (milestoneData: Milestone[], roadmapFilt
     const filteredMilestones = milestoneData.filter(milestone => {
         const milestoneRoadmapNames = milestone.roadmaps.map(map => map.name);
         return roadmapFilterState.every(name => milestoneRoadmapNames.includes(name)); //AND
+        // return roadmapFilterState.some(name => milestoneRoadmapNames.includes(name)); //OR
+    });
+    return filteredMilestones;
+}
+
+export const milestoneFilterOnTag = (milestoneData: Milestone[], tagFilterState: string[]): Milestone[] => {
+    const filteredMilestones = milestoneData.filter(milestone => {
+        const milestoneTagNames = milestone.tags.map(tag => tag.name);
+        return tagFilterState.every(name => milestoneTagNames.includes(name)); //AND
         // return roadmapFilterState.some(name => milestoneRoadmapNames.includes(name)); //OR
     });
     return filteredMilestones;

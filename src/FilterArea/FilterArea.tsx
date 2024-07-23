@@ -1,5 +1,5 @@
 import React from 'react';
-import { Milestone, Roadmap, TaskStatus, Unit, colorSets, Tag } from '../Interfaces';
+import { Milestone, Roadmap, TaskStatus, Unit, colorSets, Tag, findUnitTypefromId, UnitType } from '../Interfaces';
 import { FilterButton } from '../FilterButton';
 interface FilterAreaProps {
     selectedRoadmap: Roadmap | null;
@@ -7,10 +7,13 @@ interface FilterAreaProps {
     roadmapData: Roadmap[];
     taskStatusData: TaskStatus[];
     tagData: Tag[];
-    handleFilterByRoadmap: (roadmap: Roadmap) => void;
+    unitTypeData: UnitType[];
+    handleFilterByRoadmap: (roadmap: Roadmap) => void; //use combined object
     handleFilterByTaskStatus: (taskStatus: TaskStatus) => void;
+    handleFilterByTag: (tag: Tag) => void;
     roadmapFilterState: string[];
     taskStatusFilterState: string[];
+    tagFilterState: string[];
 
 }
 
@@ -76,21 +79,36 @@ export const FilterArea = ({
             </button>
         );
     }*/
-    const PMButton = (item: Unit) => {
-        const isRoadmap = item.type === 5;
 
+
+    const PMButton = (item: Unit) => {
         const color = colorSets['green'];
+        let filterFunction: () => void; 
+        let filterShowX;
+        let filterColor;
+        if (findUnitTypefromId(item.type, props.unitTypeData) === 'Roadmap') {
+            filterColor = props.roadmapFilterState.includes(item.name) ? color.selected : color.default 
+            filterFunction = () => props.handleFilterByRoadmap(item as Roadmap);
+            filterShowX = props.roadmapFilterState.includes(item.name) && <div className='ml-2 flex items-center'>X</div>
+        }
+        else if (findUnitTypefromId(item.type, props.unitTypeData) === 'Task Status') {
+            filterColor = props.taskStatusFilterState.includes(item.name) ? color.selected : color.default 
+            filterFunction = () => props.handleFilterByTaskStatus(item as TaskStatus);
+            filterShowX = props.taskStatusFilterState.includes(item.name) && <div className='ml-2 flex items-center'>X</div>
+        }
+        else if (findUnitTypefromId(item.type, props.unitTypeData) === 'Tag') {
+            filterColor = props.tagFilterState.includes(item.name) ? color.selected : color.default 
+            filterFunction = () => props.handleFilterByTag(item as Tag);
+            filterShowX = props.tagFilterState.includes(item.name) && <div className='ml-2 flex items-center'>X</div>
+        }
 
         return (
             <button key={item.id}
-                className={`h-[25px] w-fit bg-ash-gray rounded-lg flex justify-center items-center shrink-0 p-2 ${color.hover} ${color.focusRing} focus:ring-offset-alabaster
-            ${isRoadmap ? props.roadmapFilterState.includes(item.name) ? color.selected : color.default : props.taskStatusFilterState.includes(item.name) ? color.selected : color.default}`}
-                onClick={() => {
-                    isRoadmap ? props.handleFilterByRoadmap(item as Roadmap) : props.handleFilterByTaskStatus(item as TaskStatus);
-                }}
+                className={`h-[25px] w-fit bg-ash-gray rounded-lg flex justify-center items-center shrink-0 p-2 ${color.hover} ${color.focusRing} focus:ring-offset-alabaster ${filterColor}`}
+                onClick={() => filterFunction()}
             >
                 {item.name}
-                {isRoadmap ? props.roadmapFilterState.includes(item.name) && <div className='ml-2 flex items-center'>X</div> : props.taskStatusFilterState.includes(item.name) && <div className='ml-2 flex items-center'>X</div>}
+                {filterShowX}
             </button>
         );
     };
@@ -98,9 +116,16 @@ export const FilterArea = ({
     let pmRoadmapButtons = props.roadmapData.map(roadmap =>
         PMButton(roadmap)
     );
-    let pmTaskStatusButtons = props.taskStatusData?.map(status =>
-        PMButton(status)
+    let pmTaskStatusButtons = props.taskStatusData?.map(status => {
+        console.log("filter area task status button initial info", status)
+        return PMButton(status);
+    }
+      
     );
+    let pmTagButtons = props.tagData?.map(tag =>
+        PMButton(tag)
+    );
+
 
 
     return (
@@ -110,6 +135,7 @@ export const FilterArea = ({
 
             {pmRoadmapButtons}
             {pmTaskStatusButtons}
+            {pmTagButtons}
 
 {/*            {taskStatusButtons}
             <FilterButton text='All Task Statuses' onClick={() => props.selectedTaskStatus && props.handleFilterByTaskStatus(null)} ></FilterButton>*/}
