@@ -263,6 +263,8 @@ export const Timeline = ({
     filteredTasks = taskFilterOnTag(filteredTasks, filterStates.tagFilterState);
     filteredTasks = filteredTasks.filter((task) => new Date(task.startDate) <= endDate);
 
+    const taskColors = colorSets['yellow'];
+
     let tasks = filteredTasks.map((task, index) => {
         let top = `${day * (index + 1) * 4}px`;
         let lengthRange = Math.round((endDate.getTime() - new Date(task.endDate).getTime()) / (1000 * 3600 * 24));
@@ -284,10 +286,10 @@ export const Timeline = ({
 
         return (
             <div key={task.id} style={containerStyles}
-                className={`relative ${selectedItem?.type === findIdForUnitType('Task', unitTypeData) && selectedItem?.id === task.id ? 'bg-tigers-eyes text-smoky-black' : 'bg-chinese-violet text-white'}`}
+                className={`relative ${taskColors.hover} ${selectedItem?.type === findIdForUnitType('Task', unitTypeData) && selectedItem?.id === task.id ? taskColors.selected : taskColors.default }`}
 
                 onClick={() => handleClick(task)} onMouseDown={(event => handleMouseDown(task, event))} onMouseUp={() => handleMouseUp()}> 
-                <p className={`text-white text-center`}>{task.name}</p>
+                <p className={`text-center`}>{task.name}</p>
             </div>
         );
     });
@@ -315,6 +317,7 @@ export const Timeline = ({
     filteredMilestones = milestoneFilterOnRoadmap(filteredMilestones, filterStates.roadmapFilterState);*/
 
     filteredMilestones = filteredMilestones.filter(milestone => new Date(milestone.date) <= endDate);
+    const milestoneColors = colorSets['red'];
 
     let milestones = filteredMilestones.map((milestone, index) => {
         let width = `${day * 4}px`;
@@ -335,13 +338,13 @@ export const Timeline = ({
             width: width,
             height: height,
             borderRadius: '0.375rem',
-            backgroundColor: '#E54B4B',
             boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
             zIndex: 30
         };
 
         return (
-            <div key={index} style={containerStyles} onClick={() => handleClick(milestone)} onMouseDown={(event => handleMouseDown(milestone, event))} onMouseUp={() => handleMouseUp()}>
+            <div key={index} style={containerStyles} className={`${milestoneColors.hover} ${selectedItem?.type === findIdForUnitType('Milestone', unitTypeData) && selectedItem?.id === milestone.id ? milestoneColors.selected : milestoneColors.default}`}
+                onClick={() => handleClick(milestone)} onMouseDown={(event => handleMouseDown(milestone, event))} onMouseUp={() => handleMouseUp()}>
                 <p className={`text-center`}>{milestone.name}</p>
             </div>
         );

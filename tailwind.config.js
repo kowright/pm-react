@@ -25,7 +25,7 @@ module.exports = {
               'persian-red': '#D53030',
               'vanilla': '#F2F3AE',
               'cream': '#FFFFC3',
-              'straw': '#D5D689',
+              'pear': '#C9CC17',
               'sky-magenta': '#CE84AD',
               'amaranth-pink': '#E59EBD',
               'chinese-rose': '#AB5479'

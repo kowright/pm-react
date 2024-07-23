@@ -174,9 +174,9 @@ export const colorSets: Record<string, ColorSet> = {
     },
     yellow: {
         default: 'bg-vanilla text-smoky-black',
-        hover: 'hover:bg-light-cream hover:text-smoky-black',
+        hover: 'hover:bg-cream hover:text-smoky-black',
         focusRing: 'focus:ring-offset-4 focus:ring-vanilla focus:ring focus:text-smoky-black',
-        selected: 'bg-straw text-white focus:text-white',
+        selected: 'bg-pear text-smoky-black focus:text-smoky-black',
     },
     pink: {
         default: 'bg-sky-magenta text-smoky-black',
