@@ -82,29 +82,36 @@ export const FilterArea = ({
 
 
     const PMButton = (item: Unit) => {
-        const color = colorSets['green'];
+        let color = colorSets['green'];
         let filterFunction: () => void; 
         let filterShowX;
         let filterColor;
+
         if (findUnitTypefromId(item.type, props.unitTypeData) === 'Roadmap') {
-            filterColor = props.roadmapFilterState.includes(item.name) ? color.selected : color.default 
+            color = colorSets['orange'];
+
+            filterColor = props.roadmapFilterState.includes(item.name) ? `${color.selected} opacity-100` : color.default 
             filterFunction = () => props.handleFilterByRoadmap(item as Roadmap);
             filterShowX = props.roadmapFilterState.includes(item.name) && <div className='ml-2 flex items-center'>X</div>
         }
         else if (findUnitTypefromId(item.type, props.unitTypeData) === 'Task Status') {
-            filterColor = props.taskStatusFilterState.includes(item.name) ? color.selected : color.default 
+            color = colorSets['pink'];
+
+            filterColor = props.taskStatusFilterState.includes(item.name) ? `${color.selected} opacity-100` : color.default 
             filterFunction = () => props.handleFilterByTaskStatus(item as TaskStatus);
             filterShowX = props.taskStatusFilterState.includes(item.name) && <div className='ml-2 flex items-center'>X</div>
         }
         else if (findUnitTypefromId(item.type, props.unitTypeData) === 'Tag') {
-            filterColor = props.tagFilterState.includes(item.name) ? color.selected : color.default 
+            color = colorSets['purple'];
+
+            filterColor = props.tagFilterState.includes(item.name) ? `${color.selected} opacity-100`: color.default 
             filterFunction = () => props.handleFilterByTag(item as Tag);
             filterShowX = props.tagFilterState.includes(item.name) && <div className='ml-2 flex items-center'>X</div>
         }
 
         return (
             <button key={item.id}
-                className={`h-[25px] w-fit bg-ash-gray rounded-lg flex justify-center items-center shrink-0 p-2 ${color.hover} ${color.focusRing} focus:ring-offset-alabaster ${filterColor}`}
+                className={`h-[25px] w-fit bg-ash-gray rounded-lg flex justify-center items-center shrink-0 p-2 opacity-50 ${color.hover} ${color.focusRing} focus:ring-offset-alabaster ${filterColor}`}
                 onClick={() => filterFunction()}
             >
                 {item.name}

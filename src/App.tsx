@@ -1255,7 +1255,7 @@ function App() {
                     placeholder="Search..."
                 />
 
-                <Sidebar sidebarData={selectedItem} updateItem={updateItem} assigneeData={assignees} roadmapData={roadmaps} unitTypeData={unitTypes} tagData={tags} deleteItem={deleteItem}  />
+                <Sidebar sidebarData={selectedItem} updateItem={updateItem} assigneeData={assignees} roadmapData={roadmaps} unitTypeData={unitTypes} tagData={tags} deleteItem={deleteItem} setSelectedItem={setSelectedItem}  />
 
 
             </div>

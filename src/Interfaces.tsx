@@ -134,25 +134,25 @@ export const colorSets: Record<string, ColorSet> = {
         default: 'bg-cerulean text-white',
         hover: 'hover:bg-yinmn-blue hover:text-white',
         focusRing: 'focus:ring-offset-4 focus:ring-cerulean focus:ring focus:text-white',
-        selected: 'bg-oxford-blue text-white',
+        selected: 'bg-oxford-blue text-white focus:text-white',
     },
     blue: {
         default: 'bg-yinmn-blue text-white',
         hover: 'hover:bg-cerulean hover:text-white',
         focusRing: 'focus:ring-offset-4 focus:ring-yinmn-blue focus:ring focus:text-white',
-        selected: 'bg-oxford-blue text-white',
+        selected: 'bg-oxford-blue text-white focus:text-white',
     },
     green: {
         default: 'bg-ash-gray text-white',
         hover: 'hover:bg-sage hover:text-white',
         focusRing: 'focus:ring-offset-4 focus:ring-bg-dark-moss-green focus:ring focus:text-white',
-        selected: 'bg-dark-moss-green text-white',
+        selected: 'bg-dark-moss-green text-white focus:text-white',
     },
     blueWhite: {
         default: 'bg-white text-smoky-black',
         hover: 'hover:bg-cerulean hover:text-white',
         focusRing: 'focus:ring-offset-4 focus:ring-yinmn-blue focus:ring focus:text-white',
-        selected: 'bg-yinmn-blue text-white',
+        selected: 'bg-yinmn-blue text-white focus:text-white',
     },
     purple: {
         default: 'bg-chinese-violet text-white',
@@ -164,25 +164,25 @@ export const colorSets: Record<string, ColorSet> = {
         default: 'bg-tigers-eyes text-smoky-black',
         hover: 'hover:bg-persian-orange hover:text-smoky-black',
         focusRing: 'focus:ring-offset-4 focus:ring-tigers-eyes focus:ring focus:text-smoky-black',
-        selected: 'bg-burnt-orange text-white',
+        selected: 'bg-burnt-orange text-white focus:text-white',
     },
     red: {
         default: 'bg-imperial-red text-smoky-black',
         hover: 'hover:bg-light-coral hover:text-smoky-black',
         focusRing: 'focus:ring-offset-4 focus:ring-imperial-red focus:ring focus:text-smoky-black',
-        selected: 'bg-persian-red text-white',
+        selected: 'bg-persian-red text-white focus:text-white',
     },
     yellow: {
         default: 'bg-vanilla text-smoky-black',
         hover: 'hover:bg-light-cream hover:text-smoky-black',
         focusRing: 'focus:ring-offset-4 focus:ring-vanilla focus:ring focus:text-smoky-black',
-        selected: 'bg-straw text-white',
+        selected: 'bg-straw text-white focus:text-white',
     },
     pink: {
         default: 'bg-sky-magenta text-smoky-black',
         hover: 'hover:bg-light-coral hover:text-smoky-black',
         focusRing: 'focus:ring-offset-4 focus:ring-amaranth-pink focus:ring focus:text-smoky-black',
-        selected: 'bg-chinese-rose text-white',
+        selected: 'bg-chinese-rose text-white focus:text-white',
     }
 
 };

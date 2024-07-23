@@ -13,7 +13,7 @@ interface SidebarProps {
     tagData: Tag[];
     updateItem: (updatedItem: UnitDataTypeWithNull) => void;
     deleteItem: (deletedItem: UnitDataTypeWithNull) => void;
-
+    setSelectedItem: (unit: UnitDataTypeWithNull) => void;
 }
 
 export const Sidebar = ({
@@ -630,12 +630,12 @@ export const Sidebar = ({
     return (
         <div className='bg-white rounded-xl'>
             {!hideContent &&
-                <div className='p-4 flex flex-col gap-2'>
+                <div className='p-4 flex flex-col gap-2 relative'>
                     <div className='font-bold text-xl'>{props.unitTypeData.find(type => type.id === sidebarData.type)?.name.toUpperCase()} DETAILS</div>
                     {sidebarContent}
-                    <br/>
+                    <br />
                     <button className={`px-4 py-2 rounded ${buttonColorSet.default} ${buttonColorSet.hover}`} onClick={() => props.deleteItem(sidebarData)}>Delete</button>
-
+                    <div className={`absolute top-4 right-4 w-6 flex rounded-full items-center justify-center ${buttonColorSet.default} ${buttonColorSet.hover}`} onClick={() => props.setSelectedItem(null) }>X</div>
                 </div>
             }
         </div>
