@@ -125,6 +125,14 @@ function App() {
     const [tagFilterState, setTagFilterState] = React.useState<string[]>([]);
     const [filterStates, setFilterStates] = React.useState<FilterStates>({ roadmapFilterState: roadmapFilterState, taskStatusFilterState: taskStatusFilterState, tagFilterState: tagFilterState })
 
+    React.useEffect(() => { //reset filter area on view switch
+
+        setRoadmapFilterState([]);
+        setTaskStatusFilterState([]);
+            setTagFilterState([]);
+    
+    }, [view])
+
     React.useEffect(() => {
         setFilterStates({
             roadmapFilterState: roadmapFilterState,
@@ -208,7 +216,7 @@ function App() {
             unitTypeData: unitTypes,
             filterStates: filterStates,
         });
-    }, [filterStates, selectedItem, tasks, unitTypes]);
+    }, [filterStates, selectedItem, tasks, unitTypes, tags, roadmaps]);
 
     const handleAddButtonClick = () => {
         setShowPopup(true);
@@ -538,14 +546,15 @@ function App() {
 
     const deleteTag = (deletedTag: Tag, allowAutoDelete: boolean = false) => {
         // Delete task in API
+        console.log("delete tag func")
         if (!allowAutoDelete) {
-
+            console.log("no auto delete")
             const allTasksWithTag = tasks.filter(task =>
                 task.tags.some(tag => tag.id === deletedTag.id)
             );
             if (allTasksWithTag.length > 0) {
                 console.log("got some stuff to delete", allTasksWithTag);
-            }
+            
 
             const changeToViewName = 'Task';
 
@@ -574,17 +583,16 @@ function App() {
 
                     </div>
                 </div>
-            );
-            return;
-        }
-        if (!allowAutoDelete) {
-
+                );
+                return;
+            }
+            console.log("no tasks with tag " + deletedTag.name)
             const allMilestonesWithTag = milestones.filter(ms =>
                 ms.tags.some(tag => tag.id === deletedTag.id)
             );
             if (allMilestonesWithTag.length > 0) {
                 console.log("got some stuff to delete", allMilestonesWithTag);
-            }
+          
 
             const changeToViewName = 'Milestone';
 
@@ -613,10 +621,14 @@ function App() {
 
                     </div>
                 </div>
-            );
-            return;
-        }
+                );
+                return;
+            }
+            console.log("no milestones with tag " + deletedTag.name)
 
+        }
+   
+        console.log("time to delete")
         fetch(`/api/tags/${deletedTag.id}`, {
             method: 'DELETE',
             headers: {
@@ -624,22 +636,28 @@ function App() {
             },
             body: JSON.stringify(deletedTag),
         })
-            .then(res => res.json())
-            .then(data => {
-                const indexToDelete = tags.findIndex(tag => tag.id === deletedTag.id);
-                console.log("deleting task index " + indexToDelete)
-                if (indexToDelete !== -1) {
-                    const updatedTags = [...tags.slice(0, indexToDelete), ...tags.slice(indexToDelete + 1)];
-
-                    setTags(updatedTags);
+        .then(res => res.json())
+        .then(data => {
+            const indexToDelete = tags.findIndex(tag => tag.id === deletedTag.id);
+            console.log("deleting task index " + indexToDelete)
+            if (indexToDelete !== -1) {
+                const updatedTags = [...tags.slice(0, indexToDelete), ...tags.slice(indexToDelete + 1)];
+                console.log("updating tags after deleting tag")
+                setTags(updatedTags);
+            }
+            setSelectedItem(null)
+            setTagFilterState(prev => {
+                if (prev.includes(deletedTag.name)) {
+                    return prev.filter(item => item !== deletedTag.name);
+                } else {
+                    return prev;
                 }
-                setSelectedItem(null)
-
-
-            })
-            .catch(error => {
-                console.error('Error deleting tag:', error);
             });
+
+        })
+        .catch(error => {
+            console.error('Error deleting tag:', error);
+        });
     }
 
     const deleteAssignee = (deletedAssignee: Assignee, allowAutoDelete: boolean = false) => {
@@ -690,30 +708,26 @@ function App() {
             },
             body: JSON.stringify(deletedAssignee),
         })
-            .then(res => res.json())
-            .then(data => {
-                const indexToDelete = assignees.findIndex(as => as.id === deletedAssignee.id);
-                console.log("deleting task index " + indexToDelete)
-                if (indexToDelete !== -1) {
-                    // Create a new array without the deleted task
-                    const updatedAssignees = [...assignees.slice(0, indexToDelete), ...assignees.slice(indexToDelete + 1)];
+        .then(res => res.json())
+        .then(data => {
+            const indexToDelete = assignees.findIndex(as => as.id === deletedAssignee.id);
+            console.log("deleting task index " + indexToDelete)
+            if (indexToDelete !== -1) {
+                // Create a new array without the deleted task
+                const updatedAssignees = [...assignees.slice(0, indexToDelete), ...assignees.slice(indexToDelete + 1)];
 
-                    setAssignees(updatedAssignees);
-                }
-                setSelectedItem(null)
+                setAssignees(updatedAssignees);
+            }
+            setSelectedItem(null)
 
 
-            })
-            .catch(error => {
-                console.error('Error deleting assignee:', error);
-            });
+        })
+        .catch(error => {
+            console.error('Error deleting assignee:', error);
+        });
     };
 
     const deleteTaskStatus = (deletedTaskStatus: TaskStatus, allowAutoDelete: boolean = false) => { 
-
-        console.log("deleting ts", deletedTaskStatus)
-
-     
 
         if (!allowAutoDelete) {
 
@@ -791,7 +805,7 @@ function App() {
             }
 
             return;
-    }
+          }
         
         fetch(`/api/taskstatus/${deletedTaskStatus.id}`, {
             method: 'DELETE',
@@ -800,29 +814,36 @@ function App() {
             },
             body: JSON.stringify(deletedTaskStatus),
         })
-            .then(res => res.json())
-            .then(data => {
-                console.log("data", data)
+        .then(res => res.json())
+        .then(data => {
+            console.log("data", data)
            
 
-                console.log("deleted ts id", deletedTaskStatus.id)
-                console.log("all ts ", taskStatuses)
+            console.log("deleted ts id", deletedTaskStatus.id)
+            console.log("all ts ", taskStatuses)
 
-                const indexToDelete = taskStatuses.findIndex(ts => ts.id === deletedTaskStatus.id);
-                console.log("delete ts index", indexToDelete)
+            const indexToDelete = taskStatuses.findIndex(ts => ts.id === deletedTaskStatus.id);
+            console.log("delete ts index", indexToDelete)
 
-                if (indexToDelete !== -1) {
-                    // Create a new array without the deleted task
-                    const updatedTaskStatus = [...taskStatuses.slice(0, indexToDelete), ...taskStatuses.slice(indexToDelete + 1)];
-                    console.log("delete ts", updatedTaskStatus)
-                    setTaskStatuses(updatedTaskStatus);
+            if (indexToDelete !== -1) {
+                // Create a new array without the deleted task
+                const updatedTaskStatus = [...taskStatuses.slice(0, indexToDelete), ...taskStatuses.slice(indexToDelete + 1)];
+                console.log("delete ts", updatedTaskStatus)
+                setTaskStatuses(updatedTaskStatus);
+            }
+            setSelectedItem(null);
+            setTaskStatusFilterState(prev => {
+                if (prev.includes(deletedTaskStatus.name)) {
+                    return prev.filter(item => item !== deletedTaskStatus.name);
+                } else {
+                    return prev;
                 }
-                setSelectedItem(null)
-
-            })
-            .catch(error => {
-                console.error('Error deleting task status:', error);
             });
+
+        })
+        .catch(error => {
+            console.error('Error deleting task status:', error);
+        });
     }
 
     const deleteRoadmap = (deletedRoadmap: Roadmap, allowAutoDelete: boolean = false) => {
@@ -834,46 +855,45 @@ function App() {
             );
             if (allTasksWithRoadmap.length > 0) {
                 console.log("got some stuff to delete", allTasksWithRoadmap);
-            }
+           
 
-            const changeToViewName = 'Task';
+                const changeToViewName = 'Task';
 
-            handleShowErrorPopup(
-                <div>
-                    <p><span className='text-red-600 font-bold'>[{deletedRoadmap.name}] </span>is still being used by one or more tasks.</p>
-                    <p>Please remove this roadmap from all tasks before deleting (Go fix it).</p>
-                    <p>Or allow an automatic removal of the roadmap from all tasks (Remove tag from everything).</p>
-                    <p>These are the items that still have the roadmap:</p>
-                    <br />
-                    <br />
-                    {allTasksWithRoadmap.map(i =>
+                handleShowErrorPopup(
+                    <div>
+                        <p><span className='text-red-600 font-bold'>[{deletedRoadmap.name}] </span>is still being used by one or more tasks.</p>
+                        <p>Please remove this roadmap from all tasks before deleting (Go fix it).</p>
+                        <p>Or allow an automatic removal of the roadmap from all tasks (Remove tag from everything).</p>
+                        <p>These are the items that still have the roadmap:</p>
+                        <br />
+                        <br />
+                        {allTasksWithRoadmap.map(i =>
 
-                        <div>
-                            <p>{i.name}</p>
-                            <br />
+                            <div>
+                                <p>{i.name}</p>
+                                <br />
+                            </div>
+                        )}
+
+                        <div className='flex justify-between gap-4'>
+                            <button className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded" onClick={() => handleGoBack()}>Go Back</button>
+
+                            <button className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded" onClick={() => handleGoFixIt(changeToViewName, deletedRoadmap.name, deletedRoadmap)}>Go Fix It</button>
+
+                            <button className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded" onClick={() => { setShowErrorPopup(false); deleteRoadmap(deletedRoadmap, true) }}>Remove Tag From Everything</button>
+
                         </div>
-                    )}
-
-                    <div className='flex justify-between gap-4'>
-                        <button className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded" onClick={() => handleGoBack()}>Go Back</button>
-
-                        <button className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded" onClick={() => handleGoFixIt(changeToViewName, deletedRoadmap.name, deletedRoadmap)}>Go Fix It</button>
-
-                        <button className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded" onClick={() => { setShowErrorPopup(false); deleteRoadmap(deletedRoadmap, true) }}>Remove Tag From Everything</button>
-
                     </div>
-                </div>
-            );
-            return;
-        }
-        if (!allowAutoDelete) {
+                    );
+            }
 
             const allMilestonesWithRoadmap = milestones.filter(ms =>
                 ms.roadmaps.some(map => map.id === deletedRoadmap.id)
             );
+
             if (allMilestonesWithRoadmap.length > 0) {
                 console.log("got some stuff to delete", allMilestonesWithRoadmap);
-            }
+          
 
             const changeToViewName = 'Milestone';
 
@@ -902,10 +922,11 @@ function App() {
 
                     </div>
                 </div>
-            );
+                );
+            }
             return;
         }
-
+    
 
 
         fetch(`/api/roadmaps/${deletedRoadmap.id}`, {
@@ -915,23 +936,30 @@ function App() {
             },
             body: JSON.stringify(deletedRoadmap),
         })
-            .then(res => res.json())
-            .then(data => {
-                console.log("deleted ts id", deletedRoadmap.id)
+        .then(res => res.json())
+        .then(data => {
+            console.log("deleted ts id", deletedRoadmap.id)
 
-                const indexToDelete = roadmaps.findIndex(map => map.id === deletedRoadmap.id);
+            const indexToDelete = roadmaps.findIndex(map => map.id === deletedRoadmap.id);
 
-                if (indexToDelete !== -1) {
-                    const updatedRoadmaps = [...roadmaps.slice(0, indexToDelete), ...roadmaps.slice(indexToDelete + 1)];
-                    console.log("delete ts", deletedRoadmap)
-                    setRoadmaps(updatedRoadmaps);
+            if (indexToDelete !== -1) {
+                const updatedRoadmaps = [...roadmaps.slice(0, indexToDelete), ...roadmaps.slice(indexToDelete + 1)];
+                console.log("delete ts", deletedRoadmap)
+                setRoadmaps(updatedRoadmaps);
+            }
+            setSelectedItem(null);
+            setRoadmapFilterState(prev => {
+                if (prev.includes(deletedRoadmap.name)) {
+                    return prev.filter(item => item !== deletedRoadmap.name);
+                } else {
+                    return prev;
                 }
-                setSelectedItem(null)
-
-            })
-            .catch(error => {
-                console.error('Error deleting roadmap:', error);
             });
+
+        })
+        .catch(error => {
+            console.error('Error deleting roadmap:', error);
+        });
     };
     // #endregion
 

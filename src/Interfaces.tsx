@@ -158,7 +158,7 @@ export const colorSets: Record<string, ColorSet> = {
         default: 'bg-chinese-violet text-white',
         hover: 'hover:bg-mountbatten-pink hover:text-smoky-black',
         focusRing: 'focus:ring-offset-4 focus:ring-chinese-violet focus:ring focus:text-smoky-black',
-        selected: 'bg-english-violet text-white',
+        selected: 'bg-english-violet text-white focus:text-white',
     },
     orange: {
         default: 'bg-tigers-eyes text-smoky-black',
