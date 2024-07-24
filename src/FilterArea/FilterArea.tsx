@@ -1,5 +1,5 @@
 import React from 'react';
-import { Milestone, Roadmap, TaskStatus, Unit, colorSets, Tag, findUnitTypefromId, UnitType } from '../Interfaces';
+import { Milestone, Roadmap, TaskStatus, Unit, colorSets, Tag, findUnitTypefromId, UnitType, getUnitColorSetName } from '../Interfaces';
 import { FilterButton } from '../FilterButton';
 interface FilterAreaProps {
     selectedRoadmap: Roadmap | null;
@@ -88,21 +88,21 @@ export const FilterArea = ({
         let filterColor;
 
         if (findUnitTypefromId(item.type, props.unitTypeData) === 'Roadmap') {
-            color = colorSets['orange'];
+            color = colorSets[getUnitColorSetName('Roadmap')];
 
             filterColor = props.roadmapFilterState.includes(item.name) ? `${color.selected} opacity-100` : `${color.default} opacity-50`
             filterFunction = () => props.handleFilterByRoadmap(item as Roadmap);
             filterShowX = props.roadmapFilterState.includes(item.name) && <div className='ml-2 flex items-center'>X</div>
         }
         else if (findUnitTypefromId(item.type, props.unitTypeData) === 'Task Status') {
-            color = colorSets['pink'];
+            color = colorSets[getUnitColorSetName('Task Status')];
             
             filterColor = props.taskStatusFilterState.includes(item.name) ? `${color.selected} opacity-100` : `${color.default} opacity-50`
             filterFunction = () => props.handleFilterByTaskStatus(item as TaskStatus);
             filterShowX = props.taskStatusFilterState.includes(item.name) && <div className='ml-2 flex items-center'>X</div>
         }
         else if (findUnitTypefromId(item.type, props.unitTypeData) === 'Tag') {
-            color = colorSets['purple'];
+            color = colorSets[getUnitColorSetName('Tag')];
 
             filterColor = props.tagFilterState.includes(item.name) ? `${color.selected} opacity-100` : `${color.default} opacity-50` 
             filterFunction = () => props.handleFilterByTag(item as Tag);

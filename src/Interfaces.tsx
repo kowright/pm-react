@@ -142,7 +142,7 @@ export const colorSets: Record<string, ColorSet> = {
         focusRing: 'focus:ring-offset-4 focus:ring-yinmn-blue focus:ring focus:text-white',
         selected: 'bg-oxford-blue text-white focus:text-white',
     },
-    green: {
+    gray: {
         default: 'bg-ash-gray text-white',
         hover: 'hover:bg-sage hover:text-white',
         focusRing: 'focus:ring-offset-4 focus:ring-bg-dark-moss-green focus:ring focus:text-white',
@@ -183,10 +183,44 @@ export const colorSets: Record<string, ColorSet> = {
         hover: 'hover:bg-light-coral hover:text-smoky-black',
         focusRing: 'focus:ring-offset-4 focus:ring-amaranth-pink focus:ring focus:text-smoky-black',
         selected: 'bg-chinese-rose text-white focus:text-white',
+    },
+    green: {
+        default: 'bg-dark-moss-green text-white',
+        hover: 'hover:bg-moss-green hover:text-smoky-black',
+        focusRing: 'focus:ring-offset-4 focus:ring-dark-moss-green focus:ring focus:text-smoky-black',
+        selected: 'bg-drab-dark-brown text-white focus:text-white',
     }
 
 };
 
+export function getUnitColorSetName(name: string | undefined) {
+    let useColorSet: string = '';
+
+    if (name === 'Tag') {
+        useColorSet = 'purple'
+    }
+    else if (name === 'Assignee') {
+        useColorSet = 'green'
+    }
+    else if (name === 'Roadmap') {
+        useColorSet = 'orange'
+    }
+    else if (name === 'Task Status') {
+        useColorSet = 'pink'
+    }
+    else if (name === 'Task') {
+        useColorSet = 'yellow'
+    }
+    else if (name === 'Milestone') {
+        useColorSet = 'red'
+    }
+    else {
+        console.error("Unit does not have a color set defined; defaulting to green");
+        useColorSet = 'green'
+    }
+
+    return useColorSet;
+}
 
 export function toCamelCase(input: string): string {
     const words = input.split(' ');

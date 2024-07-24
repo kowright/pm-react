@@ -28,7 +28,9 @@ module.exports = {
               'pear': '#C9CC17',
               'sky-magenta': '#CE84AD',
               'amaranth-pink': '#E59EBD',
-              'chinese-rose': '#AB5479'
+              'chinese-rose': '#AB5479',
+              'moss-green': '#93A262',
+              'drab-dark-brown': '#31381C'
           }
       },
   },

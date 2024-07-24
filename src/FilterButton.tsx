@@ -1,5 +1,5 @@
 import React from "react";
-import { Milestone, Roadmap, Task, TaskStatus, formatDateNumericalMMDDYYYY, colorSets } from './Interfaces';
+import { Milestone, Roadmap, Task, TaskStatus, formatDateNumericalMMDDYYYY, colorSets, getUnitColorSetName } from './Interfaces';
 
 export interface FilterButtonProps {
     text: string;
@@ -29,24 +29,28 @@ export const FilterButton = ({
 }: FilterButtonProps) => {
 
 
+    /*   if (props.colorByType) {
+           if (props.colorByType === 'Tag') {
+               useColorSet = 'purple'
+           }
+           else if (props.colorByType === 'Assignee') {
+               useColorSet = 'yellow'
+           }
+           else if (props.colorByType === 'Roadmap') {
+               useColorSet = 'orange'
+           }
+           else if (props.colorByType === 'Task Status') {
+               useColorSet = 'pink'
+           }
+       }*/
+    let color = colorSets[useColorSet];
+
     if (props.colorByType) {
-        if (props.colorByType === 'Tag') {
-            useColorSet = 'purple'
-        }
-        else if (props.colorByType === 'Assignee') {
-            useColorSet = 'yellow'
-        }
-        else if (props.colorByType === 'Roadmap') {
-            useColorSet = 'orange'
-        }
-        else if (props.colorByType === 'Task Status') {
-            useColorSet = 'pink'
-        }
+        color = colorSets[getUnitColorSetName(props.colorByType)];
     }
 
     const hoverOn = props.onClick ? true : false;
 
-    const color = colorSets[useColorSet];
     const offsetColor = 'focus:ring-offset-' + backgroundColor;
     return (
         <button className={`h-[25px] w-fit rounded-lg flex justify-center items-center shrink-0 p-2 ${offsetColor}
