@@ -123,13 +123,17 @@ function App() {
     const [roadmapFilterState, setRoadmapFilterState] = React.useState<string[]>([]);
     const [taskStatusFilterState, setTaskStatusFilterState] = React.useState<string[]>([]);
     const [tagFilterState, setTagFilterState] = React.useState<string[]>([]);
-    const [filterStates, setFilterStates] = React.useState<FilterStates>({ roadmapFilterState: roadmapFilterState, taskStatusFilterState: taskStatusFilterState, tagFilterState: tagFilterState })
+    const [assigneeFilterState, setAssigneeFilterState] = React.useState<string[]>([]);
+    const [showFilterAreaAssignees, setFilterAreaAssignees] = React.useState<boolean>(true);
+
+    const [filterStates, setFilterStates] = React.useState<FilterStates>({ roadmapFilterState: roadmapFilterState, taskStatusFilterState: taskStatusFilterState, tagFilterState: tagFilterState, assigneeFilterState: assigneeFilterState })
 
     React.useEffect(() => { //reset filter area on view switch
 
         setRoadmapFilterState([]);
         setTaskStatusFilterState([]);
-            setTagFilterState([]);
+        setTagFilterState([]);
+        setAssigneeFilterState([]);
     
     }, [view])
 
@@ -138,8 +142,14 @@ function App() {
             roadmapFilterState: roadmapFilterState,
             taskStatusFilterState: taskStatusFilterState,
             tagFilterState: tagFilterState,
+            assigneeFilterState: assigneeFilterState
+       
         });
-    }, [roadmapFilterState, taskStatusFilterState, tagFilterState]);
+    }, [roadmapFilterState, taskStatusFilterState, tagFilterState, assigneeFilterState]);
+
+    function setFilterAreaSettings(showAssignees: boolean) {
+        setFilterAreaAssignees(showAssignees);
+    }
 
     const handleFilterByRoadmap = (roadmap: Roadmap) => { //keep
 
@@ -189,6 +199,21 @@ function App() {
         }
     };
 
+    const handleFilterByAssignee = (assignee: Assignee) => { //keep
+        // setSelectedTaskStatus(status);
+        console.log("clicked " + assignee.name)
+        if (assigneeFilterState.includes(assignee.name)) {
+            console.log("take out " + assignee.name)
+
+            setAssigneeFilterState(prev => prev.filter(stat => stat !== assignee.name));
+        }
+        else {
+            console.log("add " + assignee.name)
+
+            setAssigneeFilterState(prev => [...prev, assignee.name]);
+        }
+    };
+
     const handleClick = (viewName: string) => {
         setView(viewName);
         handleUnitClick(null);
@@ -198,6 +223,10 @@ function App() {
     const handleUnitClick = (item: UnitDataTypeWithNull) => {
         setSelectedItem(item);
     };
+
+    const handleFilterAreaAssignees = (showAssignees: boolean) => {
+        setFilterAreaAssignees(showAssignees)
+    }
     // #endregion
 
     const [viewData, setViewData] = React.useState<ViewData>({
@@ -206,6 +235,7 @@ function App() {
         selectedItem: selectedItem,
         unitTypeData: unitTypes,
         filterStates: filterStates,
+        setShowFilterAreaAssignees: handleFilterAreaAssignees
     });
 
     React.useEffect(() => {
@@ -215,8 +245,9 @@ function App() {
             selectedItem: selectedItem,
             unitTypeData: unitTypes,
             filterStates: filterStates,
+            setShowFilterAreaAssignees: handleFilterAreaAssignees
         });
-    }, [filterStates, selectedItem, tasks, unitTypes, tags, roadmaps]);
+    }, [filterStates, selectedItem, tasks, unitTypes, tags, roadmaps, showFilterAreaAssignees]);
 
     const handleAddButtonClick = () => {
         setShowPopup(true);
@@ -1217,9 +1248,12 @@ function App() {
                 <div className='h-full flex flex-col'>
                     <div className='h-auto flex'>
                         <div className='flex-1 h-full flex-wrap'>
-                            { view !== "Organization" && <FilterArea selectedRoadmap={selectedRoadmap} selectedTaskStatus={selectedTaskStatus}
-                                handleFilterByTaskStatus={handleFilterByTaskStatus} handleFilterByRoadmap={handleFilterByRoadmap} handleFilterByTag={handleFilterByTag}
-                                roadmapFilterState={roadmapFilterState} taskStatusFilterState={taskStatusFilterState} tagFilterState={tagFilterState} roadmapData={roadmaps} taskStatusData={taskStatuses} tagData={tags} unitTypeData={unitTypes} />
+                            {view !== "Organization" && <FilterArea selectedRoadmap={selectedRoadmap} selectedTaskStatus={selectedTaskStatus}
+                                handleFilterByTaskStatus={handleFilterByTaskStatus} handleFilterByRoadmap={handleFilterByRoadmap} handleFilterByTag={handleFilterByTag} handleFilterByAssignee={handleFilterByAssignee}
+                                roadmapFilterState={roadmapFilterState} taskStatusFilterState={taskStatusFilterState} tagFilterState={tagFilterState} assigneeFilterState={assigneeFilterState}
+                                roadmapData={roadmaps} taskStatusData={taskStatuses} tagData={tags} unitTypeData={unitTypes} assigneeData={assignees}
+                                showAssignees={showFilterAreaAssignees}
+                            />
                               } 
                         </div>
 

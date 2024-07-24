@@ -18,7 +18,7 @@ interface TimelineProps {
 }
 
 export const Timeline = ({
-    viewData: { filterStates, selectedItem, taskData, unitClick, unitTypeData},
+    viewData: { filterStates, selectedItem, taskData, unitClick, unitTypeData, setShowFilterAreaAssignees },
     ...props
 }: TimelineProps) => {
     const day = 15; // Size of cell in pixels
@@ -47,6 +47,8 @@ export const Timeline = ({
     const handleFilterByRoadmap = (roadmap: Roadmap) => {
         setSelectedRoadmap(roadmap);
     };
+
+
 
     const handleFilterByTaskStatus = (status: TaskStatus) => {
         setSelectedTaskStatus(status);

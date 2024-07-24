@@ -240,6 +240,7 @@ export type FilterStates = {
     roadmapFilterState: string[];
     taskStatusFilterState: string[];
     tagFilterState: string[];
+    assigneeFilterState: string[];
 };
 
 export type ViewData = {
@@ -248,6 +249,7 @@ export type ViewData = {
     selectedItem: UnitDataTypeWithNull;
     unitTypeData: UnitType[];
     filterStates: FilterStates;
+    setShowFilterAreaAssignees: (showAssignees: boolean) => void;
 }
 
 export const taskFilterOnTaskStatus = (taskData: Task[], taskStatusFilterState: string[]): Task[] => {
@@ -272,6 +274,14 @@ export const taskFilterOnTag = (taskData: Task[], tagFilterState: string[]): Tas
         return tagFilterState.every(name => taskTagNames.includes(name)); //AND
         // return props.roadmapFilterState.some(name => taskRoadmapNames.includes(name)); //OR
     });
+    return filteredTasks;
+}
+
+export const taskFilterOnAssignee = (taskData: Task[], assigneeFilterState: string[]): Task[] => {
+    console.log("assignee fil ", assigneeFilterState)
+    const filteredTasks = assigneeFilterState && assigneeFilterState.length > 0
+        ? taskData.filter(task => assigneeFilterState.includes(task.assignee.name))
+        : taskData;
     return filteredTasks;
 }
 
@@ -319,6 +329,7 @@ export const milestoneFilterOnTag = (milestoneData: Milestone[], tagFilterState:
     });
     return filteredMilestones;
 }
+
 
 export const milestoneSortByEarliestDate = (milestoneData: Milestone[]): Milestone[] => {
     const filteredMilestones = milestoneData.sort((a, b) => {

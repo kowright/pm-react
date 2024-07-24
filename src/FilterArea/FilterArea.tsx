@@ -1,5 +1,5 @@
 import React from 'react';
-import { Milestone, Roadmap, TaskStatus, Unit, colorSets, Tag, findUnitTypefromId, UnitType, getUnitColorSetName } from '../Interfaces';
+import { Milestone, Roadmap, TaskStatus, Unit, colorSets, Tag, findUnitTypefromId, UnitType, getUnitColorSetName, Assignee } from '../Interfaces';
 import { FilterButton } from '../FilterButton';
 interface FilterAreaProps {
     selectedRoadmap: Roadmap | null;
@@ -7,20 +7,25 @@ interface FilterAreaProps {
     roadmapData: Roadmap[];
     taskStatusData: TaskStatus[];
     tagData: Tag[];
-    unitTypeData: UnitType[];
+    assigneeData: Assignee[];
+    unitTypeData: UnitType[]; 
     handleFilterByRoadmap: (roadmap: Roadmap) => void; //use combined object
     handleFilterByTaskStatus: (taskStatus: TaskStatus) => void;
     handleFilterByTag: (tag: Tag) => void;
+    handleFilterByAssignee: (assignee: Assignee) => void;
     roadmapFilterState: string[];
     taskStatusFilterState: string[];
     tagFilterState: string[];
-
+    assigneeFilterState: string[];
+    showAssignees: boolean;
 }
 
 export const FilterArea = ({
+    showAssignees = true,
     ...props
 }: FilterAreaProps) => {
-
+    console.log("road filter", props.roadmapFilterState)
+    console.log("assigneefilter", props.assigneeFilterState)
 /*    const [roadmapData, setRoadmapData] = React.useState< Roadmap[]  | null>(null);
     const [taskStatusData, setTaskStatusData] = React.useState< TaskStatus[]  | null>(null);
 */
@@ -108,6 +113,14 @@ export const FilterArea = ({
             filterFunction = () => props.handleFilterByTag(item as Tag);
             filterShowX = props.tagFilterState.includes(item.name) && <div className='ml-2 flex items-center'>X</div>
         }
+        else if (findUnitTypefromId(item.type, props.unitTypeData) === 'Assignee') {
+            color = colorSets[getUnitColorSetName('Assignee')];
+
+            filterColor = props.assigneeFilterState.includes(item.name) ? `${color.selected} opacity-100` : `${color.default} opacity-50`
+            filterFunction = () => props.handleFilterByAssignee(item as Assignee);
+            filterShowX = props.assigneeFilterState.includes(item.name) && <div className='ml-2 flex items-center'>X</div>
+        }
+
 
         return (
             <button key={item.id}
@@ -131,6 +144,9 @@ export const FilterArea = ({
     let pmTagButtons = props.tagData?.map(tag =>
         PMButton(tag)
     );
+    let pmAssigneeButtons = props.assigneeData?.map(as =>
+        PMButton(as)
+    );
 
 
 
@@ -142,6 +158,7 @@ export const FilterArea = ({
             {pmRoadmapButtons}
             {pmTaskStatusButtons}
             {pmTagButtons}
+            {showAssignees && pmAssigneeButtons }
 
 {/*            {taskStatusButtons}
             <FilterButton text='All Task Statuses' onClick={() => props.selectedTaskStatus && props.handleFilterByTaskStatus(null)} ></FilterButton>*/}

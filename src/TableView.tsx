@@ -16,7 +16,7 @@ interface TableViewProps {
 }
 
 export const TableView = ({
-    viewData: { filterStates, selectedItem, taskData, unitClick, unitTypeData },
+    viewData: { filterStates, selectedItem, taskData, unitClick, unitTypeData, setShowFilterAreaAssignees },
     ...props
 }: TableViewProps) => {
 
@@ -30,6 +30,15 @@ export const TableView = ({
     });
 
     let content: any = <div>hi</div>;
+
+    React.useEffect(() => {
+        if (tableDataType === "Task") {
+            setShowFilterAreaAssignees(true);
+        }
+        else {//milestones
+            setShowFilterAreaAssignees(false);
+        }
+    }, [tableDataType, setShowFilterAreaAssignees]);
 
     const handleClick = (item: Task | Milestone | Tag | Assignee ) => {
         unitClick(item); // Invoke the function with some example task data

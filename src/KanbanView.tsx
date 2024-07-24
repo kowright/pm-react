@@ -13,7 +13,7 @@ interface KanbanViewProps {
 }
 
 export const KanbanView = ({
-    viewData: { filterStates, selectedItem, taskData, unitClick, unitTypeData },
+    viewData: { filterStates, selectedItem, taskData, unitClick, unitTypeData, setShowFilterAreaAssignees },
         ...props
     }: KanbanViewProps) => {
 
@@ -25,6 +25,14 @@ export const KanbanView = ({
         milestoneSortState: milestoneSortState
     });
 
+    React.useEffect(() => {
+        if (kanbanDataType === "Task") {
+            setShowFilterAreaAssignees(true);
+        }
+        else {//milestones
+            setShowFilterAreaAssignees(false);
+        }
+    }, [kanbanDataType, setShowFilterAreaAssignees]);
 
      const handleClick = (task: Task | Milestone | Tag | Assignee) => {
          unitClick(task); 
@@ -67,7 +75,7 @@ export const KanbanView = ({
         //filtering
         filteredTasks = taskFilterOnTaskStatus(taskData, filterStates.taskStatusFilterState);
         filteredTasks = taskFilterOnRoadmap(filteredTasks, filterStates.roadmapFilterState);
-        filteredTasks = taskFilterOnTag(filteredTasks, filterStates.tagFilterState);
+
 
         //sorting
         if (sortState.taskSortState.includes('EarliestStartDate')) {

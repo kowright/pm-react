@@ -2,7 +2,7 @@ import React from "react";
 import {
     Task, TaskStatus, Roadmap, Milestone, Assignee, Tag, findIdForUnitType, UnitType, colorSets, FilterStates,
     UnitDataType, UnitDataTypeWithNull, ViewData, taskFilterOnTaskStatus, taskFilterOnRoadmap, taskSortByEarliestDate,
-    milestoneFilterOnTaskStatus, milestoneFilterOnRoadmap, milestoneSortByEarliestDate, Unit, unitSortByNameAlphabetical, findUnitTypefromId, taskFilterOnTag, milestoneFilterOnTag
+    milestoneFilterOnTaskStatus, milestoneFilterOnRoadmap, milestoneSortByEarliestDate, Unit, unitSortByNameAlphabetical, findUnitTypefromId, taskFilterOnTag, milestoneFilterOnTag, taskFilterOnAssignee,
 } from './Interfaces';
 import { FilterButton } from './FilterButton';
 import { SortArea } from './SortArea/SortArea';
@@ -17,7 +17,7 @@ interface ListViewProps {
 }
 
 export const ListView = ({
-    viewData: { filterStates, selectedItem, taskData, unitClick, unitTypeData },
+    viewData: { filterStates, selectedItem, taskData, unitClick, unitTypeData, setShowFilterAreaAssignees },
     listType = 'Task',
     ...props
 }: ListViewProps) => {
@@ -31,6 +31,16 @@ export const ListView = ({
         milestoneSortState: milestoneSortState
     });
 
+
+    React.useEffect(() => {
+        if (listDataType === "Task") {
+            setShowFilterAreaAssignees(true);
+        }
+        else {//milestones
+            setShowFilterAreaAssignees(false);
+        }
+    }, [listDataType, setShowFilterAreaAssignees]);
+
     const handleClick = (item: UnitDataType) => {
         unitClick(item);
     };
@@ -40,9 +50,11 @@ export const ListView = ({
 
     if (listDataType === 'Task') {
         //filtering
+        //TODO could just put this in interfaces
         filteredTasks = taskFilterOnTaskStatus(taskData, filterStates.taskStatusFilterState);
         filteredTasks = taskFilterOnRoadmap(filteredTasks, filterStates.roadmapFilterState);
         filteredTasks = taskFilterOnTag(filteredTasks, filterStates.tagFilterState);
+        filteredTasks = taskFilterOnAssignee(filteredTasks, filterStates.assigneeFilterState);
 
         //sorting
         if (sortState.taskSortState.includes('EarliestStartDate')) {
