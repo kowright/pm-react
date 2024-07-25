@@ -1,6 +1,5 @@
 import React from "react";
-import { Milestone, Roadmap, Task, TaskStatus, formatDateNumericalMMDDYYYY, colorSets, getUnitColorSetName } from './Interfaces';
-
+import { colorSets, getUnitColorSetName } from "../utils/colors";
 export interface FilterButtonProps {
     text: string;
     /**
@@ -28,21 +27,6 @@ export const FilterButton = ({
     ...props
 }: FilterButtonProps) => {
 
-
-    /*   if (props.colorByType) {
-           if (props.colorByType === 'Tag') {
-               useColorSet = 'purple'
-           }
-           else if (props.colorByType === 'Assignee') {
-               useColorSet = 'yellow'
-           }
-           else if (props.colorByType === 'Roadmap') {
-               useColorSet = 'orange'
-           }
-           else if (props.colorByType === 'Task Status') {
-               useColorSet = 'pink'
-           }
-       }*/
     let color = colorSets[useColorSet];
 
     if (props.colorByType) {
@@ -60,4 +44,5 @@ export const FilterButton = ({
         </button>
     );
 };
+
 export default FilterButton;

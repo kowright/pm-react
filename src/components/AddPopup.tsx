@@ -1,26 +1,23 @@
 import React from "react";
-import {
-    Milestone, Roadmap, Task, TaskStatus, formatDateNumericalMMDDYYYY, colorSets,
-    UnitType, toCamelCase, formatDateNumericalYYYYMMDDWithDashes, Assignee, Tag, UnitDataTypeWithNull
-} from './Interfaces';
+import { Assignee, Roadmap, Tag, TaskStatus, UnitType } from "../utils/models";
+import { toCamelCase } from '../utils/helpers';
 import { FilterButton } from './FilterButton';
 
 export interface AddPopupProps {
     setPopupVisibility: () => void;
-    //saveNewUnit: (Tag | Assignee | Roadmap | TaskStatus)=> void;
     popupUnitType: string;
     unitTypeData: UnitType[];
     roadmapData: Roadmap[];
     assigneeData: Assignee[];
     tagData: Tag[];
     createItem: (formData: any, type: string) => void;
-
 }
 
 export const AddPopup = ({
     popupUnitType = '',
     ...props
 }: AddPopupProps) => {
+
     const [unitTypeView, setUnitTypeView] = React.useState<string>(popupUnitType);
     const [formData, setFormData] = React.useState({
         name: '', 
@@ -59,147 +56,32 @@ export const AddPopup = ({
                 console.error('Error fetching data:', error);
             }
         };
-
         fetchData();
     }, []);
 
     React.useEffect(() => {
         if (new Date(formData.startDate) > new Date(formData.endDate)) {
-            console.log("BAD DATES")
             alert("Start Date: " + formData.startDate + " must be on or before End Date: " + formData.endDate);
             return;
         }
     }, [formData])
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault(); // Prevent default form submission
-
-        console.log("Form submitted", formData);
+        e.preventDefault();
 
         if (unitTypeView === 'Task') {
-           /* try {
-                const response = await fetch('/api/tasks', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(formData),
-                });
-
-                if (!response.ok) {
-                    // Check if response is not successful (HTTP status code outside of 200-299 range)
-                    throw new Error(`HTTP error! Status: ${response.status}`);
-                }
-
-                // Assuming the API returns JSON data
-                const data = await response.json();
-
-                // Handle the response data as needed
-                console.log('API response:', data);
-
-                props.setPopupVisibility();
-                window.location.reload();
-
-
-            } catch (error) {
-                // Handle fetch errors and API errors here
-                console.error('Error fetching data:', error);
-            }*/
-
             props.createItem(formData, unitTypeView)
         }
         else if (unitTypeView === 'Milestone') {
-         /*   try {
-                const response = await fetch('/api/milestones', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(milestoneformData),
-                });
-
-                if (!response.ok) {
-                    // Check if response is not successful (HTTP status code outside of 200-299 range)
-                    throw new Error(`HTTP error! Status: ${response.status}`);
-                }
-
-                // Assuming the API returns JSON data
-                const data = await response.json();
-
-                // Handle the response data as needed
-                console.log('API response:', data);
-
-                props.setPopupVisibility();
-                 window.location.reload();
-
-
-            } catch (error) {
-                // Handle fetch errors and API errors here
-                console.error('Error fetching data:', error);
-            }*/
             props.createItem(milestoneformData, unitTypeView);
         } else {
-         /*   let url = '/api/';
-            if (unitTypeView === 'Tag') {
-
-            }
-            else if (unitTypeView === 'Assignee'){
-                url += 'assignees'
-
-            }
-            else if (unitTypeView === 'Roadmap') {
-                url += 'roadmaps'
-
-            }
-            else if (unitTypeView === 'Task Status') {
-                url += 'taskstatus'
-
-            }
-            console.log("url", url)
-            console.log(genericformData)
-            try {
-                const response = await fetch(url, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(genericformData),
-                });
-
-                if (!response.ok) {
-                    // Check if response is not successful (HTTP status code outside of 200-299 range)
-                    console.log("res", response)
-                    throw new Error(`HTTP error! Status: ${response.status}`);
-                }
-
-                // Assuming the API returns JSON data
-                const data = await response.json();
-
-                // Handle the response data as needed
-                console.log('API response:', data);
-
-                props.setPopupVisibility();
-                 window.location.reload();
-
-
-            } catch (error) {
-                // Handle fetch errors and API errors here
-                console.error('Error fetching data:', error);
-            }*/
-            console.log("add popup generic create item")
             props.createItem(genericformData, unitTypeView);
-
-        }
-
-        console.log("add popup handle submit end")
-       
+        }       
     };
 
     const handleChange = async (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         const { name, value} = e.target;
-        console.log('handle change target', e.target)
-        console.log("handle change val", value)
-        console.log("on " + unitTypeView);
+
         if (unitTypeView === 'Task') {
            
             if (name === 'taskStatus' || name === 'assignee') {
@@ -215,7 +97,6 @@ export const AddPopup = ({
                     .filter(option => option.selected)
                     .map(option => parseInt(option.value, 10));
 
-
                 setFormData(prevState => ({
                     ...prevState,
                     [name]: selectedValues
@@ -227,9 +108,6 @@ export const AddPopup = ({
                     [name]: value
                 }));
             }
-
-        
-
         }
         else if (unitTypeView === 'Milestone') {
 
@@ -264,7 +142,6 @@ export const AddPopup = ({
                 [name]: value
             }));
         }
-
     };
 
     // #region Fields
@@ -363,10 +240,10 @@ export const AddPopup = ({
 
     // #endregion
 
-    const unitButtons = props.unitTypeData
-        .map(unit => (
+    const unitButtons = props.unitTypeData.map(unit => (
             <FilterButton key={unit.id} text={unit.name} onClick={() => handleUnitClick(unit.name)} active={unit.name === unitTypeView} />
-        ));
+    ));
+
     function handleUnitClick(unitName: string) {
         setUnitTypeView(unitName);
     }
@@ -429,7 +306,6 @@ export const AddPopup = ({
             </div>
     }
 
-
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center overflow-auto bg-gray-800 bg-opacity-50">
             <div className="bg-white p-6 rounded-lg shadow-lg h-40 mx-auto flex flex-col justify-between">
@@ -447,6 +323,5 @@ export const AddPopup = ({
         </div>
     );
 };
-
 
 export default AddPopup;

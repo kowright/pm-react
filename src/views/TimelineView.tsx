@@ -1,15 +1,10 @@
 import React from "react";
-import { Timeline } from './Timeline/Timeline';
-import { Task, Milestone, Roadmap, TaskStatus, Tag, Assignee, findIdForUnitType, UnitType, ViewData } from './Interfaces';
+import { Assignee, Milestone, Tag, Task, ViewData } from "../utils/models";
+import { Timeline } from "../components/Timeline";
 
 export interface TimelineViewProps {
-    //taskClick: (task: Task | Milestone) => void;
-    //taskData: Task[];
     milestoneData: Milestone[];
     updateItem: (task: Task | Milestone | Tag | Assignee) => void;
-    //unitTypeData: UnitType[];
-    //roadmapFilterState: string[];
-    //taskStatusFilterState: string[];
     viewData: ViewData;
 }
 

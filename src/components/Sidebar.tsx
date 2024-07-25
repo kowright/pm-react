@@ -1,9 +1,7 @@
 import React from 'react';
-import {
-    Milestone, Task, Tag, Assignee, TaskStatus, Roadmap, UnitType, Unit,
-    findIdForUnitType, formatDateNumericalMMDDYYYY, formatDateNumericalYYYYMMDDWithDashes,
-    UnitDataTypeWithNull, toCamelCase, colorSets
-} from '../Interfaces';
+import { Assignee, Milestone, Roadmap, Tag, Task, TaskStatus, Unit, UnitDataTypeWithNull, UnitType } from "../utils/models";
+import { findIdForUnitType, formatDateNumericalYYYYMMDDWithDashes, toCamelCase } from "../utils/helpers";
+import { colorSets } from '../utils/colors';
 
 interface SidebarProps {
     sidebarData: UnitDataTypeWithNull; 
@@ -11,6 +9,7 @@ interface SidebarProps {
     roadmapData: Roadmap[];
     unitTypeData: UnitType[];
     tagData: Tag[];
+    taskStatusData: TaskStatus[];
     updateItem: (updatedItem: UnitDataTypeWithNull) => void;
     deleteItem: (deletedItem: UnitDataTypeWithNull) => void;
     setSelectedItem: (unit: UnitDataTypeWithNull) => void;
@@ -28,34 +27,16 @@ export const Sidebar = ({
 
     const [data, setData] = React.useState<UnitDataTypeWithNull>(sidebarData)
 
-    const [taskStatuses, setTaskStatuses] = React.useState<TaskStatus[]>([]);
-
     const buttonColorSet = colorSets['blue']
-
-    React.useEffect(() => { //TODO can get from APP
-        const fetchData = async () => {
-            try {
-                const taskStatusData = await fetch("/api/taskstatus").then(res => res.json());
-                setTaskStatuses(taskStatusData);
-            } catch (error) {
-                console.error('Error fetching data:', error);
-            }
-        };
-
-        fetchData();
-    }, []);
-
 
     React.useEffect(() => {
         setData(sidebarData);
     }, [sidebarData]);
 
-
     const handleInputBlur = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
 
         const editedValue = event.target.value;
         const propertyName = event.target.id; 
-        console.log("property name handle input blur " +  propertyName + ' = ' + editedValue );
         if (!data) {
             return; 
         }
@@ -65,11 +46,9 @@ export const Sidebar = ({
         switch (data?.type) {
             case findIdForUnitType('Task', props.unitTypeData):
 
-                console.log("handle input blur task ", sidebarData)
-
                 let taskStatusToAssign;
                 if (propertyName === 'taskStatus') {
-                    taskStatusToAssign = taskStatuses?.find(status => editedValue === status.name);
+                    taskStatusToAssign = props.taskStatusData?.find(status => editedValue === status.name);
                 } else {
                     taskStatusToAssign = (sidebarData as Task).taskStatus
                 }
@@ -106,13 +85,12 @@ export const Sidebar = ({
                     tags: selectedTags
                 };
                
-                console.log("updated item in sidebar",updatedItem)
                 break;
             case findIdForUnitType('Milestone', props.unitTypeData):
 
                 let taskStatusToAssignM;
                 if (propertyName === 'taskStatus') {
-                    taskStatusToAssignM = taskStatuses?.find(status => editedValue === status.name);
+                    taskStatusToAssignM = props.taskStatusData?.find(status => editedValue === status.name);
                 } else {
                     taskStatusToAssignM = (sidebarData as Task).taskStatus
                 }
@@ -148,12 +126,8 @@ export const Sidebar = ({
                     assignee: selectedAssigneeM,
                     tags: selectedTagsM
                 };
-
                 
-                console.log("updated item in sidebar", updatedItem)
                 break;
-
-       
 
             case findIdForUnitType('Assignee', props.unitTypeData):
                 updatedItem = {
@@ -161,19 +135,19 @@ export const Sidebar = ({
                     [propertyName]: editedValue
                 };
                 break;
+
             case findIdForUnitType('Tag', props.unitTypeData):
                 updatedItem = {
                     ...(sidebarData as Tag),
                     [propertyName]: editedValue
                 };
                 break;
+
             case findIdForUnitType('TaskStatus', props.unitTypeData):
                 updatedItem = {
                     ...(sidebarData as TaskStatus),
                     [propertyName]: editedValue
-                };
-                console.log("taskStatus update", updatedItem)
-      
+                };      
                 break;
 
             case findIdForUnitType('Roadmap', props.unitTypeData):
@@ -181,20 +155,14 @@ export const Sidebar = ({
                     ...(sidebarData as Roadmap),
                     [propertyName]: editedValue
                 };
-                console.log("roadmap update", updatedItem)
 
                 break;
             default:
                 throw new Error(`Unhandled sidebarData type: ${(sidebarData as any).type}`);
         }
 
-        //setData(updatedItem);
-
-        // Assuming updateItem handles updating the state based on the item type
         props.updateItem(updatedItem);
-
     };
-
 
     if (sidebarData === null) {
         return <div>Select an item to see details</div>
@@ -206,8 +174,6 @@ export const Sidebar = ({
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         const { id, value } = event.target;
 
-        console.log("sidebar input change on " + id + " = " + value)
-        // Special handling for assignee dropdown
         if (id === 'assignee') {
             const assigneeName = value;
             const selectedAssignee = props.assigneeData?.find(assignee => assignee.name === assigneeName);
@@ -217,19 +183,17 @@ export const Sidebar = ({
                     ...(prevData as Task | Milestone | Tag | Assignee),
                     assignee: selectedAssignee
                 }));
-                console.log("handle input change assignee", data)
             }
         }
         else if (id === 'taskStatus') {
             const statusName = value;
-            const selectedStatus= taskStatuses?.find(s => s.name === statusName);
+            const selectedStatus = props.taskStatusData?.find(s => s.name === statusName);
 
             if (selectedStatus) {
                 setData(prevData => ({
                     ...(prevData as Task | Milestone | Tag | Assignee),
                     taskStatus: selectedStatus
                 }));
-                console.log("handle input change task status", data)
             }
         }
         else if (id === 'roadmap') {
@@ -243,7 +207,6 @@ export const Sidebar = ({
                     ...(prevData as Task | Milestone | Tag | Assignee),
                     roadmaps: selectedRoadmapObjects
                 }));
-                console.log("handle input change roadmap", data);
             }
         
         }
@@ -258,7 +221,6 @@ export const Sidebar = ({
                     ...(prevData as Task | Milestone | Tag | Assignee),
                     tags: selectedTagObjects
                 }));
-                console.log("handle input change tag", data);
             }
         }
 
@@ -388,125 +350,19 @@ export const Sidebar = ({
         case findIdForUnitType('Task', props.unitTypeData):
             const taskData = data as Task;
        
-           
             sidebarContent = (
                 <div className='flex flex-col gap-2'>
-                  
 
-                   {/* <div>Name</div>
-                    <input
-                        id="name"
-                        type='text'
-                        value={data?.name || ''}
-                        onChange={handleInputChange}
-                        onBlur={handleInputBlur}
-                        className='border border-black rounded-lg text-md pl-1 focus:ring-yinmn-blue focus:ring w-full' 
-                    />*/}
                     {nameField(data?.name)}
-
-              {/*      <div>Description</div>
-                    <textarea
-                        id="description"
-                        value={data?.description || ''}
-                        onChange={handleInputChange}
-                        onBlur={handleInputBlur}
-                        className='border border-black rounded-lg w-full'
-
-                    />*/}
                     {descriptionField(data?.description)}
-                    
-
-                {/*    <div>Roadmap</div>
-                    <select
-                        multiple
-                        id="roadmap"
-                        value={taskData?.roadmaps?.map(roadmap => roadmap.name)}
-                        onChange={handleInputChange}
-                        onBlur={handleInputBlur}
-                        className='border border-black rounded-lg w-full'
-                    >
-                        {roadmaps?.map((option, index) => (
-                            <option key={index} value={option.name}>
-                                {option.name}
-                            </option>
-                        ))}
-                    </select>*/}
-
                     {multipleSelectOptionsField('roadmap', taskData?.roadmaps?.map(roadmap => roadmap.name), props.roadmapData) }
-                    
                     {multipleSelectOptionsField('tag', taskData?.tags?.map(tag => tag.name), props.tagData)}
-
-                {/*    <div>Assignee</div>
-                    <select
-                        id="assignee"
-                        value={taskData?.assignee?.name || ''}
-                        onChange={handleInputChange}
-                        onBlur={handleInputBlur}
-                        className='border border-black rounded-lg w-full'
-                    >
-                        {assignees?.map((option, index) => (
-                            <option key={index} value={option.name}>
-                                {option.name} 
-                            </option>
-                        ))}
-                    </select>*/}
-
                     {selectOptionsField('Assignee', taskData.assignee.name, props.assigneeData as Unit[])}
-
-                   {/*
-                                           <div>Start Date: </div>
-
-                       <input
-                        id="startDate"
-                        type="date"
-                        value={formatDateNumericalYYYYMMDDWithDashes(new Date(taskData?.startDate))}
-                        onChange={handleInputChange}
-                        onBlur={handleInputBlur}
-                        className='border border-black rounded-lg'
-
-                    />*/}
-                    
                     {dateField(new Date(taskData?.startDate), "Start Date")}
-
-                 {/*   <div>End Date: </div>
-                    <input
-                        id="endDate"
-                        type="date"
-                        value={formatDateNumericalYYYYMMDDWithDashes(new Date(taskData?.endDate))}
-                        onChange={handleInputChange}
-                        onBlur={handleInputBlur}
-                        className='border border-black rounded-lg'
-                    />*/}
                     {dateField(new Date(taskData?.endDate), "End Date")}
-                    
-
-                  {/*  <div>Task Status</div>
-                   <select
-                        id="taskStatus"
-                        value={taskData?.taskStatus?.name}
-                        onChange={handleInputChange}
-                        onBlur={handleInputBlur}
-                        className='border border-black rounded-lg w-full'
-
-                    >
-                        {taskStatuses?.map((option, index) => (
-                            <option key={index} value={option.name}>
-                                {option.name}
-                            </option>
-                        ))}
-                    </select>*/}
-                    {selectOptionsField('Task Status', taskData.taskStatus.name, taskStatuses as Unit[])}
-
-                    {/*<div className='text-xs pb-1'>Duration</div>
-                    <p> {taskData?.duration === 1 ? taskData?.duration + " day" : taskData?.duration + " days"} </p>*/}
+                    {selectOptionsField('Task Status', taskData.taskStatus.name, props.taskStatusData as Unit[])}
                     {stringFieldDisplay('Duration', taskData?.duration === 1 ? taskData?.duration + " day" : taskData?.duration + " days") }
-
-                    {/*<div className='text-xs pb-1'>Duration</div>
-                    <p>{data?.id} </p>
-                    */}
                     {stringFieldDisplay('ID', taskData?.id.toString() )}
-
-
                 </div>
             );
             break;
@@ -514,70 +370,21 @@ export const Sidebar = ({
         case findIdForUnitType('Milestone', props.unitTypeData):
 
             const milestoneData = data as Milestone;
-            console.log("ms data", milestoneData)
             sidebarContent = (
                 <div className='flex flex-col gap-2'>
                     {nameField(data?.name)} 
-               {/*     <label htmlFor="name">Name:</label>
-                    <input
-                        id="name"
-                        type='text'
-                        value={data?.name || ''}
-                        onChange={handleInputChange}
-
-                        onBlur={handleInputBlur}
-                    />*/}
-                    
                     {descriptionField(data?.description)}
-                  {/*  <label htmlFor="description">Description:</label>
-                    <textarea
-                        id="description"
-                        value={data?.description || ''}
-                        onChange={handleInputChange}
-
-                        onBlur={handleInputBlur}
-                    />
-                    */}
                     {dateField(new Date(milestoneData.date), "Date")}
                     {multipleSelectOptionsField('roadmap', milestoneData?.roadmaps?.map(roadmap => roadmap.name), props.roadmapData)}
-
                     {multipleSelectOptionsField('tag', milestoneData?.tags?.map(tag => tag.name), props.tagData)}
-                 {/*   <label htmlFor="date">Date: </label>
-                    <input
-                        id="date"
-                        type="date"
-                        value={formatDateNumericalYYYYMMDDWithDashes(new Date(milestoneData?.date))}
-                        onChange={handleInputChange}
-                        onBlur={handleInputBlur}
-                    />
-                    */}
-                    {selectOptionsField("Task Status", milestoneData.taskStatus.name, taskStatuses as Unit[])}
-
-                   {/* <div>Task Status:</div>
-                    <select
-                        id="taskStatus"
-                        value={milestoneData?.taskStatus.name}
-                        onChange={handleInputChange}
-                        onBlur={handleInputBlur}
-                        className='border border-black rounded-lg w-full'
-
-                    >
-                        {taskStatuses?.map((option, index) => (
-                            <option key={index} value={option.name}>
-                                {option.name}
-                            </option>
-                        ))}
-                    </select>*/}
+                    {selectOptionsField("Task Status", milestoneData.taskStatus.name, props.taskStatusData as Unit[])}
                     {stringFieldDisplay('ID', data.id.toString()) }
-              {/*          <hr/>
-                          <p>ID: {data?.id} </p>*/}
-                        
                 </div>
             );
 
             break;
         case findIdForUnitType('Tag', props.unitTypeData):
-            //const tagData = sidebarData as Tag; 
+
             sidebarContent = (
                 <div className='flex flex-col gap-2'>
                     {nameField(data.name)}
@@ -588,7 +395,7 @@ export const Sidebar = ({
 
             break;
         case findIdForUnitType('Assignee', props.unitTypeData):
-            //const assigneeData = sidebarData as Assignee;
+
             sidebarContent = (
                 <div className='flex flex-col gap-2'>
                     {nameField(data.name)}
@@ -610,8 +417,7 @@ export const Sidebar = ({
             break;
 
         case findIdForUnitType('Task Status', props.unitTypeData):
-            //const assigneeData = sidebarData as Assignee;
-            console.log("sidebar data task status", data)
+
             sidebarContent = (
                 <div className='flex flex-col gap-2'>
                     {nameField(data.name)}
@@ -621,8 +427,7 @@ export const Sidebar = ({
             );
             break;
         default:
-            console.log("couldn't find a type to show details in sidebar!")
-
+            console.error("couldn't find a type to show details in sidebar!")
     }
 
     // #endregion
@@ -641,12 +446,3 @@ export const Sidebar = ({
         </div>
     );
 };
-
-
-
-//add more types to be shown in sidebar - probably should make a single type for it, put in interfaces and use everywhere
-//make it so people can change anything in sidebar and type in it
-//make it so it can be closed
-//get rid of cell numbers
-//make it so you can change the date range on page
-//show which units cannot be changed - duration and id 

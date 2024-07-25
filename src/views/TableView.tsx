@@ -1,14 +1,11 @@
 import React from "react";
-import {
-    Task, TaskStatus, Roadmap, Milestone, Assignee, Tag, formatDateNumericalMMDDYYYY, findIdForUnitType, UnitType,
-    colorSets, ViewData, taskFilterOnTaskStatus, taskFilterOnRoadmap, taskSortByEarliestDate,
-    milestoneFilterOnTaskStatus, milestoneFilterOnRoadmap, milestoneSortByEarliestDate, unitSortByNameAlphabetical, taskFilterOnTag, milestoneFilterOnTag
-} from './Interfaces';
-import { FilterButton } from './FilterButton';
-import { SortArea } from './SortArea/SortArea';
-
+import { Assignee, Milestone, Tag, Task, ViewData } from "../utils/models";
+import { filterMilestones, filterTasks, sortMilestones, sortTasks, } from "../utils/filterSorts";
+import { findIdForUnitType, formatDateNumericalMMDDYYYY } from "../utils/helpers";
+import FilterButton from "../components/FilterButton";
+import { SortArea } from "../components/SortArea";
+import { colorSets } from "../utils/colors";
 interface TableViewProps {
- 
     milestoneData: Milestone[];
     tagData: Tag[];
     assigneeData: Assignee[];
@@ -21,10 +18,9 @@ export const TableView = ({
 }: TableViewProps) => {
 
     const [tableDataType, setTableDataType] = React.useState("Task");
-
     const [taskSortState, setTaskSortState] = React.useState<string[]>([]);
     const [milestoneSortState, setMilestoneSortState] = React.useState<string[]>([]);
-    const [sortState, setSortStates] = React.useState({
+    const [sortStates, setSortStates] = React.useState({
         taskSortState: taskSortState,
         milestoneSortState: milestoneSortState
     });
@@ -41,7 +37,7 @@ export const TableView = ({
     }, [tableDataType, setShowFilterAreaAssignees]);
 
     const handleClick = (item: Task | Milestone | Tag | Assignee ) => {
-        unitClick(item); // Invoke the function with some example task data
+        unitClick(item);
     };
 
     let tableFormat: any;
@@ -80,23 +76,10 @@ export const TableView = ({
 
     switch (tableDataType) {
         case "Task":
+   
+            let filteredTasks = filterTasks(taskData, filterStates);
 
-            //filtering
-            let filteredTasks = taskFilterOnTaskStatus(taskData, filterStates.taskStatusFilterState);
-            filteredTasks = taskFilterOnRoadmap(filteredTasks, filterStates.roadmapFilterState);
-            filteredTasks = taskFilterOnTag(filteredTasks, filterStates.tagFilterState);
-
-
-            //sorting
-            if (sortState.taskSortState.includes('EarliestStartDate')) {
-                filteredTasks = taskSortByEarliestDate(filteredTasks, true);
-            }
-            if (sortState.taskSortState.includes("EarliestEndDate")) {
-                filteredTasks = taskSortByEarliestDate(filteredTasks, false);
-            }
-            if (sortState.taskSortState.includes("Alphabetical")) {
-                unitSortByNameAlphabetical(filteredTasks)
-            }
+            filteredTasks = sortTasks(filteredTasks, sortStates);
 
             headers = taskData.length > 0 ? Object.keys(taskData[0]) : [];
 
@@ -142,16 +125,9 @@ export const TableView = ({
                     <th key={index} className="border border-gray-300 px-4 py-2">{formatHeaderLabel(header)}</th>
                 ));
 
-            let filteredMilestones = milestoneFilterOnTaskStatus(props.milestoneData, filterStates.taskStatusFilterState);
-            filteredMilestones = milestoneFilterOnRoadmap(filteredMilestones, filterStates.roadmapFilterState);
-            filteredMilestones = milestoneFilterOnTag(filteredMilestones, filterStates.tagFilterState);
+            let filteredMilestones = filterMilestones(props.milestoneData, filterStates);
 
-            if (sortState.milestoneSortState.includes('EarliestStartDate')) {
-                filteredMilestones = milestoneSortByEarliestDate(filteredMilestones)
-            }
-            if (sortState.milestoneSortState.includes("Alphabetical")) {
-                unitSortByNameAlphabetical(filteredMilestones)
-            }
+            filteredMilestones = sortMilestones(filteredMilestones, sortStates);
 
             content =
                 filteredMilestones.map((item, index) => (
@@ -174,59 +150,12 @@ export const TableView = ({
                     </tr >
                 ));
             break;
-/*        case "Tag":
-           *//* if (!tagData || !tagData.message || tagData.message.length === 0) {
-                return <p>No tags found.</p>;
-            }
-*//*
-            headers = tagData.length > 0 ? Object.keys(tagData[0]) : [];
-
-            tableFormat =
-                headers.map((header, index) => (
-                    <th key={index} className="border border-gray-300 px-4 py-2">{formatHeaderLabel(header)}</th>
-                ));
-
-            content =
-                tagData.map((item, index) => (
-                    <tr key={index} onClick={() => handleClick(item)} className={`cursor-pointer hover:bg-lime-500
-                ${selectedItem?.type === 'Tag' && selectedItem?.id === item.id ? 'bg-lime-800' : ''}`}>
-                        <td className="border border-gray-300 px-4 py-2">{item.id}</td>
-                        <td className="border border-gray-300 px-4 py-2">{item.name}</td>
-                        <td className="border border-gray-300 px-4 py-2">{item.description}</td>
-                        <td className="border border-gray-300 px-4 py-2">Tag</td>
-                    </tr >
-                ));
-            break;
-        case "Assignee":
-          *//*  if (!assigneeData || !assigneeData.message || assigneeData.message.length === 0) {
-                return <p>No assignees found.</p>;
-            }*//*
-
-            headers = assigneeData.length > 0 ? Object.keys(assigneeData[0]) : [];
-
-            tableFormat =
-                headers.map((header, index) => (
-                    <th key={index} className="border border-gray-300 px-4 py-2">{formatHeaderLabel(header)}</th>
-                ));
-
-
-            content =
-                assigneeData.map((item, index) => (
-                    <tr key={index} onClick={() => handleClick(item as Assignee)} className={`cursor-pointer hover:bg-lime-500
-                ${selectedItem?.type === 'Assignee' && selectedItem?.id === item.id ? 'bg-lime-800' : ''}`}>
-                        <td className="border border-gray-300 px-4 py-2">{item.id}</td>
-                        <td className="border border-gray-300 px-4 py-2">{item.name}</td>
-                        <td className="border border-gray-300 px-4 py-2">{item.description}</td>
-                        <td className="border border-gray-300 px-4 py-2">Assignee</td>
-                    </tr >
-                ));
-            break;*/
         default:
             break;
     }
 
     return (
-        <div className=''>
+        <div>
             <br />
             <div className='flex gap-4 justify-center'>
                 <FilterButton text='Task' onClick={() => setTableDataType("Task")} active={tableDataType === 'Task'} showX={false} />
@@ -234,7 +163,8 @@ export const TableView = ({
            </div>
   
             <br />
-            <SortArea unitOfSort={tableDataType} sortState={sortState} handleSort={handleSort} />
+
+            <SortArea unitOfSort={tableDataType} sortState={sortStates} handleSort={handleSort} />
 
             <br />
 
@@ -248,7 +178,6 @@ export const TableView = ({
                     {content}
                 </tbody>
             </table>
-
           
         </div>
     );

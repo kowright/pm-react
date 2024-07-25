@@ -1,12 +1,10 @@
 import React from "react";
-import {
-    Task, TaskStatus, Roadmap, Milestone, Assignee, Tag, findIdForUnitType, UnitType, colorSets, FilterStates,
-    UnitDataType, UnitDataTypeWithNull, ViewData, taskFilterOnTaskStatus, taskFilterOnRoadmap, taskSortByEarliestDate,
-    milestoneFilterOnTaskStatus, milestoneFilterOnRoadmap, milestoneSortByEarliestDate, Unit, unitSortByNameAlphabetical, findUnitTypefromId, taskFilterOnTag, milestoneFilterOnTag, taskFilterOnAssignee,
-} from './Interfaces';
-import { FilterButton } from './FilterButton';
-import { SortArea } from './SortArea/SortArea';
-
+import { Assignee, Milestone, SortStates, Tag, Task, UnitDataType, ViewData } from '../utils/models';
+import { filterMilestones, filterTasks, sortMilestones, sortTasks, } from "../utils/filterSorts";
+import { findIdForUnitType } from "../utils/helpers";
+import { colorSets } from "../utils/colors";
+import FilterButton from "../components/FilterButton";
+import { SortArea } from "../components/SortArea";
 
 interface ListViewProps {
     milestoneData: Milestone[];
@@ -26,11 +24,10 @@ export const ListView = ({
 
     const [taskSortState, setTaskSortState] = React.useState<string[]>([]);
     const [milestoneSortState, setMilestoneSortState] = React.useState<string[]>([]);
-    const [sortState, setSortStates] = React.useState({
+    const [sortStates, setSortStates] = React.useState<SortStates>({
         taskSortState: taskSortState,
         milestoneSortState: milestoneSortState
     });
-
 
     React.useEffect(() => {
         if (listDataType === "Task") {
@@ -48,39 +45,16 @@ export const ListView = ({
     let filteredTasks: Task[] = [];
     let filteredMilestones: Milestone[] = [];
 
+    //filters and sorts
     if (listDataType === 'Task') {
-        //filtering
-        //TODO could just put this in interfaces
-        filteredTasks = taskFilterOnTaskStatus(taskData, filterStates.taskStatusFilterState);
-        filteredTasks = taskFilterOnRoadmap(filteredTasks, filterStates.roadmapFilterState);
-        filteredTasks = taskFilterOnTag(filteredTasks, filterStates.tagFilterState);
-        filteredTasks = taskFilterOnAssignee(filteredTasks, filterStates.assigneeFilterState);
-
-        //sorting
-        if (sortState.taskSortState.includes('EarliestStartDate')) {
-            filteredTasks = taskSortByEarliestDate(filteredTasks, true);
-        }
-        if (sortState.taskSortState.includes("EarliestEndDate")) {
-            filteredTasks = taskSortByEarliestDate(filteredTasks, false);
-        }
-        if (sortState.taskSortState.includes("Alphabetical")) {
-            unitSortByNameAlphabetical(filteredTasks)
-        }
-      
+        filteredTasks = filterTasks(taskData, filterStates);
+        
+        filteredTasks = sortTasks(filteredTasks, sortStates);
     }
-    else {
-        //filtering
-        filteredMilestones = milestoneFilterOnTaskStatus(props.milestoneData, filterStates.taskStatusFilterState);
-        filteredMilestones = milestoneFilterOnRoadmap(filteredMilestones, filterStates.roadmapFilterState);
-        filteredMilestones = milestoneFilterOnTag(filteredMilestones, filterStates.tagFilterState);
+    else { //milestones
+        filteredMilestones = filterMilestones(props.milestoneData, filterStates);
 
-       //sorting
-        if (sortState.milestoneSortState.includes('EarliestStartDate')) {
-            filteredMilestones = milestoneSortByEarliestDate(filteredMilestones)
-        }
-        if (sortState.milestoneSortState.includes("Alphabetical")) {
-            unitSortByNameAlphabetical(filteredMilestones)
-        }
+        filteredMilestones = sortMilestones(filteredMilestones, sortStates);
     }
 
     const color = colorSets['blueWhite'];
@@ -111,7 +85,7 @@ export const ListView = ({
     }, [milestoneSortState, taskSortState]);
 
     return (
-        <div className=''>
+        <div>
             <br />
             <div className='flex gap-4 justify-center'>
                 <FilterButton text='Task' onClick={() => setListDataType("Task")} active={listDataType === 'Task'} showX={false} />
@@ -119,7 +93,7 @@ export const ListView = ({
             </div>
 
              <br/>
-            <SortArea unitOfSort={listDataType} sortState={sortState} handleSort={handleSort} />
+            <SortArea unitOfSort={listDataType} sortState={sortStates} handleSort={handleSort} />
             <br />
 
             <div className='flex flex-col gap-4'>
@@ -140,8 +114,6 @@ export const ListView = ({
                                     <FilterButton key={map.id} text={map.name} colorByType='Roadmap'/>
                                 )}
                                 <FilterButton text={item.taskStatus.name} colorByType='Task Status' />
-
-
                             </div>
                         </button>
                     ))
@@ -163,8 +135,6 @@ export const ListView = ({
                                     <FilterButton key={map.id} text={map.name} colorByType='Roadmap' />
                                 )}
                                 <FilterButton text={item.taskStatus.name} colorByType='Task Status' />
-
-
                             </div>
                         </button>
                     ))

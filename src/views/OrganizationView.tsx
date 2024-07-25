@@ -1,9 +1,7 @@
 import React from "react";
-import {
-    Milestone, Roadmap, Task, TaskStatus, formatDateNumericalMMDDYYYY, colorSets, ViewData,
-    UnitType, Tag, Assignee, UnitDataType, UnitDataTypeWithNull, findUnitTypefromId
-} from './Interfaces';
-import { FilterButton } from './FilterButton';
+import { Assignee, Roadmap, Tag, TaskStatus, UnitDataTypeWithNull, UnitType } from "../utils/models";
+import { findUnitTypefromId } from "../utils/helpers";
+import FilterButton from "../components/FilterButton";
 
 export interface OrganizationViewProps {
     unitTypeData: UnitType[];
@@ -16,22 +14,10 @@ export interface OrganizationViewProps {
 }
 
 export const OrganizationView = ({
-
     ...props
 }: OrganizationViewProps) => {
 
-    //const [taskStatusData, setTaskStatusData] = React.useState<TaskStatus[]>([]);
     const [unitTypeView, setUnitTypeView] = React.useState<string>('');
-
-/*    React.useEffect(() => {
-        fetch("/api/taskstatus")
-            .then((res) => res.json())
-            .then((data) => {
-                setTaskStatusData(data);
-            })
-            .catch((error) => console.error('Error fetching data:', error));
-    }, []);
-*/
     function handleUnitClick(unitName: string) {
         setUnitTypeView(unitName);
         props.unitClick(null); //reset sidebar

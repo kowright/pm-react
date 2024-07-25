@@ -9,31 +9,29 @@ import timeline_white from '../icons/timeline_white.svg';
 import timeline_black from '../icons/timeline_black.svg';
 import org_white from '../icons/org_white.svg';
 import org_black from '../icons/org_black.svg';
+
 export interface NavBarProps {
     handleNavItemClick: (viewName: string) => void;
     view: string;
 }
 
 export const NavBar = ({
-
     ...props
 }: NavBarProps) => {
-
 
     const NavItem = (view: string, white_svg: any, black_svg: any) => {
         return (
             <button className={`h-[50px] flex p-2 rounded-xl hover:bg-cerulean focus:ring-offset-4 focus:ring-yinmn-blue focus:ring
-        ${props.view === view ? 'bg-yinmn-blue text-white' : ''} `} onClick={() => props.handleNavItemClick(view)}>
-            <div className='w-[34px] h-full flex justify-center items-center'>
-                {props.view === view ? <img src={white_svg} alt={`${view} Icon`} /> : <img src={black_svg} alt={`${view} Icon`} />}
-            </div>
-            <div className='h-full flex-1 flex ml-3 items-center text-1xl'>{view} View</div>
-        </button> )
-    }
-
+                ${props.view === view ? 'bg-yinmn-blue text-white' : ''} `} onClick={() => props.handleNavItemClick(view)}>
+                <div className='w-[34px] h-full flex justify-center items-center'>
+                    {props.view === view ? <img src={white_svg} alt={`${view} Icon`} /> : <img src={black_svg} alt={`${view} Icon`} />}
+                </div>
+                <div className='h-full flex-1 flex ml-3 items-center text-1xl'>{view} View</div>
+            </button>
+        )
+    };
 
     return (
-      
         <div className='w-[300px] h-full flex flex-col'>
         
             <div className="h-[50px] shrink-0 flex p-2">
@@ -50,21 +48,14 @@ export const NavBar = ({
                 {NavItem("Kanban", kanban_white, kanban_black)}
                 {NavItem("Timeline", timeline_white, timeline_black)}
 
-
                 <hr/>
 
                 {NavItem("Organization", org_white, org_black)}
-
-
             </div>
-
-
         </div>
-
-
-
     );
 };
+
 export default NavBar;
 
 

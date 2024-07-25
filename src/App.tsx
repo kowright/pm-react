@@ -1,25 +1,27 @@
-
-import React, { useState } from 'react';
-import TableView from './TableView';
-import KanbanView from './KanbanView';
-import TimelineView from './TimelineView';
-import { Sidebar } from './Sidebar/Sidebar';
-import { Task, Roadmap, TaskStatus, Milestone, Tag, Assignee, UnitDataTypeWithNull, findIdForUnitType, UnitType, FilterStates, UnitDataType, ViewData, taskFilterOnTaskStatus } from './Interfaces';
-import { FilterArea } from './FilterArea/FilterArea';
-import { NavBar } from './NavBar/NavBar';
-import { FilterButton } from './FilterButton';
-import { ListView } from './ListView';
-import { OrganizationView } from './OrganizationView';
-import { AddPopup } from './AddPopup';
-import { ErrorPopup } from './ErrorPopup';
+import React from 'react';
+import { Assignee, Milestone, Tag, Task, Roadmap, UnitType, TaskStatus, FilterStates, UnitDataTypeWithNull, ViewData, UnitDataType } from './utils/models';
+import { findIdForUnitType } from './utils/helpers';
+import { NavBar } from './components/NavBar';
+import { FilterArea } from './components/FilterArea';
+import FilterButton from './components/FilterButton';
+import TableView from './views/TableView';
+import KanbanView from './views/KanbanView';
+import ListView from './views/ListView';
+import OrganizationView from './views/OrganizationView';
+import { Sidebar } from './components/Sidebar';
+import { ErrorPopup } from './components/ErrorPopup';
+import { AddPopup } from './components/AddPopup';
+import TimelineView from './views/TimelineView';
 
 function App() {
     const [view, setView] = React.useState<string>('List');
     const [selectedItem, setSelectedItem] = React.useState<Task | Milestone | Tag | Assignee | null>(null);
     const [showPopup, setShowPopup] = React.useState(false);
     const [showErrorPopup, setShowErrorPopup] = React.useState(false);
-    const [errorPopupContent, setErrorPopupContent] = useState(<div>WHAT</div>);
+    const [errorPopupContent, setErrorPopupContent] = React.useState(<div>WHAT</div>);
     const [listType, setListType] = React.useState('Task');
+
+    // #region Unit Get
 
     React.useEffect(() => {
         fetchTasks();
@@ -31,34 +33,13 @@ function App() {
         fetchTaskStatus();
     }, []);
 
-    // #region Fetch Units
-    const [tasks, setTasks] = useState<Task[]>([]); // State to hold tasks
-    const [milestones, setMilestones] = useState<Milestone[]>([]); // State to hold milestones
-    const [tags, setTags] = useState<Tag[]>([]); // State to hold milestones
-    const [assignees, setAssignees] = useState<Assignee[]>([]); // State to hold milestones
+    const [tasks, setTasks] = React.useState<Task[]>([]); // State to hold tasks
+    const [milestones, setMilestones] = React.useState<Milestone[]>([]); // State to hold milestones
+    const [tags, setTags] = React.useState<Tag[]>([]); // State to hold milestones
+    const [assignees, setAssignees] = React.useState<Assignee[]>([]); // State to hold milestones
     const [unitTypes, setUnitTypes] = React.useState<UnitType[]>([]);
     const [roadmaps, setRoadmaps] = React.useState<Roadmap[]>([]);
     const [taskStatuses, setTaskStatuses] = React.useState<TaskStatus[]>([]);
-
-    /* const [unitAPIData, setUnitAPIData] = React.useState<UnitAPIData>({
-         taskData: [],
-         milestoneData: [],
-         tagData: [],
-         assigneeData: [],
-         unitTypesData: [],
-         roadmapData: []
-     });
- 
-     React.useEffect(() => {
-         setUnitAPIData({
-             taskData: tasks,
-             milestoneData: milestones,
-             tagData: tags,
-             assigneeData: assignees,
-             roadmapData: roadmaps,
-             unitTypesData: unitTypes,
-         });
-     }, [assignees, milestones, roadmaps, tags, tasks, unitTypes]);*/
 
     const fetchTasks = () => {
         fetch("/api/tasks?roadmaps=true&tags=true")
@@ -70,20 +51,14 @@ function App() {
     const fetchMilestones = () => {
         fetch("/api/milestones?roadmaps=true&tags=true")
             .then((res) => res.json())
-            .then((data) => {
-                console.log("data", data)
-                setMilestones(data)
-            })
+            .then((data) => setMilestones(data))
             .catch((error) => console.error('Error fetching milestones:', error));
     };
 
     const fetchRoadmaps = () => {
         fetch("/api/roadmaps")
             .then((res) => res.json())
-            .then((data) => {
-                setRoadmaps(data);
-                //console.log("roadmapss ", (data as Roadmap[])?.map(map => map.name))
-            })
+            .then((data) => setRoadmaps(data))
             .catch((error) => console.error('Error fetching data:', error));
     };
 
@@ -116,9 +91,7 @@ function App() {
     }
     // #endregion
 
-    // #region Filter Area Necessities
-    const [selectedRoadmap, setSelectedRoadmap] = useState<Roadmap | null>(null); //keep?
-    const [selectedTaskStatus, setSelectedTaskStatus] = useState<TaskStatus | null>(null); //keep?
+    // #region Filter Area 
 
     const [roadmapFilterState, setRoadmapFilterState] = React.useState<string[]>([]);
     const [taskStatusFilterState, setTaskStatusFilterState] = React.useState<string[]>([]);
@@ -126,10 +99,12 @@ function App() {
     const [assigneeFilterState, setAssigneeFilterState] = React.useState<string[]>([]);
     const [showFilterAreaAssignees, setFilterAreaAssignees] = React.useState<boolean>(true);
 
-    const [filterStates, setFilterStates] = React.useState<FilterStates>({ roadmapFilterState: roadmapFilterState, taskStatusFilterState: taskStatusFilterState, tagFilterState: tagFilterState, assigneeFilterState: assigneeFilterState })
+    const [filterStates, setFilterStates] = React.useState<FilterStates>({
+        roadmapFilterState: roadmapFilterState, taskStatusFilterState: taskStatusFilterState,
+        tagFilterState: tagFilterState, assigneeFilterState: assigneeFilterState
+    })
 
     React.useEffect(() => { //reset filter area on view switch
-
         setRoadmapFilterState([]);
         setTaskStatusFilterState([]);
         setTagFilterState([]);
@@ -147,87 +122,65 @@ function App() {
         });
     }, [roadmapFilterState, taskStatusFilterState, tagFilterState, assigneeFilterState]);
 
-    function setFilterAreaSettings(showAssignees: boolean) {
-        setFilterAreaAssignees(showAssignees);
-    }
 
-    const handleFilterByRoadmap = (roadmap: Roadmap) => { //keep
+    const handleFilterByRoadmap = (roadmap: Roadmap) => {
+        setRoadmapFilterState(prevState => {
+            const isAlreadyFiltered = prevState.includes(roadmap.name);
 
-        //setSelectedRoadmap(roadmap);
-        if (roadmap === null) {
-            return;
-        }
-
-        if (roadmapFilterState.includes(roadmap?.name)) {
-            console.log("take out " + roadmap?.name)
-            setRoadmapFilterState(prev => prev.filter(map => map !== roadmap?.name));
-
-        }
-        else {
-            console.log("add " + roadmap?.name)
-            setRoadmapFilterState(prev => [...prev, roadmap?.name]);
-        }
+            if (isAlreadyFiltered) {
+                return prevState.filter(map => map !== roadmap.name);
+            } else {
+                return [...prevState, roadmap.name];
+            }
+        });
     };
 
-    const handleFilterByTaskStatus = (status: TaskStatus) => { //keep
-        // setSelectedTaskStatus(status);
-        console.log("clicked " + status.name)
-        if (taskStatusFilterState.includes(status.name)) {
-            console.log("take out " + status.name)
 
-            setTaskStatusFilterState(prev => prev.filter(stat => stat !== status.name));
-        }
-        else {
-            console.log("add " + status.name)
+    const handleFilterByTaskStatus = (status: TaskStatus) => {
+        setTaskStatusFilterState(prevState => {
+            const isAlreadyFiltered = prevState.includes(status.name);
 
-            setTaskStatusFilterState(prev => [...prev, status.name]);
-        }
+            if (isAlreadyFiltered) {
+                return prevState.filter(stat => stat !== status.name);
+            } else {
+                return [...prevState, status.name];
+            }
+        });
     };
 
-    const handleFilterByTag = (tag: Tag) => { //keep
-        // setSelectedTaskStatus(status);
-        console.log("clicked " + tag.name)
-        if (tagFilterState.includes(tag.name)) {
-            console.log("take out " + tag.name)
+    const handleFilterByTag = (tag: Tag) => {
+        setTagFilterState(prevState => {
+            const isAlreadyFiltered = prevState.includes(tag.name);
 
-            setTagFilterState(prev => prev.filter(stat => stat !== tag.name));
-        }
-        else {
-            console.log("add " + tag.name)
-
-            setTagFilterState(prev => [...prev, tag.name]);
-        }
+            if (isAlreadyFiltered) {
+                return prevState.filter(t => t !== tag.name);
+            } else {
+                return [...prevState, tag.name];
+            }
+        });
     };
 
-    const handleFilterByAssignee = (assignee: Assignee) => { //keep
-        // setSelectedTaskStatus(status);
-        console.log("clicked " + assignee.name)
-        if (assigneeFilterState.includes(assignee.name)) {
-            console.log("take out " + assignee.name)
+    const handleFilterByAssignee = (assignee: Assignee) => {
+        setAssigneeFilterState(prevState => {
+            const isAlreadyFiltered = prevState.includes(assignee.name);
 
-            setAssigneeFilterState(prev => prev.filter(stat => stat !== assignee.name));
-        }
-        else {
-            console.log("add " + assignee.name)
-
-            setAssigneeFilterState(prev => [...prev, assignee.name]);
-        }
-    };
-
-    const handleClick = (viewName: string) => {
-        setView(viewName);
-        handleUnitClick(null);
-
-    };
-
-    const handleUnitClick = (item: UnitDataTypeWithNull) => {
-        setSelectedItem(item);
+            if (isAlreadyFiltered) {
+                return prevState.filter(a => a !== assignee.name);
+            } else {
+                return [...prevState, assignee.name];
+            }
+        });
     };
 
     const handleFilterAreaAssignees = (showAssignees: boolean) => {
         setFilterAreaAssignees(showAssignees)
     }
     // #endregion
+
+    // #region Views
+    const handleUnitClick = (item: UnitDataTypeWithNull) => {
+        setSelectedItem(item);
+    };
 
     const [viewData, setViewData] = React.useState<ViewData>({
         taskData: tasks,
@@ -249,12 +202,14 @@ function App() {
         });
     }, [filterStates, selectedItem, tasks, unitTypes, tags, roadmaps, showFilterAreaAssignees]);
 
-    const handleAddButtonClick = () => {
-        setShowPopup(true);
+    const handleViewClick = (viewName: string) => {
+        setView(viewName);
+        handleUnitClick(null);
     };
 
+    // #endregion
 
-    // #region Unit Updates
+    // #region Unit Update
     const updateItem = (updatedItem: UnitDataTypeWithNull) => {
         if (updatedItem == null) {
             return;
@@ -490,8 +445,8 @@ function App() {
         if (deletedItem == null) {
             return;
         }
-        setShowErrorPopup(false);
 
+        setShowErrorPopup(false);
 
         if (deletedItem.type === findIdForUnitType('Task', unitTypes)) {
             deleteTask(deletedItem as Task)
@@ -515,7 +470,6 @@ function App() {
             console.log("couldn't handle delete item what was selected")
         }
     }
-
 
     const deleteTask = (deletedTask: Task) => {
         // Delete task in API
@@ -585,35 +539,35 @@ function App() {
             );
             if (allTasksWithTag.length > 0) {
                 console.log("got some stuff to delete", allTasksWithTag);
-            
 
-            const changeToViewName = 'Task';
 
-            handleShowErrorPopup(
-                <div>
-                    <p><span className='text-red-600 font-bold'>[{deletedTag.name}] </span>is still being used by one or more tasks.</p>
-                    <p>Please remove this status from all tasks before deleting (Go fix it).</p>
-                    <p>Or allow an automatic removal of the tag from all tasks (Remove tag from everything).</p>
-                    <p>These are the items that still have the status:</p>
-                    <br />
-                    <br />
-                    {allTasksWithTag.map(i =>
+                const changeToViewName = 'Task';
 
-                        <div>
-                            <p>{i.name}</p>
-                            <br />
+                handleShowErrorPopup(
+                    <div>
+                        <p><span className='text-red-600 font-bold'>[{deletedTag.name}] </span>is still being used by one or more tasks.</p>
+                        <p>Please remove this status from all tasks before deleting (Go fix it).</p>
+                        <p>Or allow an automatic removal of the tag from all tasks (Remove tag from everything).</p>
+                        <p>These are the items that still have the status:</p>
+                        <br />
+                        <br />
+                        {allTasksWithTag.map(i =>
+
+                            <div>
+                                <p>{i.name}</p>
+                                <br />
+                            </div>
+                        )}
+
+                        <div className='flex justify-between gap-4'>
+                            <button className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded" onClick={() => handleGoBack()}>Go Back</button>
+
+                            <button className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded" onClick={() => handleGoFixIt(changeToViewName, deletedTag.name, deletedTag)}>Go Fix It</button>
+
+                            <button className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded" onClick={() => { setShowErrorPopup(false); deleteTag(deletedTag, true) }}>Remove Tag From Everything</button>
+
                         </div>
-                    )}
-
-                    <div className='flex justify-between gap-4'>
-                        <button className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded" onClick={() => handleGoBack()}>Go Back</button>
-
-                        <button className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded" onClick={() => handleGoFixIt(changeToViewName, deletedTag.name, deletedTag)}>Go Fix It</button>
-
-                        <button className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded" onClick={() => { setShowErrorPopup(false); deleteTag(deletedTag, true) }}>Remove Tag From Everything</button>
-
                     </div>
-                </div>
                 );
                 return;
             }
@@ -623,43 +577,43 @@ function App() {
             );
             if (allMilestonesWithTag.length > 0) {
                 console.log("got some stuff to delete", allMilestonesWithTag);
-          
 
-            const changeToViewName = 'Milestone';
 
-            handleShowErrorPopup(
-                <div>
-                    <p><span className='text-red-600 font-bold'>[{deletedTag.name}] </span>is still being used by one or more milestones.</p>
-                    <p>Please remove this status from all milestones before deleting (Go fix it).</p>
-                    <p>Or allow an automatic removal of the tag from all milestones (Remove tag from everything).</p>
-                    <p>These are the items that still have the status:</p>
-                    <br />
-                    <br />
-                    {allMilestonesWithTag.map(i =>
+                const changeToViewName = 'Milestone';
 
-                        <div>
-                            <p>{i.name}</p>
-                            <br />
+                handleShowErrorPopup(
+                    <div>
+                        <p><span className='text-red-600 font-bold'>[{deletedTag.name}] </span>is still being used by one or more milestones.</p>
+                        <p>Please remove this status from all milestones before deleting (Go fix it).</p>
+                        <p>Or allow an automatic removal of the tag from all milestones (Remove tag from everything).</p>
+                        <p>These are the items that still have the status:</p>
+                        <br />
+                        <br />
+                        {allMilestonesWithTag.map(i =>
+
+                            <div>
+                                <p>{i.name}</p>
+                                <br />
+                            </div>
+                        )}
+
+                        <div className='flex justify-between gap-4'>
+                            <button className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded" onClick={() => handleGoBack()}>Go Back</button>
+
+                            <button className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded" onClick={() => handleGoFixIt(changeToViewName, deletedTag.name, deletedTag)}>Go Fix It</button>
+
+                            <button className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded" onClick={() => { setShowErrorPopup(false); deleteTag(deletedTag, true) }}>Remove Tag From Everything</button>
+
                         </div>
-                    )}
-
-                    <div className='flex justify-between gap-4'>
-                        <button className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded" onClick={() => handleGoBack()}>Go Back</button>
-
-                        <button className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded" onClick={() => handleGoFixIt(changeToViewName, deletedTag.name, deletedTag)}>Go Fix It</button>
-
-                        <button className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded" onClick={() => { setShowErrorPopup(false); deleteTag(deletedTag, true) }}>Remove Tag From Everything</button>
-
                     </div>
-                </div>
                 );
                 return;
             }
-            console.log("no milestones with tag " + deletedTag.name)
 
         }
-   
-        console.log("time to delete")
+        else {
+            deleteTag(deletedTag, true);
+        }
         fetch(`/api/tags/${deletedTag.id}`, {
             method: 'DELETE',
             headers: {
@@ -692,43 +646,49 @@ function App() {
     }
 
     const deleteAssignee = (deletedAssignee: Assignee, allowAutoDelete: boolean = false) => {
-
+        console.log("deleting assignee")
         if (!allowAutoDelete) {
+            console.log("checking assignee references")
 
             const allTasksWithAssignee = tasks.filter(task =>
                 task.assignee.id === deletedAssignee.id);
 
             if (allTasksWithAssignee.length > 0) {
                 console.log("got some stuff to delete", allTasksWithAssignee);
-            }
 
-            handleShowErrorPopup(
-                <div>
-                    <p><span className='text-red-600 font-bold'>[{deletedAssignee.name}] </span>is still being used by one or more tasks.</p>
-                    <p>Allow an automatic removal of the assignee from all tasks (Remove from everything).</p>
-                    <p>These are the items that still have the roadmap:</p>
-                    <br />
-                    <br />
-                    {allTasksWithAssignee.map(i =>
 
-                        <div>
-                            <p>{i.name}</p>
-                            <br />
+                handleShowErrorPopup(
+                    <div>
+                        <p><span className='text-red-600 font-bold'>[{deletedAssignee.name}] </span>is still being used by one or more tasks.</p>
+                        <p>Allow an automatic removal of the assignee from all tasks (Remove from everything).</p>
+                        <p>These are the items that still have the roadmap:</p>
+                        <br />
+                        <br />
+                        {allTasksWithAssignee.map(i =>
+
+                            <div>
+                                <p>{i.name}</p>
+                                <br />
+                            </div>
+                        )}
+
+                        <div className='flex justify-between gap-4'>
+                            <button className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded" onClick={() => handleGoBack()}>Go Back</button>
+
+                            <button className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded" onClick={() => { setShowErrorPopup(false); deleteAssignee(deletedAssignee, true) }}>Remove From Everything</button>
+
                         </div>
-                    )}
-
-                    <div className='flex justify-between gap-4'>
-                        <button className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded" onClick={() => handleGoBack()}>Go Back</button>
-
-                        <button className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded" onClick={() => { setShowErrorPopup(false); deleteAssignee(deletedAssignee, true) }}>Remove From Everything</button>
-
                     </div>
-                </div>
-            );
-
+                );
+            } else {
+                console.log("check assignee ALL GOOD")
+                deleteAssignee(deletedAssignee, true);
+            }
+            
             return;
         }
 
+        console.log("delete delete assignee")
 
 
         // Delete task in API
@@ -836,7 +796,10 @@ function App() {
             }
 
             return;
-          }
+        }
+        else {
+            deleteTaskStatus(deletedTaskStatus, true);
+        }
         
         fetch(`/api/taskstatus/${deletedTaskStatus.id}`, {
             method: 'DELETE',
@@ -1235,29 +1198,31 @@ function App() {
     };
     // #endregion
 
+    const handleAddButtonClick = () => {
+        setShowPopup(true);
+    };
+
     return (
         <div className="flex h-screen w-full bg-alabaster gap-16">
-            <NavBar handleNavItemClick={handleClick} view={view} />
+            {/* LEFT */}
+            <NavBar handleNavItemClick={handleViewClick} view={view} />
 
-
+            {/* MIDDLE */}
             <div className='w-[300px] flex-1 h-full flex flex-col'>
 
                 <div className=" h-[50px] shrink-0"></div>
 
-
                 <div className='h-full flex flex-col'>
                     <div className='h-auto flex'>
                         <div className='flex-1 h-full flex-wrap'>
-                            {view !== "Organization" && <FilterArea selectedRoadmap={selectedRoadmap} selectedTaskStatus={selectedTaskStatus}
+                            {view !== "Organization" && <FilterArea
                                 handleFilterByTaskStatus={handleFilterByTaskStatus} handleFilterByRoadmap={handleFilterByRoadmap} handleFilterByTag={handleFilterByTag} handleFilterByAssignee={handleFilterByAssignee}
-                                roadmapFilterState={roadmapFilterState} taskStatusFilterState={taskStatusFilterState} tagFilterState={tagFilterState} assigneeFilterState={assigneeFilterState}
+                                filterStates={filterStates}
                                 roadmapData={roadmaps} taskStatusData={taskStatuses} tagData={tags} unitTypeData={unitTypes} assigneeData={assignees}
                                 showAssignees={showFilterAreaAssignees}
                             />
                               } 
                         </div>
-
-
 
                         <div className='w-[100px] flex justify-end items-start'>
                             <FilterButton text="Add" onClick={handleAddButtonClick} />
@@ -1266,22 +1231,18 @@ function App() {
                     </div>
                     <div className='flex-1 max-w-full overflow-x-auto relative'>
 
-                        {/* if any view needs more data than view data, it can call its own API? */ }
                         {view === 'Timeline' && <TimelineView milestoneData={milestones} updateItem={updateItem} viewData={viewData} />}
                         {view === 'Table' && <TableView viewData={viewData} milestoneData={milestones} tagData={tags} assigneeData={assignees} />}
                         {view === 'Kanban' && <KanbanView viewData={viewData} milestoneData={milestones } />}
                         {view === 'List' && <ListView viewData={viewData} milestoneData={milestones} tagData={tags} assigneeData={assignees} listType={listType} />}
                         {view === 'Organization' && <OrganizationView unitTypeData={unitTypes} tagData={tags} assigneeData={assignees} roadmapData={roadmaps} unitClick={handleUnitClick} selectedItem={selectedItem} taskStatusData={taskStatuses}  /> }
-                       
+
 
                     </div>
-
                 </div>
-
-
             </div>
 
-
+            {/* RIGHT */}
             <div className='w-[300px] h-full flex flex-col'>
                 <input
                     className="rounded-full px-4 py-2 my-2 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 shrink-0"
@@ -1289,31 +1250,16 @@ function App() {
                     placeholder="Search..."
                 />
 
-                <Sidebar sidebarData={selectedItem} updateItem={updateItem} assigneeData={assignees} roadmapData={roadmaps} unitTypeData={unitTypes} tagData={tags} deleteItem={deleteItem} setSelectedItem={setSelectedItem}  />
-
-
+                <Sidebar sidebarData={selectedItem} updateItem={updateItem} assigneeData={assignees} roadmapData={roadmaps} unitTypeData={unitTypes} tagData={tags} taskStatusData={taskStatuses} deleteItem={deleteItem} setSelectedItem={setSelectedItem}  />
             </div>
 
+            {/* FLOATING */}
             <div className='flex justify-center items-center'>
                 {showErrorPopup && <ErrorPopup setPopupVisibility={() => setShowErrorPopup(false)} content={errorPopupContent} />}
             </div>
+
         </div>
-
-
     );
 }
 
 export default App;
-
-
-//things to do
-//put view/filter changing things in a component and do api call on parent to pass to children data and filters
-//make roadmaps and tags be held in database and populate into header component
-//put sidebar component in here
-//could reduce amount of props params by putting it in a variable first
-/* <div>
-                        <Sidebar sidebarData={selectedItem} updateItem={updateItem} />
-                    </div>
-
-                <FilterArea selectedRoadmap={selectedRoadmap} selectedTaskStatus={selectedTaskStatus} handleFilterByTaskStatus={handleFilterByTaskStatus} handleFilterByRoadmap={handleFilterByRoadmap} />
-*/

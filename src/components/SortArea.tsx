@@ -1,6 +1,5 @@
 import React from 'react';
-import { Milestone, Roadmap, TaskStatus, Unit, UnitDataType, colorSets } from '../Interfaces';
-import { FilterButton } from '../FilterButton';
+import FilterButton from './FilterButton';
 interface SortAreaProps {
     unitOfSort: string;
     sortState: {
