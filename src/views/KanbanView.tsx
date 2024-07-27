@@ -5,6 +5,7 @@ import { formatDateWords } from "../utils/helpers";
 import { colorSets } from "../utils/colors";
 import FilterButton from "../components/FilterButton";
 import { SortArea } from "../components/SortArea";
+import AssigneeProfileImage from '../components/AssigneeProfile';
 
 interface KanbanViewProps {
     milestoneData: Milestone[];
@@ -90,7 +91,7 @@ export const KanbanView = ({
                 <div key={task.id} onClick={() => handleClick(task)} className={`cursor-pointer relative ${color.focusRing} ${color.hover} rounded-xl flex flex-col justify-center w-[320px] gap-1 p-2
                ${selectedItem?.id === task.id ? color.selected : color.default} `}>
                     <div className='absolute right-0 top-0 mt-2 mr-2'>
-                        <img className='ml-2 w-[34px] rounded-full' src="https://www.hartz.com/wp-content/uploads/2022/04/small-dog-owners-1.jpg" alt="Doggo" />
+                        <AssigneeProfileImage imageId={task.assignee.imageId} />
                     </div>
 
                     <div className='text-lg font-bold'> {task.name}</div>

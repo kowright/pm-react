@@ -1209,7 +1209,6 @@ function App() {
 
             {/* MIDDLE */}
             <div className='w-[300px] flex-1 h-full flex flex-col'>
-
                 <div className=" h-[50px] shrink-0"></div>
 
                 <div className='h-full flex flex-col'>

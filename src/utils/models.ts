@@ -54,6 +54,7 @@ export interface Roadmap extends Unit {
 
 export interface Assignee extends Unit {
     name: string;
+    imageId: number;
     //role
 }
 export interface Tag extends Unit {

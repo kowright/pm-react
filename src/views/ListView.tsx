@@ -5,6 +5,7 @@ import { findIdForUnitType } from "../utils/helpers";
 import { colorSets } from "../utils/colors";
 import FilterButton from "../components/FilterButton";
 import { SortArea } from "../components/SortArea";
+import AssigneeProfileImage from "../components/AssigneeProfile";
 
 interface ListViewProps {
     milestoneData: Milestone[];
@@ -106,7 +107,7 @@ export const ListView = ({
                             onClick={() => handleClick(item)}>
                             <div className='w-auto'>{item.name}</div>
                             <div className='flex-1'>{item.description}</div>
-                            <div className='w-auto flex justify-end gap-x-2'>
+                            <div className='w-auto flex justify-end items-center gap-x-2'>
                                 {item.tags.map(tag =>
                                     <FilterButton key={tag.id} text={tag.name} colorByType='Tag'/>
                                 )}
@@ -114,6 +115,7 @@ export const ListView = ({
                                     <FilterButton key={map.id} text={map.name} colorByType='Roadmap'/>
                                 )}
                                 <FilterButton text={item.taskStatus.name} colorByType='Task Status' />
+                                <AssigneeProfileImage imageId={item.assignee.imageId} /> 
                             </div>
                         </button>
                     ))
