@@ -38,6 +38,12 @@ export const AddPopup = ({
         roadmaps: [], //array of num
         assignee: 0 //default No Assignee
     });
+    const [assigneeFormData, setAssigneeFormData] = React.useState({
+        name: '',
+        description: '',
+        fileInput: null as File | null, // Initialize with null
+        imageId: 0
+    });
     const [genericformData, setGenericFormData] = React.useState({
         name: '',
         description: '',
@@ -74,7 +80,11 @@ export const AddPopup = ({
         }
         else if (unitTypeView === 'Milestone') {
             props.createItem(milestoneformData, unitTypeView);
-        } else {
+        } 
+        else if (unitTypeView === 'Assignee') {
+            props.createItem(assigneeFormData, unitTypeView);
+        }
+        else {
             props.createItem(genericformData, unitTypeView);
         }       
     };
@@ -131,6 +141,25 @@ export const AddPopup = ({
             }
             else {
                 setMilestoneFormData(prevState => ({
+                    ...prevState,
+                    [name]: value
+                }));
+            }
+        }
+        else if (unitTypeView === 'Assignee') {
+           
+            if (name === 'fileInput') {
+                const fileInput = e.target as HTMLInputElement;
+                const file = fileInput.files?.[0] || null;
+
+                setAssigneeFormData(prevState => ({
+                    ...prevState,
+                    [name]: file
+                }));
+
+            }
+            else {
+                setAssigneeFormData(prevState => ({
                     ...prevState,
                     [name]: value
                 }));
@@ -286,6 +315,29 @@ export const AddPopup = ({
                         <button className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded" onClick={() => props.setPopupVisibility()}>Close</button>
                         <button type="submit" className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">Save</button>
                     </div>
+                </form>
+            </div>
+    }
+    else if (unitTypeView === 'Assignee') {
+        content =
+            <div>
+                <form onSubmit={handleSubmit} className="space-y-4">
+                <div>
+                    {nameField()}
+                        {descriptionField()}
+                        <div className='text-xs pb-1'>Photo</div>
+                        <input
+                            type="file"
+                            id="fileInput"
+                            name="fileInput"
+                            onChange={handleChange}
+                        />
+                </div>
+
+                <div className='flex justify-between'>
+                    <button className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded" onClick={() => props.setPopupVisibility()}>Close</button>
+                    <button type="submit" className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">Save</button>
+                </div>
                 </form>
             </div>
     }

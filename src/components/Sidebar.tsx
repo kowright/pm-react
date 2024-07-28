@@ -237,7 +237,7 @@ export const Sidebar = ({
         else if (id === 'fileInput') {
             const fileInput = event.target as HTMLInputElement;
             const file = fileInput.files?.[0];
-            if (file) {
+            if (file) { //TODO change with helper image upload
                 const formData = new FormData();
                 formData.append('image', file);
                 try {
@@ -445,8 +445,7 @@ export const Sidebar = ({
                     {nameField(data.name)}
                     {descriptionField(data.description)}
                     {stringFieldDisplay('ID', data.id.toString())}
-                    <AssigneeProfileImage imageId={assigneeData.imageId} />
-                    <label htmlFor="fileInput">Choose a file:</label>
+                    <div className='text-xs pb-1'>Photo</div>
                     <input
                         type="file"
                         id="fileInput"
@@ -454,6 +453,7 @@ export const Sidebar = ({
                         onChange={handleInputChange}
                         onBlur={handleInputBlur}
                     />
+                    <AssigneeProfileImage imageId={assigneeData.imageId} />
                 </div>
             );
             break;

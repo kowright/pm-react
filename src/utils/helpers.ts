@@ -71,3 +71,28 @@ export function toCamelCase(input: string): string {
 
     return camelCased.join('');
 }
+
+export async function imageUpload(file: File) {
+    //image upload
+
+    const formDataInput = new FormData();
+    formDataInput.append('image', file);
+    try {
+
+        const response = await fetch("/api/upload", {
+            method: 'POST',
+            body: formDataInput,
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            console.log("File upload response:", data);
+
+            return data;
+        } else {
+            console.error('File upload failed with status:', response.status);
+        }
+    } catch (error) {
+        console.error('Error uploading file:', error);
+    }
+}

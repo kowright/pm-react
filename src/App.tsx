@@ -1,6 +1,6 @@
 import React from 'react';
 import { Assignee, Milestone, Tag, Task, Roadmap, UnitType, TaskStatus, FilterStates, UnitDataTypeWithNull, ViewData, UnitDataType } from './utils/models';
-import { findIdForUnitType } from './utils/helpers';
+import { findIdForUnitType, imageUpload } from './utils/helpers';
 import { NavBar } from './components/NavBar';
 import { FilterArea } from './components/FilterArea';
 import FilterButton from './components/FilterButton';
@@ -1104,7 +1104,15 @@ function App() {
 
     const createAssignee = async (formData: any) => {
         // Create task in API
+      
+        //assignee creation
         try {
+
+            if (formData.fileInput !== null) {
+                formData.imageId = await imageUpload(formData.fileInput);
+            }
+            console.log("form data assignee", formData)
+
             const response = await fetch('/api/assignees', {
                 method: 'POST',
                 headers: {
