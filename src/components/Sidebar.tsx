@@ -2,6 +2,7 @@ import React from 'react';
 import { Assignee, Milestone, Roadmap, Tag, Task, TaskStatus, Unit, UnitDataTypeWithNull, UnitType } from "../utils/models";
 import { findIdForUnitType, formatDateNumericalYYYYMMDDWithDashes, toCamelCase } from "../utils/helpers";
 import { colorSets } from '../utils/colors';
+import AssigneeProfileImage from './AssigneeProfile';
 
 interface SidebarProps {
     sidebarData: UnitDataTypeWithNull; 
@@ -34,7 +35,7 @@ export const Sidebar = ({
     }, [sidebarData]);
 
     const handleInputBlur = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-
+        console.log("input blur")
         const editedValue = event.target.value;
         const propertyName = event.target.id; 
         if (!data) {
@@ -130,8 +131,18 @@ export const Sidebar = ({
                 break;
 
             case findIdForUnitType('Assignee', props.unitTypeData):
+
+                if (propertyName === 'fileInput') {
+                    updatedItem = {
+                        ...(sidebarData as Assignee),
+
+                        'imageId': (data as Assignee).imageId
+                    }; 
+                    break;
+                }
                 updatedItem = {
                     ...(sidebarData as Assignee),
+                   
                     [propertyName]: editedValue
                 };
                 break;
@@ -171,7 +182,7 @@ export const Sidebar = ({
 
     hideContent = false;
 
-    const handleInputChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const handleInputChange = async (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         const { id, value } = event.target;
 
         if (id === 'assignee') {
@@ -223,7 +234,39 @@ export const Sidebar = ({
                 }));
             }
         }
+        else if (id === 'fileInput') {
+            const fileInput = event.target as HTMLInputElement;
+            const file = fileInput.files?.[0];
+            if (file) {
+                const formData = new FormData();
+                formData.append('image', file);
+                try {
 
+                    const response = await fetch("/api/upload", {
+                        method: 'POST',
+                        body: formData,
+                    });
+
+                    if (response.ok) {
+                        const data = await response.json();
+                        console.log("File upload response:", data);
+                        setData(prevData => {
+                            const updatedData = {
+                                ...(prevData as Task | Milestone | Tag | Assignee),
+                                imageId: data 
+                            };
+
+                            return updatedData;
+                        });
+
+                    } else {
+                        console.error('File upload failed with status:', response.status);
+                    }
+                } catch (error) {
+                    console.error('Error uploading file:', error);
+                }
+            }
+        }
         else {
             setData(prevData => ({
                 ...(prevData as Task | Milestone | Tag | Assignee),
@@ -395,12 +438,22 @@ export const Sidebar = ({
 
             break;
         case findIdForUnitType('Assignee', props.unitTypeData):
+            const assigneeData = data as Assignee;
 
             sidebarContent = (
                 <div className='flex flex-col gap-2'>
                     {nameField(data.name)}
                     {descriptionField(data.description)}
                     {stringFieldDisplay('ID', data.id.toString())}
+                    <AssigneeProfileImage imageId={assigneeData.imageId} />
+                    <label htmlFor="fileInput">Choose a file:</label>
+                    <input
+                        type="file"
+                        id="fileInput"
+                        name="fileInput"
+                        onChange={handleInputChange}
+                        onBlur={handleInputBlur}
+                    />
                 </div>
             );
             break;

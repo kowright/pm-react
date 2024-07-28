@@ -337,6 +337,7 @@ function App() {
 
     const updateAssignee = (updatedAssignee: Assignee) => {
         // Update task in API
+        console.log("update assignee", updatedAssignee)
         fetch(`/api/assignees/${updatedAssignee.id}`, {
             method: 'PUT',
             headers: {

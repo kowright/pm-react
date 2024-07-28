@@ -12,9 +12,7 @@ const AssigneeProfileImage: React.FC<AssigneeProfileImageProps> = ({ imageId }) 
             try {
                 const response = await fetch(`api/upload/${imageId}`);
                 if (response.ok) {
-                    console.log("response was ok")
                     const blob = await response.blob();
-                    console.log("blob is ok", blob)
                     const url = URL.createObjectURL(blob);
                     setImageUrl(url);
                 } else {
