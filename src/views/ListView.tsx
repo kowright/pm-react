@@ -86,18 +86,20 @@ export const ListView = ({
     }, [milestoneSortState, taskSortState]);
 
     return (
-        <div>
+        <div className='flex flex-col flex-1 overflow-auto p-2 mb-4'>
             <br />
             <div className='flex gap-4 justify-center'>
                 <FilterButton text='Task' onClick={() => setListDataType("Task")} active={listDataType === 'Task'} showX={false} />
                 <FilterButton text='Milestone' onClick={() => setListDataType("Milestone")} active={listDataType === 'Milestone'} showX={false} />
             </div>
 
-             <br/>
-            <SortArea unitOfSort={listDataType} sortState={sortStates} handleSort={handleSort} />
             <br />
 
-            <div className='flex flex-col gap-4'>
+            <SortArea unitOfSort={listDataType} sortState={sortStates} handleSort={handleSort} />
+
+            <br />
+
+            <div className='flex flex-col gap-4 overflow-y-auto'>
 
                 {listDataType === 'Task' &&
                     filteredTasks.map((item, index) => (

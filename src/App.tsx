@@ -1212,17 +1212,19 @@ function App() {
     };
 
     return (
-        <div className="flex h-screen w-full bg-alabaster gap-16">
+        <div className="flex w-full h-screen bg-alabaster gap-16">
             {/* LEFT */}
             <NavBar handleNavItemClick={handleViewClick} view={view} />
 
             {/* MIDDLE */}
             <div className='w-[300px] flex-1 h-full flex flex-col'>
+
                 <div className=" h-[50px] shrink-0"></div>
 
-                <div className='h-full flex flex-col'>
-                    <div className='h-auto flex'>
-                        <div className='flex-1 h-full flex-wrap'>
+                
+
+                    <div className='h-auto flex p-2'>
+                        <div className='flex-1 h-full flex-wrap p-2'>
                             {view !== "Organization" && <FilterArea
                                 handleFilterByTaskStatus={handleFilterByTaskStatus} handleFilterByRoadmap={handleFilterByRoadmap} handleFilterByTag={handleFilterByTag} handleFilterByAssignee={handleFilterByAssignee}
                                 filterStates={filterStates}
@@ -1236,18 +1238,37 @@ function App() {
                             <FilterButton text="Add" onClick={handleAddButtonClick} />
                             {showPopup && <AddPopup setPopupVisibility={() => setShowPopup(false)} popupUnitType='' unitTypeData={unitTypes} roadmapData={roadmaps} assigneeData={assignees} tagData={tags} createItem={createItem} />}
                         </div>
-                    </div>
-                    <div className='flex-1 max-w-full overflow-x-auto relative'>
+                </div>
 
+                        {/*{view === 'List' &&
+                            <div className='flex flex-col bg-black overflow-y-auto max-h-full'>
+                                <button
+                                    className={`h-[600px] w-fit bg-ash-gray rounded-lg flex justify-center items-center shrink-0 p-2 focus:ring-offset-alabaster `}>dfsdf
+                                </button>
+                                <button
+                                    className={`h-[600px] w-fit bg-ash-gray rounded-lg flex justify-center items-center shrink-0 p-2 focus:ring-offset-alabaster `}>dfsdf
+                                </button>
+
+                     
+                            </div>}*/}
+
+               {/* {view === 'List' &&
+                    <div className='flex flex-col flex-1 bg-black overflow-y-auto mb-16 mt-16'>
+                        <div className='flex flex-col flex-1 overflow-y-auto'>
+                            <button
+                                className={`h-[800px] w-fit bg-lime-400 rounded-lg flex justify-center items-center shrink-0 p-2 focus:ring-offset-alabaster`}>dfsdf
+                            </button>
+                        </div>
+                    </div>}*/}
+
+                
                         {view === 'Timeline' && <TimelineView milestoneData={milestones} updateItem={updateItem} viewData={viewData} />}
                         {view === 'Table' && <TableView viewData={viewData} milestoneData={milestones} tagData={tags} assigneeData={assignees} />}
                         {view === 'Kanban' && <KanbanView viewData={viewData} milestoneData={milestones } />}
                         {view === 'List' && <ListView viewData={viewData} milestoneData={milestones} tagData={tags} assigneeData={assignees} listType={listType} />}
                         {view === 'Organization' && <OrganizationView unitTypeData={unitTypes} tagData={tags} assigneeData={assignees} roadmapData={roadmaps} unitClick={handleUnitClick} selectedItem={selectedItem} taskStatusData={taskStatuses}  /> }
-
-
-                    </div>
-                </div>
+          
+               
             </div>
 
             {/* RIGHT */}

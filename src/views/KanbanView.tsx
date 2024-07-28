@@ -148,7 +148,7 @@ export const KanbanView = ({
    
 
     return (
-        <div>
+        <div className='flex flex-col flex-1 overflow-auto p-2 mb-4'>
             <br />
             <div className='flex gap-4 justify-center'>
                 <FilterButton text='Task' onClick={() => setKanbanDataType("Task")} active={kanbanDataType === 'Task'} showX={false} />
@@ -158,7 +158,7 @@ export const KanbanView = ({
             <SortArea unitOfSort={kanbanDataType} sortState={sortStates} handleSort={handleSort} />
 
             <br/>
-            <div className='flex gap-4'>
+            <div className='flex gap-4 overflow-x-auto'>
                 <div className='flex gap-4'>
                     {kanbanDataType === 'Task' && statusColumns.map((column, columnIndex) => (
                         <div key={columnIndex} className="flex flex-col space-y-4">

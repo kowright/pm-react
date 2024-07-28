@@ -155,7 +155,7 @@ export const TableView = ({
     }
 
     return (
-        <div>
+        <div className='flex flex-col flex-1 overflow-auto p-2 mb-4'>
             <br />
             <div className='flex gap-4 justify-center'>
                 <FilterButton text='Task' onClick={() => setTableDataType("Task")} active={tableDataType === 'Task'} showX={false} />
@@ -167,17 +167,19 @@ export const TableView = ({
             <SortArea unitOfSort={tableDataType} sortState={sortStates} handleSort={handleSort} />
 
             <br />
-
-            <table className="min-w-full text-white border-collapse border border-gray-200">
-                <thead className={`${color.selected}`}>
-                    <tr>
-                        {tableFormat}
-                    </tr>
-                </thead>
-                <tbody>
-                    {content}
-                </tbody>
-            </table>
+            <div className='flex overflow-y-auto'> 
+                <table className="min-w-full text-white border-collapse border border-gray-200">
+                    <thead className={`${color.selected}`}>
+                        <tr>
+                            {tableFormat}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {content}
+                    </tbody>
+                </table>
+            </div>
+           
           
         </div>
     );

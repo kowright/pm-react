@@ -287,7 +287,8 @@ export const Timeline = ({
     // #endregion
 
     return (
-        <div>
+        <div className='flex flex-col flex-1 overflow-auto'>
+
             <div className='flex justify-start text-smoky-black gap-4'>
                 <div className='flex gap-2'>
                     <p className={`text-smoky-black font-bold `}>START DATE  </p> 
