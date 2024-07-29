@@ -19,7 +19,7 @@ export const Timeline = ({
     const handleClick = (task: Task | Milestone) => {
         unitClick(task);
     };
-
+    const [caretDirection, setCaretDirection] = React.useState<string>('');
     const [selectedStartDate, setSelectedStartDate] = React.useState('2024-06-01');
     const [selectedEndDate, setSelectedEndDate] = React.useState('2024-09-01');
 
@@ -108,7 +108,60 @@ export const Timeline = ({
         const modulo = mouseInsideContainer % (day * 4);
         const leftNum = mouseInsideContainer - modulo;
 
-        element.style.left = `${leftNum}px`;
+        //element.style.left = `${leftNum}px`;
+
+        if (caretDirection === 'left') { //make sure duration can't be less zero
+            element.style.left = `${leftNum}px`;
+
+            let startOffset = Math.round((new Date(draggedTask.startDate).getTime() - startDate.getTime()) / (1000 * 3600 * 24));
+            const offset = leftNum - (startOffset / 60);
+            //console.log('start ' + leftNum + 'px')
+
+    /*        console.log("task dur " + draggedTask.duration + ' days')
+            console.log("duration " +  (draggedTask.duration * 60) + 'px')*/ 
+           // console.log("start offset " + ((startOffset * 60) - leftNum)/60 )
+            //element.style.right = '660px'; dont work
+            const newDuration = (draggedTask.duration + ((startOffset * 60) - leftNum) / 60)
+            element.style.width = `${newDuration * 60}px`;
+            console.log('new duration ' + newDuration);
+            //draggedTask.duration = newDuration
+        }
+        if (caretDirection === 'right') { //make sure duration can't be less zero
+            let endOffset = Math.round((new Date(draggedTask.endDate).getTime() - endDate.getTime()) / (1000 * 3600 * 24));
+            console.log('left ' + leftNum + 'px')
+         /*   console.log("duration " + (draggedTask.duration * 60) + 'px') 
+            console.log("mouse inside container " + mouseInsideContainer);
+            console.log("modulo " + modulo)
+            console.log('rect right ' + rect.right + 'px')*/
+            console.log("dragged div left " + draggedDiv.style.left)
+            console.log("mouse inside container " + mouseInsideContainer);
+            console.log('container left ' + containerLeft)
+            console.log("scroll left " + scrollContainer.scrollLeft)
+            console.log("possible mouseX " + (mouseX - containerLeft))
+            console.log('mouseX ' + mouseX)
+            const newMouseX = mouseX + (draggedTask.duration * 60)
+            console.log('new mouse x ' + newMouseX)
+            const modulus = (mouseX - containerLeft) % (day * 4);
+            console.log("modulo " + modulus)
+            const nextBlock = (mouseX - containerLeft) - modulus;
+            console.log("next block " + nextBlock);
+            const computedStyle = getComputedStyle(element);
+            const leftStyleValue = computedStyle.left;
+
+            const currentLeft = parseFloat(leftStyleValue);
+            const newWidth = nextBlock - currentLeft;
+            console.log('hm ' + newWidth + " px");
+            
+            //element.style.width = `${3 * 60}px`; //moves back
+
+            //const newDuration = (draggedTask.duration + ((startOffset * 60) - leftNum) / 60)
+            element.style.width = `${newWidth}px`;
+            //console.log('new duration ' + newDuration);
+            //draggedTask.duration = newDuration
+        }
+
+
+
     }, [draggedDiv, day, scrollContainerRef]);
 
     const handleMouseUp = React.useCallback(() => {
@@ -119,11 +172,28 @@ export const Timeline = ({
         if (draggedDiv) {
 
             if (dragId !== -1) {
+
+              
+
                 const daysAfterStart = (draggedDiv.offsetLeft / (day * 4));
                 const editedStartDate = new Date(startDate);
                 editedStartDate.setDate(startDate.getDate() + daysAfterStart);
   
-                const millisecondsToAdd = draggedTask.duration * 24 * 60 * 60 * 1000;
+                let millisecondsToAdd = draggedTask.duration * 24 * 60 * 60 * 1000; //make conditional calc
+
+                if (caretDirection === 'left') {
+                    console.log('duration mouse up ' + draggedTask.duration);
+                    const editedDuration = (draggedDiv.offsetWidth) / 60;
+                    console.log('calc duration ' + editedDuration)
+                    millisecondsToAdd = editedDuration * 24 * 60 * 60 * 1000;
+                }
+                if (caretDirection === 'right') {
+                /*    console.log('duration mouse up ' + draggedTask.duration);
+                    const editedDuration = (draggedDiv.offsetWidth) / 60;
+                    console.log('calc duration ' + editedDuration)
+                    millisecondsToAdd = editedDuration * 24 * 60 * 60 * 1000;*/
+
+                }
 
                 const editedEndDateTimestamp = editedStartDate.getTime() + millisecondsToAdd;
 
@@ -137,7 +207,11 @@ export const Timeline = ({
 
                 };
 
-                props.updateItem(updatedItem as Task);
+
+                console.log('start date ' + editedStartDate + ' - ' + editedEndDate);
+                setCaretDirection('');
+
+               // props.updateItem(updatedItem as Task);
             }
             else {
                 const daysAfterStart = (draggedDiv.offsetLeft / (day * 4));
@@ -227,13 +301,28 @@ export const Timeline = ({
             boxShadow: '0 8px 16px rgba(0, 0, 0, 0.1)',
             zIndex: 20
         };
+        const leftCaret = '<';
+        const rightCaret = '>';
 
         return (
             <div key={task.id} style={containerStyles}
-                className={`relative ${taskColors.hover} ${selectedItem?.type === findIdForUnitType('Task', unitTypeData) && selectedItem?.id === task.id ? taskColors.selected : taskColors.default }`}
+                className={`relative group ${taskColors.hover} ${selectedItem?.type === findIdForUnitType('Task', unitTypeData) && selectedItem?.id === task.id ? taskColors.selected : taskColors.default }`}
 
                 onClick={() => handleClick(task)} onMouseDown={(event => handleMouseDown(task, event))} onMouseUp={() => handleMouseUp()}> 
-                <p className={`text-center`}>{task.name}</p>
+                <div className='flex justify-between'>
+                    <div className='bg-lime-400 w-4 flex justify-center items-center invisible group-hover:visible' onClick={(e) => {
+                        e.stopPropagation(); 
+                        setCaretDirection('left');
+                    }}
+                    >{ caretDirection}</div>
+                    <p className={`text-center`}>{task.name}</p>
+                    <div className={`bg-lime-400 w-4 flex justify-center items-center invisible group-hover:visible ${caretDirection === 'right' ? 'visible bg-lime-600 group-hover:visible' : ''}`} onClick={(e) => {
+                        e.stopPropagation();
+                        setCaretDirection('right');
+                    }}
+                    >{caretDirection}</div>
+
+                </div>
             </div>
         );
     });
@@ -335,3 +424,4 @@ export const Timeline = ({
         </div>
     );
 };
+
