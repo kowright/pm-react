@@ -108,39 +108,17 @@ export const Timeline = ({
         const modulo = mouseInsideContainer % (day * 4);
         const leftNum = mouseInsideContainer - modulo;
 
-        //element.style.left = `${leftNum}px`;
 
         if (caretDirection === 'left') { //make sure duration can't be less zero
             element.style.left = `${leftNum}px`;
 
             let startOffset = Math.round((new Date(draggedTask.startDate).getTime() - startDate.getTime()) / (1000 * 3600 * 24));
-            const offset = leftNum - (startOffset / 60);
-            //console.log('start ' + leftNum + 'px')
 
-    /*        console.log("task dur " + draggedTask.duration + ' days')
-            console.log("duration " +  (draggedTask.duration * 60) + 'px')*/ 
-           // console.log("start offset " + ((startOffset * 60) - leftNum)/60 )
-            //element.style.right = '660px'; dont work
             const newDuration = (draggedTask.duration + ((startOffset * 60) - leftNum) / 60)
             element.style.width = `${newDuration * 60}px`;
-            console.log('new duration ' + newDuration);
-            //draggedTask.duration = newDuration
         }
         if (caretDirection === 'right') { //make sure duration can't be less zero
-            let endOffset = Math.round((new Date(draggedTask.endDate).getTime() - endDate.getTime()) / (1000 * 3600 * 24));
-            console.log('left ' + leftNum + 'px')
-         /*   console.log("duration " + (draggedTask.duration * 60) + 'px') 
-            console.log("mouse inside container " + mouseInsideContainer);
-            console.log("modulo " + modulo)
-            console.log('rect right ' + rect.right + 'px')*/
-            console.log("dragged div left " + draggedDiv.style.left)
-            console.log("mouse inside container " + mouseInsideContainer);
-            console.log('container left ' + containerLeft)
-            console.log("scroll left " + scrollContainer.scrollLeft)
-            console.log("possible mouseX " + (mouseX - containerLeft))
-            console.log('mouseX ' + mouseX)
-            const newMouseX = mouseX + (draggedTask.duration * 60)
-            console.log('new mouse x ' + newMouseX)
+
             const modulus = (mouseX - containerLeft) % (day * 4);
             console.log("modulo " + modulus)
             const nextBlock = (mouseX - containerLeft) - modulus;
@@ -151,13 +129,17 @@ export const Timeline = ({
             const currentLeft = parseFloat(leftStyleValue);
             const newWidth = nextBlock - currentLeft;
             console.log('hm ' + newWidth + " px");
-            
+
             //element.style.width = `${3 * 60}px`; //moves back
 
             //const newDuration = (draggedTask.duration + ((startOffset * 60) - leftNum) / 60)
             element.style.width = `${newWidth}px`;
             //console.log('new duration ' + newDuration);
             //draggedTask.duration = newDuration
+        }
+        else {
+            element.style.left = `${leftNum}px`; //still needed for middle change
+
         }
 
 
@@ -181,19 +163,21 @@ export const Timeline = ({
   
                 let millisecondsToAdd = draggedTask.duration * 24 * 60 * 60 * 1000; //make conditional calc
 
-                if (caretDirection === 'left') {
+                if (caretDirection !== '') {
                     console.log('duration mouse up ' + draggedTask.duration);
                     const editedDuration = (draggedDiv.offsetWidth) / 60;
                     console.log('calc duration ' + editedDuration)
                     millisecondsToAdd = editedDuration * 24 * 60 * 60 * 1000;
-                }
-                if (caretDirection === 'right') {
-                /*    console.log('duration mouse up ' + draggedTask.duration);
-                    const editedDuration = (draggedDiv.offsetWidth) / 60;
-                    console.log('calc duration ' + editedDuration)
-                    millisecondsToAdd = editedDuration * 24 * 60 * 60 * 1000;*/
+                    setCaretDirection('');
 
                 }
+             /*   if (caretDirection === 'right') {
+                  console.log('duration mouse up ' + draggedTask.duration);
+                    const editedDuration = (draggedDiv.offsetWidth) / 60;
+                    console.log('calc duration ' + editedDuration)
+                    millisecondsToAdd = editedDuration * 24 * 60 * 60 * 1000;
+
+                }*/
 
                 const editedEndDateTimestamp = editedStartDate.getTime() + millisecondsToAdd;
 
@@ -211,7 +195,7 @@ export const Timeline = ({
                 console.log('start date ' + editedStartDate + ' - ' + editedEndDate);
                 setCaretDirection('');
 
-               // props.updateItem(updatedItem as Task);
+                props.updateItem(updatedItem as Task);
             }
             else {
                 const daysAfterStart = (draggedDiv.offsetLeft / (day * 4));
@@ -310,17 +294,27 @@ export const Timeline = ({
 
                 onClick={() => handleClick(task)} onMouseDown={(event => handleMouseDown(task, event))} onMouseUp={() => handleMouseUp()}> 
                 <div className='flex justify-between'>
-                    <div className='bg-lime-400 w-4 flex justify-center items-center invisible group-hover:visible' onClick={(e) => {
+                    <div className={`bg-lime-400 w-4 flex justify-center items-center invisible group-hover:visible ${caretDirection === 'left' ? 'visible bg-lime-600 group-hover:visible' : ''}`}
+                        onClick={(e) => {
                         e.stopPropagation(); 
                         setCaretDirection('left');
                     }}
-                    >{ caretDirection}</div>
-                    <p className={`text-center`}>{task.name}</p>
-                    <div className={`bg-lime-400 w-4 flex justify-center items-center invisible group-hover:visible ${caretDirection === 'right' ? 'visible bg-lime-600 group-hover:visible' : ''}`} onClick={(e) => {
+                    >
+                        {leftCaret}
+                    </div>
+
+                    <div>
+                        <p className={`text-center`}>{task.name}</p>
+                    </div>
+
+                    <div className={`bg-lime-400 w-4 flex justify-center items-center invisible group-hover:visible ${caretDirection === 'right' ? 'visible bg-lime-600 group-hover:visible' : ''}`}
+                        onClick={(e) => {
                         e.stopPropagation();
-                        setCaretDirection('right');
+                            setCaretDirection('right');
                     }}
-                    >{caretDirection}</div>
+                    >
+                        {rightCaret}
+                    </div>
 
                 </div>
             </div>
