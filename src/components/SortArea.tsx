@@ -12,7 +12,7 @@ interface SortAreaProps {
 export const SortArea = (props: SortAreaProps) => {
 
     return (
-        <>
+        <div className='px-2'>
             {props.unitOfSort === 'Task' && (
                 <div className='flex gap-x-4 gap-y-2 flex-wrap'>
                     <FilterButton text='Sort Alphabetically' active={props.sortState.taskSortState.includes("Alphabetical")} onClick={() => props.handleSort('Alphabetical')} />
@@ -27,7 +27,7 @@ export const SortArea = (props: SortAreaProps) => {
                     <FilterButton text='Sort By Date' active={props.sortState.milestoneSortState.includes("EarliestDate")} onClick={() => props.handleSort('EarliestDate')} />
                 </div>
             )}
-        </>
+        </div>
     );
 
 };

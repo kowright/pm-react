@@ -12,13 +12,15 @@ import { Sidebar } from './components/Sidebar';
 import { ErrorPopup } from './components/ErrorPopup';
 import { AddPopup } from './components/AddPopup';
 import TimelineView from './views/TimelineView';
+import createLogger from './utils/logger';
 
+const logger = createLogger('App');
 function App() {
     const [view, setView] = React.useState<string>('List');
     const [selectedItem, setSelectedItem] = React.useState<Task | Milestone | Tag | Assignee | null>(null);
     const [showPopup, setShowPopup] = React.useState(false);
     const [showErrorPopup, setShowErrorPopup] = React.useState(false);
-    const [errorPopupContent, setErrorPopupContent] = React.useState(<div>WHAT</div>);
+    const [errorPopupContent, setErrorPopupContent] = React.useState(<div>ERROR</div>);
     const [listType, setListType] = React.useState('Task');
 
     // #region Unit Get
@@ -33,10 +35,10 @@ function App() {
         fetchTaskStatus();
     }, []);
 
-    const [tasks, setTasks] = React.useState<Task[]>([]); // State to hold tasks
-    const [milestones, setMilestones] = React.useState<Milestone[]>([]); // State to hold milestones
-    const [tags, setTags] = React.useState<Tag[]>([]); // State to hold milestones
-    const [assignees, setAssignees] = React.useState<Assignee[]>([]); // State to hold milestones
+    const [tasks, setTasks] = React.useState<Task[]>([]); 
+    const [milestones, setMilestones] = React.useState<Milestone[]>([]); 
+    const [tags, setTags] = React.useState<Tag[]>([]); 
+    const [assignees, setAssignees] = React.useState<Assignee[]>([]); 
     const [unitTypes, setUnitTypes] = React.useState<UnitType[]>([]);
     const [roadmaps, setRoadmaps] = React.useState<Roadmap[]>([]);
     const [taskStatuses, setTaskStatuses] = React.useState<TaskStatus[]>([]);
@@ -45,49 +47,49 @@ function App() {
         fetch("/api/tasks?roadmaps=true&tags=true")
             .then((res) => res.json())
             .then((data) => setTasks(data))
-            .catch((error) => console.error('Error fetching tasks:', error));
+            .catch((error) => logger.error('error fetching tasks', error));
     };
 
     const fetchMilestones = () => {
         fetch("/api/milestones?roadmaps=true&tags=true")
             .then((res) => res.json())
             .then((data) => setMilestones(data))
-            .catch((error) => console.error('Error fetching milestones:', error));
+            .catch((error) => logger.error('Error fetching milestones:', error));
     };
 
     const fetchRoadmaps = () => {
         fetch("/api/roadmaps")
             .then((res) => res.json())
             .then((data) => setRoadmaps(data))
-            .catch((error) => console.error('Error fetching data:', error));
+            .catch((error) => logger.error('Error fetching roadmaps:', error));
     };
 
     const fetchTags = () => {
         fetch("/api/tags")
             .then((res) => res.json())
             .then((data) => setTags(data))
-            .catch((error) => console.error('Error fetching tags:', error));
+            .catch((error) => logger.error('Error fetching tags:', error));
     };
 
     const fetchAssignees = () => {
         fetch("/api/assignees")
             .then((res) => res.json())
             .then((data) => setAssignees(data))
-            .catch((error) => console.error('Error fetching assignees:', error));
+            .catch((error) => logger.error('Error fetching assignees:', error));
     };
 
     const fetchUnitTypes = () => {
         fetch("/api/unittypes")
             .then((res) => res.json())
             .then((data) => setUnitTypes(data))
-            .catch((error) => console.error('Error fetching unit types:', error));
+            .catch((error) => logger.error('Error fetching unit types:', error));
     };
 
     const fetchTaskStatus = () => {
         fetch("/api/taskstatus")
             .then((res) => res.json())
             .then((data) => setTaskStatuses(data))
-            .catch((error) => console.error('Error fetching task statuses:', error));
+            .catch((error) => logger.error('Error fetching task statuses:', error));
     }
     // #endregion
 
@@ -105,11 +107,14 @@ function App() {
     })
 
     React.useEffect(() => { //reset filter area on view switch
+        if (showErrorPopup === true) {
+            setShowErrorPopup(false);
+            return;
+        }
         setRoadmapFilterState([]);
         setTaskStatusFilterState([]);
         setTagFilterState([]);
         setAssigneeFilterState([]);
-    
     }, [view])
 
     React.useEffect(() => {
@@ -118,8 +123,9 @@ function App() {
             taskStatusFilterState: taskStatusFilterState,
             tagFilterState: tagFilterState,
             assigneeFilterState: assigneeFilterState
-       
         });
+        
+
     }, [roadmapFilterState, taskStatusFilterState, tagFilterState, assigneeFilterState]);
 
 
@@ -216,28 +222,27 @@ function App() {
         }
 
         if (updatedItem.type === findIdForUnitType('Task', unitTypes)) {
-            updateTask(updatedItem as Task)
+            updateTask(updatedItem as Task);
         }
         else if (updatedItem.type === findIdForUnitType('Milestone', unitTypes)) {
-            updateMilestone(updatedItem as Milestone)
+            updateMilestone(updatedItem as Milestone);
         }
         else if (updatedItem.type === findIdForUnitType('Tag', unitTypes)) {
-            updateTag(updatedItem as Tag)
+            updateTag(updatedItem as Tag);
         }
         else if (updatedItem.type === findIdForUnitType('Assignee', unitTypes)) {
-            updateAssignee(updatedItem as Assignee)
+            updateAssignee(updatedItem as Assignee);
         }
         else if (updatedItem.type === findIdForUnitType('TaskStatus', unitTypes)) {
-            updateTaskStatus(updatedItem as TaskStatus)
+            updateTaskStatus(updatedItem as TaskStatus);
         }
         else if (updatedItem.type === findIdForUnitType('Roadmap', unitTypes)) {
-            updateRoadmap(updatedItem as Roadmap)
+            updateRoadmap(updatedItem as Roadmap);
         }
     }
 
     const updateTask = (updatedTask: Task) => {
-        // Update task in API
-        console.log("sending backend: ", updatedTask);
+        
         fetch(`/api/tasks/${updatedTask.id}`, {
             method: 'PUT',
             headers: {
@@ -245,29 +250,28 @@ function App() {
             },
             body: JSON.stringify(updatedTask),
         })
-            .then(res => res.json())
-            .then(data => {
-                console.log(data)
-                if (data === undefined) {
-                    console.log("data returned from backend is null")
-                    console.log("ERROR:", data.error)
+        .then(res => res.json())
+        .then(data => {
+                if (data.error) {
+                    logger.error(data.error);
+                    alert(data.error)
                     return;
                 }
-                console.log('Updated task:', data);
-                // Update local state with updated task
-                const updatedTasks: Task[] = tasks.map(task => (task.id === updatedTask.id ? data : task));
-                setSelectedItem(data)
-                console.log("updated new task to ", updatedTasks.find(task => task.id === data.id));
-                setTasks(updatedTasks);
-            })
-            .catch(error => {
-                console.error('Error updating task:', error);
-            });
+               
+            logger.info('updated task ' + data.name);
+
+            const updatedTasks: Task[] = tasks.map(task => (task.id === updatedTask.id ? data : task));
+
+            //setSelectedItem(data); //TODO is this needed
+            setTasks(updatedTasks);
+        })
+        .catch(error => {
+            logger.error('Error updating task:', error);
+        });
     };
 
     const updateMilestone = (updatedMilestone: Milestone) => {
-        // Update milestone in API
-        console.log("sending backend ", updatedMilestone)
+
         fetch(`/api/milestones/${updatedMilestone.id}`, {
             method: 'PUT',
             headers: {
@@ -275,20 +279,20 @@ function App() {
             },
             body: JSON.stringify(updatedMilestone),
         })
-            .then(res => res.json())
-            .then(data => {
-                console.log('Updated milestone:', data);
-                // Update local state with updated milestone
-                const updatedMilestones = milestones.map(milestone => (milestone.id === updatedMilestone.id ? data : milestone));
-                setMilestones(updatedMilestones);
-            })
-            .catch(error => {
-                console.error('Error updating milestone:', error);
-            });
+        .then(res => res.json())
+        .then(data => {
+            logger.info('Updated milestone ' + data.name);
+
+            const updatedMilestones = milestones.map(milestone => (milestone.id === updatedMilestone.id ? data : milestone));
+            setMilestones(updatedMilestones);
+        })
+        .catch(error => {
+            logger.error('Error updating milestone:', error);
+        });
     };
 
     const updateTag = (updatedTag: Tag) => {
-        // Update task in API
+
         fetch(`/api/tags/${updatedTag.id}`, {
             method: 'PUT',
             headers: {
@@ -296,23 +300,26 @@ function App() {
             },
             body: JSON.stringify(updatedTag),
         })
-            .then(res => res.json())
+        .then(res => res.json())
             .then(data => {
-                console.log('Updated item:', data);
-                // Update local state with updated task
-                const updatedTags: Tag[] = tags.map(tag => (tag.id === updatedTag.id ? data : tag));
+                if (data.error) {
+                    logger.error(data.error);
+                    alert(data.error)
+                    return;
+                }
+            logger.info('Updated tag ' + data.name);
 
-                setTags(updatedTags);
+            const updatedTags: Tag[] = tags.map(tag => (tag.id === updatedTag.id ? data : tag));
 
-
-            })
-            .catch(error => {
-                console.error('Error updating tag:', error);
-            });
+            setTags(updatedTags);
+        })
+        .catch(error => {
+            logger.error('Error updating tag:', error);
+        });
     };
 
     const updateRoadmap = (updatedRoadmap: Roadmap) => {
-        // Update task in API
+
         fetch(`/api/roadmaps/${updatedRoadmap.id}`, {
             method: 'PUT',
             headers: {
@@ -320,24 +327,25 @@ function App() {
             },
             body: JSON.stringify(updatedRoadmap),
         })
-            .then(res => res.json())
+        .then(res => res.json())
             .then(data => {
-                console.log('Updated roadmap:', data);
+                if (data.error) {
+                    logger.error(data.error);
+                    alert(data.error)
+                    return;
+                }
+            logger.info('Updated roadmap ' + data.name);
 
-                const updatedRoadmaps: Roadmap[] = roadmaps.map(map => (map.id === updatedRoadmap.id ? data : map));
-                console.log('updated raodmaps array', updatedRoadmaps)
-                setRoadmaps(updatedRoadmaps);
-
-
-            })
-            .catch(error => {
-                console.error('Error updating roadmap:', error);
-            });
+            const updatedRoadmaps: Roadmap[] = roadmaps.map(map => (map.id === updatedRoadmap.id ? data : map));
+            setRoadmaps(updatedRoadmaps);
+        })
+        .catch(error => {
+            logger.error('Error updating roadmap:', error);
+        });
     };
 
     const updateAssignee = (updatedAssignee: Assignee) => {
-        // Update task in API
-        console.log("update assignee", updatedAssignee)
+   
         fetch(`/api/assignees/${updatedAssignee.id}`, {
             method: 'PUT',
             headers: {
@@ -345,23 +353,26 @@ function App() {
             },
             body: JSON.stringify(updatedAssignee),
         })
-            .then(res => res.json())
+        .then(res => res.json())
             .then(data => {
-                console.log('Updated item:', data);
+                if (data.error) {
+                    logger.error(data.error);
+                    alert(data.error)
+                    return;
+                }
+            logger.info('Updated assignee ' + data.name);
 
-                const updatedTags: Assignee[] = assignees.map(assignee => (assignee.id === updatedAssignee.id ? data : assignee));
+            const updatedTags: Assignee[] = assignees.map(assignee => (assignee.id === updatedAssignee.id ? data : assignee));
 
-                setAssignees(updatedTags);
-
-
-            })
-            .catch(error => {
-                console.error('Error updating assignee:', error);
-            });
+            setAssignees(updatedTags);
+        })
+        .catch(error => {
+            logger.error('Error updating assignee:', error);
+        });
     };
 
     const updateTaskStatus = (updatedTaskStatus: TaskStatus) => {
-        // Update task in API
+
         fetch(`/api/taskstatus/${updatedTaskStatus.id}`, {
             method: 'PUT',
             headers: {
@@ -369,19 +380,22 @@ function App() {
             },
             body: JSON.stringify(updatedTaskStatus),
         })
-            .then(res => res.json())
+        .then(res => res.json())
             .then(data => {
-                console.log('Updated item:', data);
-                // Update local state with updated task
-                const updatedTaskStatuses: TaskStatus[] = taskStatuses.map(status => (status.id === updatedTaskStatus.id ? data : status));
+                if (data.error) {
+                    logger.error(data.error);
+                    alert(data.error)
+                    return;
+                }
+            logger.info('Updated milestone ' + data.name);
 
-                setTaskStatuses(updatedTaskStatuses);
+            const updatedTaskStatuses: TaskStatus[] = taskStatuses.map(status => (status.id === updatedTaskStatus.id ? data : status));
 
-
-            })
-            .catch(error => {
-                console.error('Error updating task status:', error);
-            });
+            setTaskStatuses(updatedTaskStatuses);
+        })
+        .catch(error => {
+            logger.error('Error updating task status:', error);
+        });
     };
 
     // #endregion
@@ -398,8 +412,8 @@ function App() {
     };
 
     const handleGoFixIt = (listType: string, filterName: string, data: UnitDataType) => {
-
-        setShowErrorPopup(false);
+        console.log("fixing it "  + filterName)
+        //setShowErrorPopup(false);
         setView('List');
         setListType(listType);
         setSelectedItem(null);
@@ -408,7 +422,8 @@ function App() {
             setTagFilterState([filterName]);
         }
         else if (data.type === findIdForUnitType('Assignee', unitTypes)) {
-            //maybe none? 
+            console.log('fixing it assignee')
+            setAssigneeFilterState([filterName]);
         }
         else if (data.type === findIdForUnitType('Task Status', unitTypes)) {
             setTaskStatusFilterState([filterName]);
@@ -417,9 +432,8 @@ function App() {
             setRoadmapFilterState([filterName]);
         }
         else {
-            console.log("handle go fix it cannot deal with this data.type")
+            logger.warn("handle go fix it cannot deal with this data.type")
         }
-
     };
 
     const deleteItem = (deletedItem: UnitDataTypeWithNull) => {
@@ -450,32 +464,30 @@ function App() {
         setShowErrorPopup(false);
 
         if (deletedItem.type === findIdForUnitType('Task', unitTypes)) {
-            deleteTask(deletedItem as Task)
+            deleteTask(deletedItem as Task);
         }
         else if (deletedItem.type === findIdForUnitType('Milestone', unitTypes)) {
-            deleteMilestone(deletedItem as Milestone)
+            deleteMilestone(deletedItem as Milestone);
         }
         else if (deletedItem.type === findIdForUnitType('Tag', unitTypes)) {
-            deleteTag(deletedItem as Tag)
+            deleteTag(deletedItem as Tag);
         }
         else if (deletedItem.type === findIdForUnitType('Assignee', unitTypes)) {
-            deleteAssignee(deletedItem as Assignee)
+            deleteAssignee(deletedItem as Assignee);
         }
         else if (deletedItem.type === findIdForUnitType('Task Status', unitTypes)) {
-            deleteTaskStatus(deletedItem as TaskStatus)
+            deleteTaskStatus(deletedItem as TaskStatus);
         }
         else if (deletedItem.type === findIdForUnitType('Roadmap', unitTypes)) {
-            deleteRoadmap(deletedItem as Roadmap)
+            deleteRoadmap(deletedItem as Roadmap);
         }
         else {
-            console.log("couldn't handle delete item what was selected")
+            logger.warn("couldn't handle delete item what was selected");
         }
     }
 
     const deleteTask = (deletedTask: Task) => {
-        // Delete task in API
-        console.log("delettask")
-        console.log("sending backend: ", deletedTask);
+   
         fetch(`/api/tasks/${deletedTask.id}`, {
             method: 'DELETE',
             headers: {
@@ -483,29 +495,29 @@ function App() {
             },
 
         })
-            .then(res => res.json())
-            .then(data => {
+        .then(res => res.json())
+        .then(data => {
+            logger.info('deleted task ' + deletedTask.name);
+            if (data.error) {
+                logger.error(data.error);
+                alert(data.error)
+                return;
+            }
+            const indexToDelete = tasks.findIndex(task => task.id === deletedTask.id);
+            if (indexToDelete !== -1) {
+                const updatedTasks = [...tasks.slice(0, indexToDelete), ...tasks.slice(indexToDelete + 1)];
 
-
-                const indexToDelete = tasks.findIndex(task => task.id === deletedTask.id);
-                console.log("deleting task index " + indexToDelete)
-                if (indexToDelete !== -1) {
-                    // Create a new array without the deleted task
-                    const updatedTasks = [...tasks.slice(0, indexToDelete), ...tasks.slice(indexToDelete + 1)];
-
-                    setTasks(updatedTasks);
-                }
-                setSelectedItem(null)
-
-            })
-            .catch(error => {
-                console.error('Error deleting task:', error);
-            });
+                setTasks(updatedTasks);
+            }
+            setSelectedItem(null); //TODO does this need to be here
+        })
+        .catch(error => {
+            logger.error('Error deleting task:', error);
+        });
     };
 
     const deleteMilestone = (deletedMilestone: Milestone) => {
-        // Delete milestone in API
-        console.log("sending backend ", deletedMilestone)
+
         fetch(`/api/milestones/${deletedMilestone.id}`, {
             method: 'DELETE',
             headers: {
@@ -513,28 +525,32 @@ function App() {
             },
             body: JSON.stringify(deletedMilestone),
         })
-            .then(res => res.json())
+        .then(res => res.json())
             .then(data => {
-                const indexToDelete = milestones.findIndex(ms => ms.id === deletedMilestone.id);
-                console.log("deleting task index " + indexToDelete)
-                if (indexToDelete !== -1) {
-                    // Create a new array without the deleted task
-                    const updatedMilestones = [...milestones.slice(0, indexToDelete), ...milestones.slice(indexToDelete + 1)];
-
-                    setMilestones(updatedMilestones);
+                if (data.error) {
+                    logger.error(data.error);
+                    alert(data.error)
+                    return;
                 }
-                setSelectedItem(null)
-            })
-            .catch(error => {
-                console.error('Error deleting milestone:', error);
-            });
+            logger.info('deleted milestone ' + deletedMilestone.name);
+
+        const indexToDelete = milestones.findIndex(ms => ms.id === deletedMilestone.id);
+
+        if (indexToDelete !== -1) {
+            const updatedMilestones = [...milestones.slice(0, indexToDelete), ...milestones.slice(indexToDelete + 1)];
+
+            setMilestones(updatedMilestones);
+        }
+        setSelectedItem(null); //TODO and this
+        })
+        .catch(error => {
+            logger.error('Error deleting milestone:', error);
+        });
     };
 
     const deleteTag = (deletedTag: Tag, allowAutoDelete: boolean = false) => {
-        // Delete task in API
-        console.log("delete tag func")
+
         if (!allowAutoDelete) {
-            console.log("no auto delete")
             const allTasksWithTag = tasks.filter(task =>
                 task.tags.some(tag => tag.id === deletedTag.id)
             );
@@ -572,7 +588,6 @@ function App() {
                 );
                 return;
             }
-            console.log("no tasks with tag " + deletedTag.name)
             const allMilestonesWithTag = milestones.filter(ms =>
                 ms.tags.some(tag => tag.id === deletedTag.id)
             );
@@ -612,9 +627,10 @@ function App() {
             }
 
         }
-        else {
+       /* else {
             deleteTag(deletedTag, true);
-        }
+        }*/
+
         fetch(`/api/tags/${deletedTag.id}`, {
             method: 'DELETE',
             headers: {
@@ -623,15 +639,21 @@ function App() {
             body: JSON.stringify(deletedTag),
         })
         .then(res => res.json())
-        .then(data => {
+            .then(data => {
+                if (data.error) {
+                    logger.error(data.error);
+                    alert(data.error)
+                    return;
+                }
+            logger.info('deleted tag ' + deletedTag.name);
+
             const indexToDelete = tags.findIndex(tag => tag.id === deletedTag.id);
-            console.log("deleting task index " + indexToDelete)
+
             if (indexToDelete !== -1) {
                 const updatedTags = [...tags.slice(0, indexToDelete), ...tags.slice(indexToDelete + 1)];
-                console.log("updating tags after deleting tag")
                 setTags(updatedTags);
             }
-            setSelectedItem(null)
+            setSelectedItem(null); //TODO and this
             setTagFilterState(prev => {
                 if (prev.includes(deletedTag.name)) {
                     return prev.filter(item => item !== deletedTag.name);
@@ -642,21 +664,18 @@ function App() {
 
         })
         .catch(error => {
-            console.error('Error deleting tag:', error);
+            logger.error('Error deleting tag:', error);
         });
     }
 
     const deleteAssignee = (deletedAssignee: Assignee, allowAutoDelete: boolean = false) => {
-        console.log("deleting assignee")
         if (!allowAutoDelete) {
-            console.log("checking assignee references")
 
             const allTasksWithAssignee = tasks.filter(task =>
                 task.assignee.id === deletedAssignee.id);
 
             if (allTasksWithAssignee.length > 0) {
-                console.log("got some stuff to delete", allTasksWithAssignee);
-
+                const changeToViewName = 'Task';
 
                 handleShowErrorPopup(
                     <div>
@@ -676,23 +695,20 @@ function App() {
                         <div className='flex justify-between gap-4'>
                             <button className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded" onClick={() => handleGoBack()}>Go Back</button>
 
-                            <button className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded" onClick={() => { setShowErrorPopup(false); deleteAssignee(deletedAssignee, true) }}>Remove From Everything</button>
+                            <button className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded" onClick={() => handleGoFixIt(changeToViewName, deletedAssignee.name, deletedAssignee)}>Go Fix It</button>
 
+{/*                            <button className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded" onClick={() => { setShowErrorPopup(false); deleteAssignee(deletedAssignee, true) }}>Remove From Everything</button>
+*/}
                         </div>
                     </div>
                 );
             } else {
-                console.log("check assignee ALL GOOD")
                 deleteAssignee(deletedAssignee, true);
             }
-            
+
             return;
         }
 
-        console.log("delete delete assignee")
-
-
-        // Delete task in API
         fetch(`/api/assignees/${deletedAssignee.id}`, {
             method: 'DELETE',
             headers: {
@@ -701,21 +717,24 @@ function App() {
             body: JSON.stringify(deletedAssignee),
         })
         .then(res => res.json())
-        .then(data => {
+            .then(data => {
+                if (data.error) {
+                    logger.error(data.error + ' for ' + deletedAssignee.name);
+                    alert(data.error);
+                    return;
+                }
+            logger.info('deleted assignee ' + deletedAssignee.name);
+            
             const indexToDelete = assignees.findIndex(as => as.id === deletedAssignee.id);
-            console.log("deleting task index " + indexToDelete)
             if (indexToDelete !== -1) {
-                // Create a new array without the deleted task
                 const updatedAssignees = [...assignees.slice(0, indexToDelete), ...assignees.slice(indexToDelete + 1)];
 
                 setAssignees(updatedAssignees);
             }
-            setSelectedItem(null)
-
-
+            setSelectedItem(null); //and this
         })
         .catch(error => {
-            console.error('Error deleting assignee:', error);
+            logger.error('Error deleting assignee:', error);
         });
     };
 
@@ -810,23 +829,21 @@ function App() {
             body: JSON.stringify(deletedTaskStatus),
         })
         .then(res => res.json())
-        .then(data => {
-            console.log("data", data)
-           
-
-            console.log("deleted ts id", deletedTaskStatus.id)
-            console.log("all ts ", taskStatuses)
-
+            .then(data => {
+                if (data.error) {
+                    logger.error(data.error);
+                    alert(data.error)
+                    return;
+                }
+            logger.info('deleted task status ' + deletedTaskStatus.name);
+          
             const indexToDelete = taskStatuses.findIndex(ts => ts.id === deletedTaskStatus.id);
-            console.log("delete ts index", indexToDelete)
 
             if (indexToDelete !== -1) {
-                // Create a new array without the deleted task
                 const updatedTaskStatus = [...taskStatuses.slice(0, indexToDelete), ...taskStatuses.slice(indexToDelete + 1)];
-                console.log("delete ts", updatedTaskStatus)
                 setTaskStatuses(updatedTaskStatus);
             }
-            setSelectedItem(null);
+            setSelectedItem(null);//TODO and this 
             setTaskStatusFilterState(prev => {
                 if (prev.includes(deletedTaskStatus.name)) {
                     return prev.filter(item => item !== deletedTaskStatus.name);
@@ -837,7 +854,7 @@ function App() {
 
         })
         .catch(error => {
-            console.error('Error deleting task status:', error);
+            logger.error('Error deleting task status:', error);
         });
     }
 
@@ -849,9 +866,7 @@ function App() {
                 task.roadmaps.some(map => map.id === deletedRoadmap.id)
             );
             if (allTasksWithRoadmap.length > 0) {
-                console.log("got some stuff to delete", allTasksWithRoadmap);
            
-
                 const changeToViewName = 'Task';
 
                 handleShowErrorPopup(
@@ -922,8 +937,6 @@ function App() {
             return;
         }
     
-
-
         fetch(`/api/roadmaps/${deletedRoadmap.id}`, {
             method: 'DELETE',
             headers: {
@@ -932,17 +945,21 @@ function App() {
             body: JSON.stringify(deletedRoadmap),
         })
         .then(res => res.json())
-        .then(data => {
-            console.log("deleted ts id", deletedRoadmap.id)
+            .then(data => {
+                if (data.error) {
+                    logger.error(data.error);
+                    alert(data.error)
+                    return;
+                }
+            logger.info('deleted roadmap ' + deletedRoadmap.name);
 
             const indexToDelete = roadmaps.findIndex(map => map.id === deletedRoadmap.id);
 
             if (indexToDelete !== -1) {
                 const updatedRoadmaps = [...roadmaps.slice(0, indexToDelete), ...roadmaps.slice(indexToDelete + 1)];
-                console.log("delete ts", deletedRoadmap)
                 setRoadmaps(updatedRoadmaps);
             }
-            setSelectedItem(null);
+            setSelectedItem(null); //and this TODO
             setRoadmapFilterState(prev => {
                 if (prev.includes(deletedRoadmap.name)) {
                     return prev.filter(item => item !== deletedRoadmap.name);
@@ -953,87 +970,73 @@ function App() {
 
         })
         .catch(error => {
-            console.error('Error deleting roadmap:', error);
+            logger.error('Error deleting roadmap:', error);
         });
     };
     // #endregion
 
     // #region Unit Create
     const createItem = (formData: any, type: string) => {
-        console.log("create item routing on " + type)
         if (formData == null) {
             return;
         }
-        console.log("create item routing form data not null")
 
-        if (type === 'Task') {
+        if (type === 'Task') { 
             createTask(formData)
         }
         else if (type === 'Milestone') {
             createMilestone(formData);
         }
         else if (type === 'Tag') {
-            console.log("tag create item")
-
             createTag(formData);
         }
         else if (type === 'Assignee') {
-            console.log("assignee create item")
-
             createAssignee(formData);
         }
         else if (type === 'Task Status') {
-
-            console.log("task status create item")
             createTaskStatus(formData);
         }
         else if (type === 'Roadmap') {
-
-            console.log("roadmap create item")
             createRoadmap(formData);
         }
-
     }
 
 
     const createTask = async (formData: any) => {
-         try {
-          const response = await fetch('/api/tasks', {
-              method: 'POST',
-              headers: {
-                  'Content-Type': 'application/json',
-              },
-              body: JSON.stringify(formData),
-          });
+        try {
+            const response = await fetch('/api/tasks', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData),
+            });
 
-          if (!response.ok) {
-              // Check if response is not successful (HTTP status code outside of 200-299 range)
-              throw new Error(`HTTP error! Status: ${response.status}`);
-          }
+            if (!response.ok) {
+                logger.error(`HTTP error; status: ${response.status}`);
+            }
 
-          // Assuming the API returns JSON data
-             const data = await response.json();
+            const data = await response.json();
+
+            if (data.error) {
+                logger.error(data.error);
+                alert(data.error)
+                return;
+            }
              
-             const newTask = data as Task;
-             console.log("new task", newTask)
+            const newTask = data as Task;
 
-        
+            setShowPopup(false);
 
-             setShowPopup(false)
-
-             setTasks(prevTasks => [...prevTasks, newTask]);
-
-
+            setTasks(prevTasks => [...prevTasks, newTask]);
 
       } catch (error) {
-          // Handle fetch errors and API errors here
-          console.error('Error fetching data:', error);
+          logger.error('Error fetching data:', error);
       }
     };
 
     const createMilestone = async (formData: any) => {
-        // Create milestone in API
-        console.log("sending backend ", formData)
+
         try {
             const response = await fetch('/api/milestones', {
                 method: 'POST',
@@ -1044,33 +1047,29 @@ function App() {
             });
 
             if (!response.ok) {
-                // Check if response is not successful (HTTP status code outside of 200-299 range)
-                throw new Error(`HTTP error! Status: ${response.status}`);
+                logger.error(`HTTP error; status: ${response.status}`);
             }
 
-            // Assuming the API returns JSON data
             const data = await response.json();
 
-            // Handle the response data as needed
-            console.log('API response:', data);
-
-            setShowPopup(false)
+            if (data.error) {
+                logger.error(data.error);
+                alert(data.error)
+                return;
+            }
+            setShowPopup(false);
 
             const newMs = data as Milestone;
-            console.log("new task", newMs)
 
             setMilestones(prev => [...prev, newMs]);
 
-
         } catch (error) {
-            // Handle fetch errors and API errors here
-            console.error('Error fetching data:', error);
+            logger.error('Error fetching data:', error);
         }
     };
 
     const createTag = async (formData:any) => {
-        // Create task in API
-        console.log("create tag")
+
         try {
             const response = await fetch('/api/tags', {
                 method: 'POST',
@@ -1081,37 +1080,35 @@ function App() {
             });
 
             if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}} & ${await response.json() }`);
+                logger.error(`HTTP error; status: ${response.status}`);
             }
 
-            // Assuming the API returns JSON data
             const data = await response.json();
 
-            setShowPopup(false)
+            if (data.error) {
+                logger.error(data.error);
+                alert(data.error)
+                return;
+            }
+
+            setShowPopup(false);
 
             const newTag = data as Tag;
-            console.log("new tags", newTag)
-            console.log("tag format", tags[0])
 
             setTags(prev => [...prev, newTag]);
 
-
         } catch (error) {
-            // Handle fetch errors and API errors here
-            console.error('Error fetching data:', error);
+            logger.error('Error fetching data:', error);
         }
     }
 
     const createAssignee = async (formData: any) => {
-        // Create task in API
-      
-        //assignee creation
+
         try {
 
             if (formData.fileInput !== null) {
                 formData.imageId = await imageUpload(formData.fileInput);
             }
-            console.log("form data assignee", formData)
 
             const response = await fetch('/api/assignees', {
                 method: 'POST',
@@ -1122,28 +1119,30 @@ function App() {
             });
 
             if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
+                logger.error(`HTTP error; status: ${response.status}`);
             }
 
-            // Assuming the API returns JSON data
             const data = await response.json();
 
-            setShowPopup(false)
+            if (data.error) {
+                logger.error(data.error);
+                alert(data.error)
+                return;
+            }
+
+            setShowPopup(false);
 
             const newAssignee = data as Assignee;
-            console.log("new assignee", newAssignee)
 
             setAssignees(prev => [...prev, newAssignee]);
 
-
         } catch (error) {
-            // Handle fetch errors and API errors here
-            console.error('Error fetching data:', error);
+            logger.error('Error fetching data:', error);
         }
     };
 
     const createTaskStatus = async (formData: any) => {
-        // Create task in API
+
         try {
             const response = await fetch('/api/taskstatus', {
                 method: 'POST',
@@ -1154,28 +1153,30 @@ function App() {
             });
 
             if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
+                logger.error(`HTTP error; status: ${response.status}`);
             }
 
-            // Assuming the API returns JSON data
             const data = await response.json();
 
-            setShowPopup(false)
+            if (data.error) {
+                logger.error(data.error);
+                alert(data.error)
+                return;
+            }
+
+            setShowPopup(false);
 
             const newTaskStatus = data as TaskStatus;
-            console.log("new task status", newTaskStatus)
 
             setTaskStatuses(prev => [...prev, newTaskStatus]);
 
-
         } catch (error) {
-            // Handle fetch errors and API errors here
-            console.error('Error fetching data:', error);
+            logger.error('Error fetching data:', error);
         }
     };
 
     const createRoadmap = async (formData: any) => {
-        // Create task in API
+
         try {
             const response = await fetch('/api/roadmaps', {
                 method: 'POST',
@@ -1186,23 +1187,25 @@ function App() {
             });
 
             if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
+                logger.error(`HTTP error; status: ${response.status}`);
             }
 
-            // Assuming the API returns JSON data
             const data = await response.json();
 
-            setShowPopup(false)
+            if (data.error) {
+                logger.error(data.error);
+                alert(data.error)
+                return;
+            }
+
+            setShowPopup(false);
 
             const newRoadmap = data as Roadmap;
-            console.log("new roadmap", newRoadmap)
 
             setRoadmaps(prev => [...prev, newRoadmap]);
 
-
         } catch (error) {
-            // Handle fetch errors and API errors here
-            console.error('Error fetching data:', error);
+            logger.error('Error fetching data:', error);
         }
     };
     // #endregion
@@ -1212,7 +1215,7 @@ function App() {
     };
 
     return (
-        <div className="flex w-full h-screen bg-alabaster gap-16">
+        <div className="flex w-full h-screen bg-alabaster justify-between p-2 ">
             {/* LEFT */}
             <NavBar handleNavItemClick={handleViewClick} view={view} />
 
@@ -1221,54 +1224,27 @@ function App() {
 
                 <div className=" h-[50px] shrink-0"></div>
 
-                
+                <div className='h-auto flex p-2'>
+                    <div className='flex-1 h-full flex-wrap p-2'>
+                        {view !== "Organization" && <FilterArea
+                            handleFilterByTaskStatus={handleFilterByTaskStatus} handleFilterByRoadmap={handleFilterByRoadmap} handleFilterByTag={handleFilterByTag} handleFilterByAssignee={handleFilterByAssignee}
+                            filterStates={filterStates}
+                            roadmapData={roadmaps} taskStatusData={taskStatuses} tagData={tags} unitTypeData={unitTypes} assigneeData={assignees}
+                            showAssignees={showFilterAreaAssignees}
+                        />} 
+                    </div>
 
-                    <div className='h-auto flex p-2'>
-                        <div className='flex-1 h-full flex-wrap p-2'>
-                            {view !== "Organization" && <FilterArea
-                                handleFilterByTaskStatus={handleFilterByTaskStatus} handleFilterByRoadmap={handleFilterByRoadmap} handleFilterByTag={handleFilterByTag} handleFilterByAssignee={handleFilterByAssignee}
-                                filterStates={filterStates}
-                                roadmapData={roadmaps} taskStatusData={taskStatuses} tagData={tags} unitTypeData={unitTypes} assigneeData={assignees}
-                                showAssignees={showFilterAreaAssignees}
-                            />
-                              } 
-                        </div>
-
-                        <div className='w-[100px] flex justify-end items-start'>
-                            <FilterButton text="Add" onClick={handleAddButtonClick} />
-                            {showPopup && <AddPopup setPopupVisibility={() => setShowPopup(false)} popupUnitType='' unitTypeData={unitTypes} roadmapData={roadmaps} assigneeData={assignees} tagData={tags} createItem={createItem} />}
-                        </div>
+                    <div className='w-[100px] flex justify-end items-start'>
+                        <FilterButton text="Add" onClick={handleAddButtonClick} />
+                    </div>
                 </div>
 
-                        {/*{view === 'List' &&
-                            <div className='flex flex-col bg-black overflow-y-auto max-h-full'>
-                                <button
-                                    className={`h-[600px] w-fit bg-ash-gray rounded-lg flex justify-center items-center shrink-0 p-2 focus:ring-offset-alabaster `}>dfsdf
-                                </button>
-                                <button
-                                    className={`h-[600px] w-fit bg-ash-gray rounded-lg flex justify-center items-center shrink-0 p-2 focus:ring-offset-alabaster `}>dfsdf
-                                </button>
-
-                     
-                            </div>}*/}
-
-               {/* {view === 'List' &&
-                    <div className='flex flex-col flex-1 bg-black overflow-y-auto mb-16 mt-16'>
-                        <div className='flex flex-col flex-1 overflow-y-auto'>
-                            <button
-                                className={`h-[800px] w-fit bg-lime-400 rounded-lg flex justify-center items-center shrink-0 p-2 focus:ring-offset-alabaster`}>dfsdf
-                            </button>
-                        </div>
-                    </div>}*/}
-
-                
-                        {view === 'Timeline' && <TimelineView milestoneData={milestones} updateItem={updateItem} viewData={viewData} />}
-                        {view === 'Table' && <TableView viewData={viewData} milestoneData={milestones} tagData={tags} assigneeData={assignees} />}
-                        {view === 'Kanban' && <KanbanView viewData={viewData} milestoneData={milestones } />}
-                        {view === 'List' && <ListView viewData={viewData} milestoneData={milestones} tagData={tags} assigneeData={assignees} listType={listType} />}
-                        {view === 'Organization' && <OrganizationView unitTypeData={unitTypes} tagData={tags} assigneeData={assignees} roadmapData={roadmaps} unitClick={handleUnitClick} selectedItem={selectedItem} taskStatusData={taskStatuses}  /> }
+                {view === 'Timeline' && <TimelineView milestoneData={milestones} updateItem={updateItem} viewData={viewData} />}
+                {view === 'Table' && <TableView viewData={viewData} milestoneData={milestones} tagData={tags} assigneeData={assignees} />}
+                {view === 'Kanban' && <KanbanView viewData={viewData} milestoneData={milestones } />}
+                {view === 'List' && <ListView viewData={viewData} milestoneData={milestones} tagData={tags} assigneeData={assignees} listType={listType} />}
+                {view === 'Organization' && <OrganizationView unitTypeData={unitTypes} tagData={tags} assigneeData={assignees} roadmapData={roadmaps} unitClick={handleUnitClick} selectedItem={selectedItem} taskStatusData={taskStatuses}  /> }
           
-               
             </div>
 
             {/* RIGHT */}
@@ -1285,6 +1261,7 @@ function App() {
             {/* FLOATING */}
             <div className='flex justify-center items-center'>
                 {showErrorPopup && <ErrorPopup setPopupVisibility={() => setShowErrorPopup(false)} content={errorPopupContent} />}
+                {showPopup && <AddPopup setPopupVisibility={() => setShowPopup(false)} popupUnitType='' unitTypeData={unitTypes} roadmapData={roadmaps} assigneeData={assignees} tagData={tags} createItem={createItem} />}
             </div>
 
         </div>

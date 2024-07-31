@@ -167,7 +167,7 @@ export const TableView = ({
             <SortArea unitOfSort={tableDataType} sortState={sortStates} handleSort={handleSort} />
 
             <br />
-            <div className='flex overflow-y-auto'> 
+            <div className='flex overflow-y-auto px-2'> 
                 <table className="min-w-full text-white border-collapse border border-gray-200">
                     <thead className={`${color.selected}`}>
                         <tr>

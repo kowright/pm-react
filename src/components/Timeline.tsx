@@ -15,6 +15,7 @@ export const Timeline = ({
     ...props
 }: TimelineProps) => {
     const day = 15; // Size of cell in pixels
+    const cell = day * 4; 
 
     const handleClick = (task: Task | Milestone) => {
         unitClick(task);
@@ -36,7 +37,7 @@ export const Timeline = ({
     // #region Table
     // Table Header Styles
     const tableHeaderStyle: React.CSSProperties = {
-        width: `${day * 4}px`,
+        width: `${cell}px`,
         height: `${(day / 2) * 4}px`,
         border: '0.5px solid',
         textAlign: 'center'
@@ -64,8 +65,8 @@ export const Timeline = ({
     }
 
     const tableRowStyle: React.CSSProperties = {
-        width: `${day * 4}px`,
-        height: `${day * 4}px`,
+        width: `${cell}px`,
+        height: `${cell}px`,
         border: '0.5px solid #6C8FAB',
         textAlign: 'center'
     };
@@ -105,7 +106,7 @@ export const Timeline = ({
         const containerLeft = rect.left;
         const mouseInsideContainer = mouseX - containerLeft + scrollContainer.scrollLeft;
 
-        const modulo = mouseInsideContainer % (day * 4);
+        const modulo = mouseInsideContainer % cell;
         const leftNum = mouseInsideContainer - modulo;
 
 
@@ -119,7 +120,7 @@ export const Timeline = ({
         }
         if (caretDirection === 'right') { //make sure duration can't be less zero
 
-            const modulus = (mouseX - containerLeft) % (day * 4);
+            const modulus = (mouseX - containerLeft) % cell;
             console.log("modulo " + modulus)
             const nextBlock = (mouseX - containerLeft) - modulus;
             console.log("next block " + nextBlock);
@@ -157,7 +158,7 @@ export const Timeline = ({
 
               
 
-                const daysAfterStart = (draggedDiv.offsetLeft / (day * 4));
+                const daysAfterStart = (draggedDiv.offsetLeft / cell);
                 const editedStartDate = new Date(startDate);
                 editedStartDate.setDate(startDate.getDate() + daysAfterStart);
   
@@ -198,7 +199,7 @@ export const Timeline = ({
                 props.updateItem(updatedItem as Task);
             }
             else {
-                const daysAfterStart = (draggedDiv.offsetLeft / (day * 4));
+                const daysAfterStart = (draggedDiv.offsetLeft / cell );
                 const editedStartDate = new Date(startDate);
                 editedStartDate.setDate(startDate.getDate() + daysAfterStart);
 
@@ -268,19 +269,19 @@ export const Timeline = ({
     const taskColors = colorSets['yellow'];
 
     let tasks = filteredTasks.map((task, index) => {
-        let top = `${day * (index + 1) * 4}px`;
+        let top = `${cell * (index + 1) }px`;
         let lengthRange = Math.round((endDate.getTime() - new Date(task.endDate).getTime()) / (1000 * 3600 * 24));
-        let width = lengthRange < 0 ? `${day * (task.duration + lengthRange + 1) * 4}px` : `${day * task.duration * 4}px`;
+        let width = lengthRange < 0 ? `${cell * (task.duration + lengthRange + 1) }px` : `${cell * task.duration}px`;
 
         let startOffset = Math.round((new Date(task.startDate).getTime() - startDate.getTime()) / (1000 * 3600 * 24));
-        let left = `${day * 4 * startOffset}px`;
+        let left = `${cell * startOffset}px`;
 
         const containerStyles: React.CSSProperties = {
             position: 'absolute',
             left: left,
             top: top,
             width: width,
-            height: `${day * 4}px`,
+            height: `${cell}px`,
             borderRadius: '0.5rem',
             boxShadow: '0 8px 16px rgba(0, 0, 0, 0.1)',
             zIndex: 20
@@ -330,12 +331,12 @@ export const Timeline = ({
     const milestoneColors = colorSets['red'];
 
     let milestones = filteredMilestones.map((milestone, index) => {
-        let width = `${day * 4}px`;
-        let top = `${day * 4}px`;
-        let height = `${day * 4 * filteredTasks.length}px`;
+        let width = `${cell}px`;
+        let top = `${cell}px`;
+        let height = `${cell * filteredTasks.length}px`;
 
         let dateRange = Math.round((new Date(milestone.date).getTime() - startDate.getTime()) / (1000 * 3600 * 24));
-        let left = `${day * 4 * dateRange}px`;
+        let left = `${cell * dateRange}px`;
 
         const containerStyles: React.CSSProperties = {
             position: 'absolute',

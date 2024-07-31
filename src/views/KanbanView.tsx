@@ -158,7 +158,7 @@ export const KanbanView = ({
             <SortArea unitOfSort={kanbanDataType} sortState={sortStates} handleSort={handleSort} />
 
             <br/>
-            <div className='flex gap-4 overflow-x-auto'>
+            <div className='flex gap-4 overflow-x-auto px-2 pb-4'>
                 <div className='flex gap-4'>
                     {kanbanDataType === 'Task' && statusColumns.map((column, columnIndex) => (
                         <div key={columnIndex} className="flex flex-col space-y-4">

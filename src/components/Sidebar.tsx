@@ -284,14 +284,15 @@ export const Sidebar = ({
     const nameField = (value: string) => {
         return (
         <div className='text-smoky-black'>
-            <div className='text-xs pb-1'>Name</div>
+            <div className='text-xs pb-1'>Name*</div>
             <input
                 id="name"
                 type='text'
                 value={value || ''}
                 onChange={handleInputChange}
                 onBlur={handleInputBlur}
-                className='border border-alabaster rounded-lg text-md pl-1 focus:ring-yinmn-blue focus:ring w-full' 
+                    className='border border-alabaster rounded-lg text-md pl-1 focus:ring-yinmn-blue focus:ring w-full' 
+                required
             />
             </div>
         )

@@ -99,7 +99,7 @@ export const ListView = ({
 
             <br />
 
-            <div className='flex flex-col gap-4 overflow-y-auto'>
+            <div className='flex flex-col gap-4 overflow-y-auto overflow-visible p-2'>
 
                 {listDataType === 'Task' &&
                     filteredTasks.map((item, index) => (
