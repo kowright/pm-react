@@ -13,7 +13,7 @@ export const TimelineView = ({
 }: TimelineViewProps) => {
 
     return (
-        <div className='flex flex-col flex-1 overflow-auto'>
+        <div className='flex flex-col flex-1 overflow-auto p-4'>
             <br />
             <Timeline viewData={props.viewData} milestoneData={props.milestoneData} updateItem={props.updateItem} />
         </div>
